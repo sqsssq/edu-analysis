@@ -64,17 +64,16 @@ scripts/        verification entry points
 - If a task changes product behavior, update the relevant PRD or decision log in the same change set.
 - If a user request changes scope, classify it with `docs/meta/CHANGE_REQUEST_GUIDE.md` before absorbing it into the current task.
 - Run available verification before handoff.
-- Do not commit without human approval.
-- After the user approves a change or asks to commit, commit the relevant verified change set and push it to the current remote branch unless the user explicitly says not to push.
+- After completing a verified change set, automatically commit the relevant changes and push them to the configured remote branch unless the user explicitly says not to commit or push.
 
 ## GitHub Publishing Rule
 
-- When the user explicitly asks to publish, push, or sync the project to GitHub, automatically commit the relevant verified change set and push it to the configured GitHub remote.
+- Automatic GitHub publishing is the default for completed, verified changes; an explicit user request to avoid committing or pushing overrides this rule.
 - If no GitHub remote exists, report that the repository must first be created or connected; do not invent an organization, repository name, or visibility.
 - Keep repositories private when the user explicitly requests a private project.
 - Never push secrets, raw restricted PISA data, local environment files, model artifacts containing user data, or credentials.
 - Before pushing, run the relevant verification commands and inspect the staged file list.
-- When the user has not explicitly requested publishing, do not push automatically.
+- Do not commit or push when verification fails, the scope is unclear, or the staged file list contains unexpected material.
 
 ## Before Implementation
 
