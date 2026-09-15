@@ -38,6 +38,19 @@ model.save("model.pt")
 reloaded = LearningModel.load("model.pt")
 ```
 
+For named mappings or DataFrames, `fit_table()` combines aggregate quality
+validation, column selection, optional ordinary weights, and fitting:
+
+```python
+model = LearningModel(DataConfig(target_name="outcome"))
+fit = model.fit_table(
+    table,
+    feature_names=("home_resources", "teacher_support"),
+    target_name="outcome",
+    weight_name="W_FSTUWT",
+)
+```
+
 `calculation="auto"` uses exact enumeration through `max_exact_nodes` and
 Gibbs sampling above it. Use `"exact"` or `"monte_carlo"` to force a path.
 `method="kl"` is an exact-only autodiff cross-check.

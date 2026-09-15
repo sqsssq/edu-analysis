@@ -10,6 +10,7 @@ import torch
 
 from .components import AnalyzerProtocol, PreprocessorProtocol, SamplerProtocol, TrainerProtocol
 from .config import DataConfig
+from .data import prepare_tabular_data, validate_tabular_data
 from .preprocessing import BinaryPreprocessor
 from .results import AnalysisResult, FitResult, PredictionResult
 from .sampler import GibbsSampler
@@ -389,6 +390,48 @@ class LearningModel:
             model_higher_order_moments=self._higher_order_moments(),
         )
         return self.fit_result
+
+    def fit_table(
+        self,
+        table: Any,
+        *,
+        feature_names: tuple[str, ...] | None = None,
+        target_name: str | None = None,
+        weight_name: str | None = None,
+        method: str = "moment_matching",
+    ) -> FitResult:
+        """Validate, prepare, and fit directly from a named table or mapping."""
+        selected_features = feature_names or self.config.feature_names
+        selected_target = target_name or self.config.target_name
+        selected_weight = weight_name or self.config.sample_weight_name
+        if not selected_features:
+            raise ValueError("feature_names are required when fitting a named table")
+        quality = validate_tabular_data(
+            table,
+            feature_names=selected_features,
+            target_name=selected_target,
+            weight_name=selected_weight,
+        )
+        if not quality.passed:
+            raise ValueError("input quality checks failed: " + "; ".join(quality.issues))
+        prepared = prepare_tabular_data(
+            table,
+            feature_names=selected_features,
+            target_name=selected_target,
+            weight_name=selected_weight,
+        )
+        self.config = self.config.copy_with(
+            feature_names=prepared.feature_names,
+            target_name=prepared.target_name,
+            sample_weight_name=selected_weight,
+        )
+        self.preprocessor = BinaryPreprocessor(self.config)
+        return self.fit(
+            prepared.X,
+            prepared.y,
+            sample_weight=prepared.sample_weight,
+            method=method,
+        )
 
     def _require_fitted(self) -> None:
         if not self._fitted or self.h is None or self.J is None:

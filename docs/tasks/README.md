@@ -78,3 +78,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-042-public-api-reference.md` | Review Ready | `docs/API.md`, `docs/prd/01-mvp-scope.md` | markdown-link validation, `pytest`, and `bash scripts/verify.sh --strict-instance` |
 | `task-043-legacy-artifact-compatibility.md` | Review Ready | `docs/prd/04-content-model.md`, `docs/prd/06-acceptance-criteria.md` | legacy-load regression test, `pytest`, ruff, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-044-core-infinity-validation.md` | Review Ready | `docs/prd/06-acceptance-criteria.md`, `docs/prd/04-content-model.md` | regression test, `pytest`, ruff, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
+| `task-045-fit-table-convenience-api.md` | Review Ready | `docs/API.md`, `docs/prd/01-mvp-scope.md` | `pytest`, ruff, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |

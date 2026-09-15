@@ -26,6 +26,22 @@ def test_prepare_tabular_data_extracts_named_columns_and_weights():
     np.testing.assert_array_equal(prepared.sample_weight, [1.0, 2.0, 1.0])
 
 
+def test_model_fit_table_runs_quality_check_and_preserves_weight_provenance():
+    model = LearningModel(DataConfig(target_name="outcome"), max_epochs=2)
+    result = model.fit_table(
+        {
+            "support": [1.0, 2.0, 3.0, 4.0],
+            "outcome": [0.0, 1.0, 1.0, 0.0],
+            "weight": [1.0, 2.0, 1.0, 2.0],
+        },
+        feature_names=("support",),
+        weight_name="weight",
+    )
+    assert result.diagnostics["n_samples"] == 4
+    assert model.config.sample_weight_name == "weight"
+    assert model.config.feature_names == ("support",)
+
+
 def test_prepare_tabular_data_rejects_bad_weights():
     with pytest.raises(ValueError, match="sample weights"):
         prepare_tabular_data(
