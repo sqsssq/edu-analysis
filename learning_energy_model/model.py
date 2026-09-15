@@ -37,11 +37,20 @@ class LearningModel:
         mc_thinning: int = 1,
         mc_chains: int = 4,
         calculation: str = "auto",
+        mc_max_rhat: float = 1.1,
+        mc_min_effective_sample_size: float = 100.0,
+        mc_max_mcse: float = 0.05,
         device: str | None = None,
         seed: int = 0,
     ) -> None:
         if calculation not in {"auto", "exact", "monte_carlo"}:
             raise ValueError("calculation must be 'auto', 'exact', or 'monte_carlo'")
+        if mc_max_rhat < 1.0 or not np.isfinite(mc_max_rhat):
+            raise ValueError("mc_max_rhat must be finite and at least 1")
+        if mc_min_effective_sample_size <= 0 or not np.isfinite(mc_min_effective_sample_size):
+            raise ValueError("mc_min_effective_sample_size must be finite and positive")
+        if mc_max_mcse <= 0 or not np.isfinite(mc_max_mcse):
+            raise ValueError("mc_max_mcse must be finite and positive")
         self.config = config or DataConfig()
         self.learning_rate = learning_rate
         self.max_epochs = max_epochs
@@ -53,6 +62,9 @@ class LearningModel:
         self.mc_thinning = mc_thinning
         self.mc_chains = mc_chains
         self.calculation = calculation
+        self.mc_max_rhat = mc_max_rhat
+        self.mc_min_effective_sample_size = mc_min_effective_sample_size
+        self.mc_max_mcse = mc_max_mcse
         self.device = torch.device(device or "cpu")
         self.seed = seed
         self.preprocessor = BinaryPreprocessor(self.config)
@@ -143,6 +155,30 @@ class LearningModel:
                     (value * probabilities).sum()
                 )
         return moments
+
+    def _sampling_quality(self, diagnostics: dict[str, Any]) -> tuple[bool, dict[str, Any]]:
+        """Evaluate configured Monte Carlo calibration thresholds."""
+        if diagnostics.get("calculation") == "exact":
+            return True, {"quality_passed": True, "quality_checks": {}}
+        checks = {
+            "max_rhat": float(diagnostics.get("max_rhat", float("inf")))
+            <= self.mc_max_rhat,
+            "min_effective_sample_size": float(
+                diagnostics.get("min_effective_sample_size", 0.0)
+            )
+            >= self.mc_min_effective_sample_size,
+            "max_mcse": float(diagnostics.get("max_mcse", float("inf")))
+            <= self.mc_max_mcse,
+        }
+        return all(checks.values()), {
+            "quality_passed": all(checks.values()),
+            "quality_checks": checks,
+            "quality_thresholds": {
+                "max_rhat": self.mc_max_rhat,
+                "min_effective_sample_size": self.mc_min_effective_sample_size,
+                "max_mcse": self.mc_max_mcse,
+            },
+        }
 
     @staticmethod
     def _empirical_higher_order_moments(
@@ -311,6 +347,9 @@ class LearningModel:
         warnings = []
         if not converged:
             warnings.append("moment matching did not reach the requested tolerance")
+        sampling_quality_passed, sampling_quality = self._sampling_quality(sampling_diagnostics)
+        if not sampling_quality_passed:
+            warnings.append("Monte Carlo diagnostics did not meet configured quality thresholds")
         final_model_means, final_model_pairs, _, _ = self._model_moments(
             seed_offset=self.max_epochs + 1
         )
@@ -328,6 +367,7 @@ class LearningModel:
                 "calculation": "exact" if self._states is not None else "monte_carlo",
                 "training_method": "moment_matching",
                 **sampling_diagnostics,
+                **sampling_quality,
             },
             observed_means=data_means.detach().cpu().numpy(),
             model_means=final_model_means.detach().cpu().numpy(),
@@ -480,6 +520,9 @@ class LearningModel:
                 "mc_thinning": self.mc_thinning,
                 "mc_chains": self.mc_chains,
                 "calculation": self.calculation,
+                "mc_max_rhat": self.mc_max_rhat,
+                "mc_min_effective_sample_size": self.mc_min_effective_sample_size,
+                "mc_max_mcse": self.mc_max_mcse,
                 "seed": self.seed,
             },
         }

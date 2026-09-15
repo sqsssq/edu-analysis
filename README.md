@@ -78,6 +78,11 @@ if not quality.passed:
 
 The default `calculation="auto"` uses exact enumeration up to `max_exact_nodes` and switches to multi-chain Gibbs sampling for larger models. Use `calculation="exact"` or `"monte_carlo"` to force and record a path for reproducibility. Sampling diagnostics are returned with fit and analysis results and should be reviewed for large systems.
 
+Sampled fits also report `quality_passed`, the individual R-hat/ESS/MCSE checks,
+and the configured thresholds (`mc_max_rhat`,
+`mc_min_effective_sample_size`, and `mc_max_mcse`). These are review guardrails,
+not universal scientific cutoffs.
+
 Missing values can be handled with `missing_strategy="error"`, `"median"`, `"mean"`, or `"zero"`; the latter three impute without dropping rows. PISA-specific nonresponse codes must be recoded before fitting.
 
 When passing a named mapping or DataFrame to `predict`, the fitted feature names are used, so column order and extra columns do not silently change the model input.

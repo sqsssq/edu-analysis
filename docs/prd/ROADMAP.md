@@ -32,7 +32,7 @@
 ## v0.2 - robust computation
 
 - Automatic Monte Carlo selection for larger systems. **Implemented: `calculation="auto"` selects exact enumeration or Gibbs sampling from `max_exact_nodes`, while `exact` and `monte_carlo` can be forced for reproducible runs.**
-- Multiple chains, convergence diagnostics, burn-in, effective sample size, and error estimates. **In progress: multi-chain R-hat, autocorrelation-based ESS, and ESS-derived MCSE are present with sampler-parameter validation; calibration thresholds remain.**
+- Multiple chains, convergence diagnostics, burn-in, effective sample size, and error estimates. **Implemented: multi-chain R-hat, autocorrelation-based ESS, ESS-derived MCSE, configurable quality thresholds, and fit warnings are present; scientific threshold calibration remains domain-dependent.**
 - More missing-value strategies and sample-weight handling. **Partially implemented: `error`, `median`, `mean`, and `zero` preserve rows; PISA-specific missing codes and row-dropping policy remain caller-owned.**
 - Example pretrained model artifact only if its data and redistribution rights are clear.
 

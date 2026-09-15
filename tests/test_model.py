@@ -161,6 +161,19 @@ def test_gibbs_sampler_rejects_invalid_configuration_and_parameters():
         GibbsSampler(samples=10).sample(torch.zeros(2), torch.tensor([[0.0, 1.0], [0.0, 0.0]]))
 
 
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"mc_max_rhat": 0.9},
+        {"mc_min_effective_sample_size": 0},
+        {"mc_max_mcse": 0},
+    ],
+)
+def test_model_rejects_invalid_monte_carlo_quality_thresholds(kwargs):
+    with pytest.raises(ValueError, match="mc_"):
+        LearningModel(**kwargs)
+
+
 def test_gibbs_sampler_agrees_with_exact_moments_on_known_model():
     import torch
 
@@ -203,6 +216,8 @@ def test_model_switches_to_monte_carlo_above_exact_threshold():
     )
     result = model.fit(X, y)
     assert result.diagnostics["calculation"] == "monte_carlo"
+    assert "quality_passed" in result.diagnostics
+    assert "quality_thresholds" in result.diagnostics
     analysis = model.analyze()
     assert analysis.diagnostics["chains"] == 2
     assert model.sample(10).shape == (10, 4)

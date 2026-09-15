@@ -25,7 +25,7 @@
 ## Current Gap Register
 
 - `pyproject.toml` and an initial installable package now exist; dependency locking and release metadata remain.
-- Initial model source modules, public API, and Gibbs sampler exist; sampler calibration and plugin components remain.
+- Initial model source modules, public API, and Gibbs sampler exist; plugin components remain.
 - Configured missing-value strategies include fail-fast, median, mean, and zero imputation; PISA-specific missing codes remain an explicit preparation responsibility.
 - Exact KL/autodiff training is available as a cross-check for models within the exact-enumeration threshold.
 - Analysis results expose third- and fourth-order joint moments for reproducibility checks.
@@ -40,4 +40,5 @@
 - A dependency-free sklearn-style adapter exposes `fit`, `predict`, `predict_proba`, and parameter access without changing the core model contract.
 - A pre-training tabular quality report exposes aggregate missingness, shape, infinity, and sample-weight checks without retaining raw rows.
 - Monte Carlo diagnostics expose per-node and aggregate MC standard error estimates in addition to R-hat and ESS.
+- Monte Carlo fit reports evaluate configurable R-hat, ESS, and MCSE quality thresholds and emit a warning when a sampled run fails them.
 - PyTorch dependency policy is encoded in `pyproject.toml`; lock files and CI installation verification remain.
