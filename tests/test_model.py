@@ -52,6 +52,34 @@ def test_gibbs_sampler_matches_uniform_exact_moments():
     assert diagnostics["draws"] == 1_200
 
 
+def test_gibbs_sampler_agrees_with_exact_moments_on_known_model():
+    import torch
+
+    h = torch.tensor([-0.35, 0.2, 0.45], dtype=torch.float64)
+    J = torch.tensor(
+        [[0.0, -0.3, 0.15], [-0.3, 0.0, 0.25], [0.15, 0.25, 0.0]],
+        dtype=torch.float64,
+    )
+    states = torch.tensor(
+        [[(value >> shift) & 1 for shift in (2, 1, 0)] for value in range(8)],
+        dtype=torch.float64,
+    )
+    energies = states @ h + 0.5 * ((states @ J) * states).sum(dim=1)
+    probabilities = torch.softmax(-energies, dim=0)
+    exact_means = probabilities @ states
+    exact_pairs = torch.einsum("n,ni,nj->ij", probabilities, states, states)
+
+    sampled_means, sampled_pairs, _, _ = GibbsSampler(
+        samples=1_000, burn_in=500, chains=4, seed=23
+    ).moments(h, J)
+    np.testing.assert_allclose(sampled_means.numpy(), exact_means.numpy(), atol=0.045)
+    np.testing.assert_allclose(
+        sampled_pairs.numpy()[np.triu_indices(3, 1)],
+        exact_pairs.numpy()[np.triu_indices(3, 1)],
+        atol=0.06,
+    )
+
+
 def test_model_switches_to_monte_carlo_above_exact_threshold():
     rng = np.random.default_rng(13)
     X = rng.integers(0, 2, size=(30, 3)).astype(float)

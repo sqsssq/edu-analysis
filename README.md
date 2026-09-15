@@ -4,7 +4,7 @@ This repository will turn the paper *A Neural Network Model for Learning - Appli
 
 ## Current status
 
-The initial package core is now implemented. Monte Carlo sampling, PISA preparation, and reproduction notebooks remain planned work.
+The initial package core and an automatic Gibbs-sampling path are implemented. PISA preparation, reproduction notebooks, and final numerical calibration remain planned work.
 
 ## Quick start
 
@@ -22,7 +22,7 @@ analysis = model.analyze()
 model.save("learning-model.pt")
 ```
 
-The current implementation uses exact enumeration and therefore supports up to the configured node threshold. It is intended for the paper-scale binary model while larger-scale Monte Carlo support is developed.
+The implementation uses exact enumeration up to the configured node threshold and automatically switches to multi-chain Gibbs sampling for larger models. Sampling diagnostics are returned with fit and analysis results and should be reviewed for large systems.
 
 ## Intended first release
 
@@ -41,7 +41,7 @@ Run the project harness check from the repository root:
 bash scripts/verify.sh --instance
 ```
 
-GitHub Actions runs the strict harness check on pushes and pull requests. The Python matrix is ready for package tests and builds once package metadata and source code are added.
+GitHub Actions runs the strict harness check, package tests, lint, type checks, and wheel builds on pushes and pull requests across Python 3.10–3.12.
 
 ## Documentation map
 
