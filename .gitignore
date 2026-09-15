@@ -1,0 +1,6 @@
+# Local initialization config copied from config/init-project.example.env.
+init-project.env
+
+# Local environment and scratch files.
+.env
+.DS_Store
