@@ -50,3 +50,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-014-moment-comparison.md` | Review Ready | `docs/prd/00-product-brief.md`, `docs/prd/ROADMAP.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-015-notebook-companion.md` | Review Ready | `docs/prd/PRODUCT_BRIEF.md`, `docs/prd/ROADMAP.md` | executed notebook, rendered HTML, repository verification suite |
 | `task-016-estimator-adapter.md` | Review Ready | `docs/prd/PRODUCT_BRIEF.md`, `docs/prd/ROADMAP.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
+| `task-017-pisa-benchmark-contract.md` | Review Ready | `docs/prd/ROADMAP.md`, `docs/reproduction/PISA_2018_DATA_GUIDE.md` | `bash scripts/verify.sh --strict-instance` and markdown-link validation |

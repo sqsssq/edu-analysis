@@ -11,7 +11,7 @@
 - Implement conditional target probability and structured diagnostics. **Implemented: `predict` exposes the energy-derived conditional probability and diagnostics; the formula is regression-tested.**
 - Add synthetic recovery tests. **Implemented: sampled and deterministic exact-distribution parameter recovery are covered; broader calibration remains.**
 - Add exact-vs-Monte-Carlo agreement tests on small systems. **Implemented: known-model moment agreement and computation-path switching are covered; deterministic exact-distribution recovery is also tested.**
-- Add PISA reproduction benchmark contracts and preparation instructions.
+- Add PISA reproduction benchmark contracts and preparation instructions. **Implemented: the aggregate-only contract is documented in `docs/reproduction/PISA_BENCHMARK_CONTRACT.md`; local data and aligned mappings remain required.**
 - Add PISA source and local-data instructions. **Implemented: official source, access boundary, and preparation checklist are documented.**
 - Add an optional local PISA reader and explicit mapping adapter. **Implemented: `PISAMapping` and `prepare_pisa_file` are available; survey inference remains out of scope.**
 - Add a runnable synthetic end-to-end example. **Implemented: `examples/fit_synthetic.py` and `examples/synthetic_workflow.ipynb` cover preparation, fit, analysis, comparison, and save/load without restricted data.**
