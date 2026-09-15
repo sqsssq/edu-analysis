@@ -78,6 +78,8 @@ if not quality.passed:
 
 The implementation uses exact enumeration up to the configured node threshold and automatically switches to multi-chain Gibbs sampling for larger models. Sampling diagnostics are returned with fit and analysis results and should be reviewed for large systems.
 
+When passing a named mapping or DataFrame to `predict`, the fitted feature names are used, so column order and extra columns do not silently change the model input.
+
 ## Intended first release
 
 - PyTorch implementation of a pairwise maximum-entropy energy model.

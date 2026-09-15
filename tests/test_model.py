@@ -61,6 +61,25 @@ def test_predict_matches_the_model_conditional_energy():
     assert result.diagnostics["conditional_on"] == ["a", "b"]
 
 
+def test_predict_selects_named_columns_from_reordered_mapping():
+    X = np.array([[0.0, 1.0], [1.0, 0.0], [1.0, 1.0], [0.0, 0.0]])
+    y = np.array([1.0, 1.0, 1.0, 0.0])
+    model = LearningModel(
+        DataConfig(feature_names=("first", "second")),
+        max_epochs=30,
+        min_epochs=5,
+        tolerance=0.1,
+        seed=8,
+    )
+    model.fit(X, y)
+    named = {"extra": [99.0] * 4, "second": X[:, 1], "first": X[:, 0]}
+    np.testing.assert_allclose(
+        model.predict(named).probabilities, model.predict(X).probabilities
+    )
+    with pytest.raises(ValueError, match="missing fitted feature"):
+        model.predict({"first": X[:, 0]})
+
+
 def test_sklearn_style_classifier_exposes_binary_probabilities_and_params():
     X = np.array([[0.0], [1.0], [0.0], [1.0]])
     y = np.array([0.0, 1.0, 0.0, 1.0])

@@ -1,5 +1,6 @@
 """Dependency-light binary preprocessing for arrays and tabular adapters."""
 
+from collections.abc import Mapping
 from typing import Any
 
 import numpy as np
@@ -16,6 +17,21 @@ def _as_array(data: Any) -> np.ndarray:
     if array.ndim != 2:
         raise ValueError("data must be a two-dimensional array or table")
     return array
+
+
+def _select_named_features(data: Any, names: tuple[str, ...]) -> Any:
+    """Select fitted feature columns when a named table is supplied."""
+    if isinstance(data, Mapping):
+        missing = set(names) - set(data)
+        if missing:
+            raise ValueError(f"X is missing fitted feature columns: {sorted(missing)}")
+        return np.column_stack([data[name] for name in names])
+    if hasattr(data, "columns") and hasattr(data, "loc"):
+        missing = set(names) - set(data.columns)
+        if missing:
+            raise ValueError(f"X is missing fitted feature columns: {sorted(missing)}")
+        return data.loc[:, list(names)]
+    return data
 
 
 class BinaryPreprocessor:
@@ -90,7 +106,7 @@ class BinaryPreprocessor:
     def transform_features(self, X: Any) -> np.ndarray:
         if not self._fitted:
             raise RuntimeError("preprocessor must be fitted before transform")
-        features = _as_array(X)
+        features = _as_array(_select_named_features(X, self.feature_names))
         if features.shape[1] != len(self.feature_names):
             raise ValueError("X has a different number of columns from the fitted data")
         features = self._fill_missing(features, self.feature_medians)
