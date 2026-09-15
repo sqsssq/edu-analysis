@@ -20,13 +20,23 @@ def _json_safe(value: Any) -> Any:
 
 
 class ResultExportMixin:
-    """Provide stable JSON-compatible export without requiring pandas."""
+    """Provide stable aggregate exports without making pandas a core dependency."""
 
     def to_dict(self) -> dict[str, Any]:
         return _json_safe(asdict(cast(Any, self)))
 
     def to_json(self, *, indent: int | None = 2) -> str:
         return json.dumps(self.to_dict(), ensure_ascii=False, indent=indent, sort_keys=True)
+
+    def to_dataframe(self) -> Any:
+        """Return a one-row pandas DataFrame when the optional dependency is installed."""
+        try:
+            import pandas as pd  # type: ignore[import-untyped]
+        except ImportError as exc:
+            raise ImportError(
+                "to_dataframe requires pandas; install with `pip install pandas`"
+            ) from exc
+        return pd.json_normalize(self.to_dict())
 
 
 @dataclass

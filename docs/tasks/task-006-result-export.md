@@ -20,7 +20,7 @@ Researchers can archive parameters, diagnostics, assumptions, and limitations as
 
 ## Scope
 
-- `to_dict()` and `to_json()` on all public result objects.
+- `to_dict()` and `to_json()` on all public result objects, plus optional `to_dataframe()`.
 - Recursive conversion of NumPy arrays and scalars.
 - Round-trip test and API documentation.
 
@@ -42,7 +42,7 @@ Adds a feedback sensor for stable, JSON-compatible result serialization.
 
 - Every public result object produces a JSON-compatible dictionary and valid JSON.
 - Export includes structured diagnostics and analysis guardrails.
-- Core dependencies remain unchanged.
+- Core dependencies remain unchanged; pandas is optional.
 - Standard package verification passes.
 
 ## Verification Method

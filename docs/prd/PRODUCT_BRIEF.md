@@ -22,7 +22,7 @@ The package is an exploratory research tool. It models a joint distribution over
 - Moment matching as the primary, interpretable trainer.
 - KL-divergence/autodiff training as a secondary implementation and validation path.
 - Optional sample weights.
-- Structured result objects and dependency-light JSON/dict export (with optional DataFrame conversion by callers).
+- Structured result objects and dependency-light JSON/dict export, with optional DataFrame conversion.
 - Model serialization including parameters, preprocessing, metadata, random state, sampler state, logs, and version information.
 - Synthetic recovery tests and PISA reproduction benchmarks.
 

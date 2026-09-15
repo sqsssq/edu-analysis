@@ -1,6 +1,7 @@
 import json
 
 import numpy as np
+import pytest
 
 from learning_energy_model import DataConfig, LearningModel
 from learning_energy_model.sampler import GibbsSampler
@@ -31,6 +32,17 @@ def test_fit_predict_and_analyze_on_binary_data():
     exported = json.loads(analysis.to_json())
     assert len(exported["h"]) == 3
     assert exported["assumptions"]
+
+
+def test_analysis_can_export_one_row_dataframe_when_pandas_is_available():
+    pytest.importorskip("pandas")
+    X = np.array([[0.0], [1.0], [0.0], [1.0]])
+    y = np.array([0.0, 1.0, 1.0, 0.0])
+    model = LearningModel(DataConfig(feature_names=("feature",)), max_epochs=2)
+    model.fit(X, y)
+    frame = model.analyze().to_dataframe()
+    assert frame.shape[0] == 1
+    assert "assumptions" in frame.columns
 
 
 def test_save_and_load_preserves_predictions(tmp_path):

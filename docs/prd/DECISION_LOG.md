@@ -14,7 +14,7 @@
 | Scale | Exact enumeration for small models; automatic Monte Carlo for larger models |
 | Training | Primarily interpretable moment matching; KL/autodiff as a second path |
 | Sampling | Multiple chains, convergence checks, burn-in, effective sample diagnostics |
-| Results | Structured result objects with dependency-light dict/JSON export; callers may convert to DataFrame |
+| Results | Structured result objects with dependency-light dict/JSON export and optional `to_dataframe()` |
 | Interventions | Node-freezing/model-internal interventions, explicitly not causal effects |
 | Missingness | Package-level strategies plus optional sample weights; no promise of full PISA survey inference |
 | Testing | Synthetic recovery, exact-vs-Monte-Carlo comparison, and PISA first- through fourth-order reproduction benchmarks |

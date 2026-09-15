@@ -22,7 +22,7 @@ Describe the structured data contracts and result objects needed for the MVP.
 - `PredictionResult`: target probability, optional energy score, uncertainty interval, and preprocessing metadata.
 - `AnalysisResult`: correlations, higher-order moments, node-freezing results, energy/entropy diagnostics, assumptions, and limitations.
 - `model.sample(n_samples)`: draws binary states from the fitted joint distribution, using exact probabilities or Gibbs sampling according to model size.
-- `FitResult`, `PredictionResult`, and `AnalysisResult` expose `to_dict()` and `to_json()` for dependency-light aggregate export; pandas is not required.
+- `FitResult`, `PredictionResult`, and `AnalysisResult` expose `to_dict()` and `to_json()` for dependency-light aggregate export, plus optional `to_dataframe()` when pandas is installed.
 
 ## Serialization Contract
 
