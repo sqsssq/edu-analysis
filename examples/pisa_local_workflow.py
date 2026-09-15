@@ -27,23 +27,40 @@ def _parse_missing_values(value: str) -> tuple[float, ...]:
 
 
 def run(args: argparse.Namespace) -> None:
-    features = _parse_names(args.features)
-    mapping = PISAMapping(
-        feature_names=features,
-        target_name=args.target,
-        weight_name=args.weight,
-        missing_values=_parse_missing_values(args.missing_values),
-    )
+    if args.mapping:
+        mapping = PISAMapping.load(args.mapping)
+    else:
+        if not args.features or not args.target:
+            raise ValueError("--features and --target are required when --mapping is not used")
+        mapping = PISAMapping(
+            feature_names=_parse_names(args.features),
+            target_name=args.target,
+            weight_name=args.weight,
+            missing_values=_parse_missing_values(args.missing_values),
+            metadata={
+                "cycle": args.cycle or "",
+                "scope": args.scope or "",
+                "codebook": args.codebook or "",
+            },
+        )
+    features = mapping.feature_names
+    target = mapping.target_name
+    weight = mapping.weight_name
+    cycle = args.cycle or str(mapping.metadata.get("cycle", ""))
+    scope = args.scope or str(mapping.metadata.get("scope", ""))
+    codebook = args.codebook or str(mapping.metadata.get("codebook", ""))
+    if not cycle or not scope or not codebook:
+        raise ValueError("cycle, scope, and codebook must be supplied or present in the mapping metadata")
     prepared = prepare_pisa_file(args.input, mapping)
     mapped_table = {name: prepared.X[:, index] for index, name in enumerate(features)}
-    mapped_table[args.target] = prepared.y
-    if prepared.sample_weight is not None and args.weight is not None:
-        mapped_table[args.weight] = prepared.sample_weight
+    mapped_table[target] = prepared.y
+    if prepared.sample_weight is not None and weight is not None:
+        mapped_table[weight] = prepared.sample_weight
     quality = validate_tabular_data(
         mapped_table,
         feature_names=features,
-        target_name=args.target,
-        weight_name=args.weight,
+        target_name=target,
+        weight_name=weight,
     )
     if not quality.passed:
         raise ValueError("mapped input quality checks failed: " + "; ".join(quality.issues))
@@ -51,19 +68,24 @@ def run(args: argparse.Namespace) -> None:
         DataConfig(
             feature_names=prepared.feature_names,
             target_name=prepared.target_name,
-            sample_weight_name=args.weight,
+            sample_weight_name=weight,
             missing_strategy=args.missing_strategy,
             metadata={
                 "interface": "pisa-local-workflow",
                 "input": str(args.input),
-                "assessment_cycle": args.cycle,
-                "scope": args.scope,
-                "codebook_reference": args.codebook,
+                "mapping": str(args.mapping) if args.mapping else None,
+                "assessment_cycle": cycle,
+                "scope": scope,
+                "codebook_reference": codebook,
             },
         ),
         max_epochs=args.max_epochs,
         min_epochs=args.min_epochs,
         max_exact_nodes=args.max_exact_nodes,
+        calculation=args.calculation,
+        mc_max_rhat=args.mc_max_rhat,
+        mc_min_effective_sample_size=args.mc_min_effective_sample_size,
+        mc_max_mcse=args.mc_max_mcse,
         seed=args.seed,
     )
     fit = model.fit(prepared.X, prepared.y, sample_weight=prepared.sample_weight)
@@ -82,19 +104,24 @@ def run(args: argparse.Namespace) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Fit the model on a local mapped PISA file.")
     parser.add_argument("--input", required=True, help="local CSV/SAS/SPSS file or single-data-file ZIP")
-    parser.add_argument("--features", required=True, help="comma-separated codebook variable names")
-    parser.add_argument("--target", required=True, help="codebook target variable name")
+    parser.add_argument("--mapping", help="reviewed PISAMapping JSON contract")
+    parser.add_argument("--features", help="comma-separated codebook variable names")
+    parser.add_argument("--target", help="codebook target variable name")
     parser.add_argument("--weight", help="ordinary row-weight variable name")
     parser.add_argument("--missing-values", default="", help="comma-separated codebook missing codes")
-    parser.add_argument("--cycle", required=True, help="assessment cycle, e.g. PISA 2018 or PISA 2022")
-    parser.add_argument("--scope", required=True, help="country/economy or multi-country scope")
-    parser.add_argument("--codebook", required=True, help="local codebook reference or version")
+    parser.add_argument("--cycle", help="assessment cycle, e.g. PISA 2018 or PISA 2022")
+    parser.add_argument("--scope", help="country/economy or multi-country scope")
+    parser.add_argument("--codebook", help="local codebook reference or version")
     parser.add_argument("--output-model", required=True, help="local model artifact path")
     parser.add_argument("--output-report", required=True, help="aggregate JSON report path")
-    parser.add_argument("--missing-strategy", choices=("error", "median"), default="median")
+    parser.add_argument("--missing-strategy", choices=("error", "median", "mean", "zero"), default="median")
     parser.add_argument("--max-epochs", type=int, default=2_000)
     parser.add_argument("--min-epochs", type=int, default=25)
     parser.add_argument("--max-exact-nodes", type=int, default=20)
+    parser.add_argument("--calculation", choices=("auto", "exact", "monte_carlo"), default="auto")
+    parser.add_argument("--mc-max-rhat", type=float, default=1.1)
+    parser.add_argument("--mc-min-effective-sample-size", type=float, default=100.0)
+    parser.add_argument("--mc-max-mcse", type=float, default=0.05)
     parser.add_argument("--seed", type=int, default=0)
     return parser
 

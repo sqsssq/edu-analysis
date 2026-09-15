@@ -66,6 +66,20 @@ fit = model.fit(prepared.X, prepared.y, sample_weight=prepared.sample_weight)
 model.save("data/prepared/pisa2022-model.pt")
 ```
 
+The same contract can be passed to the local workflow without repeating the
+column names:
+
+```bash
+python examples/pisa_local_workflow.py \
+  --input data/raw/pisa2022-student.zip \
+  --mapping data/mapping/pisa2022-reviewed.json \
+  --output-model data/prepared/pisa2022-model.pt \
+  --output-report data/prepared/pisa2022-report.json
+```
+
+Cycle, scope, and codebook are read from mapping metadata unless explicitly
+overridden on the command line.
+
 The saved model and benchmark report must state that `sample_weight` is ordinary
 row weighting. PISA replicate weights, plausible-value aggregation, and
 complex-survey variance estimation are not implemented by this package, so the

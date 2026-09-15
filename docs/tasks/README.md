@@ -68,3 +68,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-032-component-protocols.md` | Review Ready | `docs/prd/ROADMAP.md`, `docs/prd/04-content-model.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-033-pisa-2022-data-guide.md` | Review Ready | `docs/reproduction/PISA_2022_DATA_GUIDE.md`, `docs/prd/ROADMAP.md` | markdown-link validation and `bash scripts/verify.sh --strict-instance` |
 | `task-034-release-metadata-alignment.md` | Review Ready | `docs/prd/DECISION_LOG.md`, `docs/prd/06-acceptance-criteria.md` | license consistency check, `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
+| `task-035-pisa-workflow-mapping-cli.md` | Review Ready | `docs/reproduction/PISA_2022_DATA_GUIDE.md`, `docs/prd/ROADMAP.md` | synthetic local workflow smoke test, `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
