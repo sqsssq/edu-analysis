@@ -81,3 +81,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-045-fit-table-convenience-api.md` | Review Ready | `docs/API.md`, `docs/prd/01-mvp-scope.md` | `pytest`, ruff, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-046-fit-table-quality-report.md` | Review Ready | `docs/API.md`, `docs/prd/04-content-model.md` | `pytest`, ruff, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-047-chinese-user-guide.md` | Review Ready | `README.zh-CN.md`, `docs/API.md` | `pytest`, ruff, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
+| `task-048-estimator-fit-table.md` | Review Ready | `docs/API.md`, `docs/prd/ROADMAP.md` | `pytest`, ruff, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |

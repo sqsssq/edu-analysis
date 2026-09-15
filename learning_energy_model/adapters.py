@@ -50,6 +50,24 @@ class LearningEnergyClassifier:
         self.fit_result_ = self.model_.fit(X, y, sample_weight=sample_weight)
         return self
 
+    def fit_table(
+        self,
+        table: Any,
+        *,
+        feature_names: tuple[str, ...] | None = None,
+        target_name: str | None = None,
+        weight_name: str | None = None,
+    ) -> "LearningEnergyClassifier":
+        """Fit from a named mapping or DataFrame through the core table API."""
+        self.model_ = LearningModel(self.config, **self.model_kwargs)
+        self.fit_result_ = self.model_.fit_table(
+            table,
+            feature_names=feature_names,
+            target_name=target_name,
+            weight_name=weight_name,
+        )
+        return self
+
     def predict_proba(self, X: Any) -> np.ndarray:
         """Return two-column probabilities ordered as ``classes_``."""
         prediction = self._predict_result(X)

@@ -133,6 +133,18 @@ def test_sklearn_style_classifier_exposes_binary_probabilities_and_params():
     assert estimator.analyze().assumptions
 
 
+def test_sklearn_style_classifier_fit_table_preserves_quality_report():
+    estimator = LearningEnergyClassifier(config=DataConfig(target_name="outcome"), max_epochs=2)
+    estimator.fit_table(
+        {"support": [1.0, 2.0, 3.0, 4.0], "outcome": [0.0, 1.0, 1.0, 0.0]},
+        feature_names=("support",),
+    )
+    assert estimator.fit_result_ is not None
+    assert estimator.model_ is not None
+    assert estimator.model_.last_quality_report is not None
+    assert estimator.predict_proba({"support": [1.0, 4.0]}).shape == (2, 2)
+
+
 def test_analysis_can_export_one_row_dataframe_when_pandas_is_available():
     pytest.importorskip("pandas")
     X = np.array([[0.0], [1.0], [0.0], [1.0]])

@@ -74,6 +74,8 @@ node-freezing comparisons. A node-freezing comparison is not a causal effect.
 
 `LearningEnergyClassifier` provides `fit`, `predict`, `predict_proba`,
 `get_params`, `set_params`, and `analyze` for estimator-oriented callers.
+It also provides `fit_table()` for named mappings or DataFrames and exposes the
+wrapped model's `last_quality_report` through `estimator.model_`.
 `MultiDomainManager` keeps independent `LearningModel` instances per domain:
 
 ```python
