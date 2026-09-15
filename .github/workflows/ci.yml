@@ -38,7 +38,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - name: Check Python project when present
-          shell: bash
+        shell: bash
         run: |
           python --version
           if [[ -f pyproject.toml || -f setup.py || -f setup.cfg ]]; then
