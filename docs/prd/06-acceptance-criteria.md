@@ -24,7 +24,7 @@
 
 ## Current Gap Register
 
-- `pyproject.toml` and an initial installable package now exist; dependency locking and final release metadata remain.
+- `pyproject.toml` and an initial installable package now exist; dependency locking and final release publication remain.
 - Initial model source modules, public API, Gibbs sampler, and injectable lifecycle components exist.
 - Configured missing-value strategies include fail-fast, median, mean, and zero imputation; PISA-specific missing codes remain an explicit preparation responsibility.
 - Exact KL/autodiff training is available as a cross-check for models within the exact-enumeration threshold.
