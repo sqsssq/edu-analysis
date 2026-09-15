@@ -16,6 +16,15 @@ python -m pip install -e ".[dev]"
 python -m pip install -e ".[pisa]"
 ```
 
+如果需要严格复现项目开发环境，可以安装 [uv](https://docs.astral.sh/uv/)
+并运行：
+
+```bash
+uv sync --locked --extra dev
+```
+
+这会使用仓库中的 `uv.lock`，而不是重新解析依赖版本。
+
 ## 用自己的数据训练
 
 模型接受 `X`（行是样本、列是特征）和 `y`（每行一个目标值）。特征会按配置转换为二元节点；`h` 和对称的 `J` 参数可以直接检查和解释。

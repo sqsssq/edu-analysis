@@ -1,5 +1,6 @@
 # Local initialization config copied from config/init-project.example.env.
 init-project.env
+.venv/
 
 # Local environment and scratch files.
 .env

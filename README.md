@@ -8,6 +8,11 @@ The initial package core, automatic Gibbs-sampling path, and runnable synthetic 
 
 ## Quick start
 
+For a reproducible development environment, install [uv](https://docs.astral.sh/uv/)
+and run `uv sync --locked --extra dev`. The lock file covers the supported
+Python matrix and the optional PISA extra; ordinary users can continue to use
+the pip commands from the package metadata.
+
 ```python
 from learning_energy_model import DataConfig, LearningModel
 
