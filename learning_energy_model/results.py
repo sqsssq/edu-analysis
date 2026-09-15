@@ -69,3 +69,4 @@ class AnalysisResult(ResultExportMixin):
     assumptions: list[str]
     limitations: list[str]
     diagnostics: dict[str, Any] = field(default_factory=dict)
+    higher_order_moments: dict[str, float] = field(default_factory=dict)

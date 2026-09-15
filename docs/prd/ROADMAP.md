@@ -16,6 +16,7 @@
 - Add an optional local PISA reader and explicit mapping adapter. **Implemented: `PISAMapping` and `prepare_pisa_file` are available; survey inference remains out of scope.**
 - Add a runnable synthetic end-to-end example. **Implemented: `examples/fit_synthetic.py` covers fit, analyze, and save without restricted data.**
 - Add aggregate result export. **Implemented: result objects expose JSON-compatible `to_dict()` and `to_json()`.**
+- Add third- and fourth-order joint moment outputs for reproduction checks. **Implemented: `AnalysisResult.higher_order_moments` is available on exact and sampled paths.**
 - Add a dependency-light named-column preparation helper. **Implemented: `PreparedData` and `prepare_tabular_data` are available.**
 
 ## v0.2 - robust computation

@@ -27,11 +27,13 @@ def test_fit_predict_and_analyze_on_binary_data():
     assert analysis.h.shape == (3,)
     assert analysis.J.shape == (3, 3)
     assert set(analysis.interventions) == {"home", "support"}
+    assert "0×1×2" in analysis.higher_order_moments
     samples = model.sample(25)
     assert samples.shape == (25, 3)
     exported = json.loads(analysis.to_json())
     assert len(exported["h"]) == 3
     assert exported["assumptions"]
+    assert "higher_order_moments" in exported
 
 
 def test_analysis_can_export_one_row_dataframe_when_pandas_is_available():

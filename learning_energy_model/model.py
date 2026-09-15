@@ -1,6 +1,7 @@
 """Pairwise binary maximum-entropy energy model."""
 
 from dataclasses import asdict
+from itertools import combinations
 from pathlib import Path
 from typing import Any
 
@@ -108,6 +109,30 @@ class LearningModel:
             self.h, self.J, seed_offset=seed_offset
         )
         return means, pairwise, energies, diagnostics
+
+    def _higher_order_moments(self, *, max_order: int = 4) -> dict[str, float]:
+        """Return model joint moments for orders three through ``max_order``."""
+        self._require_fitted()
+        assert self.h is not None and self.J is not None
+        if self._states is not None:
+            states = self._states
+            probabilities = torch.softmax(-self._energies(states), dim=0)
+        else:
+            states = self.sampler.sample(self.h, self.J, seed_offset=991).samples
+            probabilities = torch.full(
+                (states.shape[0],),
+                1.0 / states.shape[0],
+                dtype=torch.float64,
+                device=states.device,
+            )
+        moments: dict[str, float] = {}
+        for order in range(3, min(max_order, states.shape[1]) + 1):
+            for indices in combinations(range(states.shape[1]), order):
+                value = states[:, indices].prod(dim=1)
+                moments["×".join(str(index) for index in indices)] = float(
+                    (value * probabilities).sum()
+                )
+        return moments
 
     def _fit_kl(self, data: torch.Tensor, weights: torch.Tensor) -> FitResult:
         """Fit the exact negative log-likelihood with PyTorch autodiff."""
@@ -348,6 +373,7 @@ class LearningModel:
                 "Monte Carlo results require convergence diagnostics to be reviewed.",
             ],
             diagnostics=sampling_diagnostics,
+            higher_order_moments=self._higher_order_moments(),
         )
 
     def save(self, path: Any) -> None:

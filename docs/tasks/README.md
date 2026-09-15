@@ -41,3 +41,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-005-synthetic-example.md` | Review Ready | `docs/prd/PRODUCT_BRIEF.md`, `docs/prd/ROADMAP.md` | synthetic smoke test, `pytest`, `ruff`, mypy, and `bash scripts/verify.sh --strict-instance` |
 | `task-006-result-export.md` | Review Ready | `docs/prd/PRODUCT_BRIEF.md`, `docs/prd/04-content-model.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-007-kl-training.md` | Review Ready | `docs/prd/PRODUCT_BRIEF.md`, `docs/prd/ROADMAP.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
+| `task-008-higher-order-moments.md` | Review Ready | `docs/prd/00-product-brief.md`, `docs/prd/04-content-model.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
