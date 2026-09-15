@@ -11,6 +11,7 @@
 - Add synthetic recovery tests. **In progress: initial API tests are present; parameter-recovery coverage remains.**
 - Add exact-vs-Monte-Carlo agreement tests on small systems.
 - Add PISA reproduction benchmark contracts and preparation instructions.
+- Add PISA source and local-data instructions. **Implemented: official source, access boundary, and preparation checklist are documented.**
 - Add a dependency-light named-column preparation helper. **Implemented: `PreparedData` and `prepare_tabular_data` are available.**
 
 ## v0.2 - robust computation

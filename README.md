@@ -49,5 +49,6 @@ GitHub Actions runs the strict harness check, package tests, lint, type checks, 
 - `docs/prd/DECISION_LOG.md` - decisions made during requirements grilling.
 - `docs/prd/ROADMAP.md` - staged implementation plan.
 - `docs/domain/PROJECT_RULES.md` - scientific and safety guardrails.
+- `docs/reproduction/PISA_2018_DATA_GUIDE.md` - official PISA source, local-only data workflow, and reproduction boundary.
 - `docs/harness/README.md` - HarnessWeaver workflow and verification contract.
 - `docs/meta/WORKFLOW.md` - contribution and task workflow.

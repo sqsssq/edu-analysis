@@ -28,5 +28,5 @@
 - Initial model source modules, public API, and Gibbs sampler exist; sampler calibration and plugin components remain.
 - The public model can draw joint binary states with exact or Gibbs sampling according to model size.
 - Initial `tests/` coverage exists; exact parameter recovery and full numerical acceptance thresholds remain.
-- No synthetic fixtures, PISA preparation scripts, or reproduction notebooks exist yet.
+- A PISA local-data guide and generic tabular preparation helper exist; PISA-specific mappings, synthetic reproduction fixtures, and notebooks remain.
 - PyTorch dependency policy is encoded in `pyproject.toml`; lock files and CI installation verification remain.

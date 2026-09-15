@@ -5,6 +5,10 @@ init-project.env
 .env
 .DS_Store
 
+# Restricted or user-provided research data.
+data/raw/
+data/prepared/
+
 # Python build and test artifacts.
 build/
 dist/
