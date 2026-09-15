@@ -3,7 +3,7 @@ import json
 import numpy as np
 import pytest
 
-from learning_energy_model import DataConfig, LearningModel
+from learning_energy_model import DataConfig, LearningModel, __version__
 from learning_energy_model.sampler import GibbsSampler
 
 
@@ -53,7 +53,9 @@ def test_analysis_can_export_one_row_dataframe_when_pandas_is_available():
 def test_save_and_load_preserves_predictions(tmp_path):
     X = np.array([[0.0], [1.0], [0.2], [0.8], [0.9], [0.1]])
     y = np.array([0.0, 1.0, 0.0, 1.0, 1.0, 0.0])
-    config = DataConfig(feature_names=("feature",), target_name="target")
+    config = DataConfig(
+        feature_names=("feature",), target_name="target", metadata={"source": "synthetic"}
+    )
     model = LearningModel(config, max_epochs=100, tolerance=0.1, min_epochs=5)
     model.fit(X, y)
     path = tmp_path / "model.pt"
@@ -62,6 +64,8 @@ def test_save_and_load_preserves_predictions(tmp_path):
     np.testing.assert_allclose(model.predict(X).probabilities, loaded.predict(X).probabilities)
     assert loaded.fit_result is not None
     np.testing.assert_allclose(loaded.fit_result.observed_means, model.fit_result.observed_means)
+    assert loaded.config.metadata == {"source": "synthetic"}
+    assert loaded.artifact_metadata["package_version"] == __version__
 
 
 def test_gibbs_sampler_matches_uniform_exact_moments():

@@ -12,6 +12,7 @@ from .config import DataConfig
 from .preprocessing import BinaryPreprocessor
 from .results import AnalysisResult, FitResult, PredictionResult
 from .sampler import GibbsSampler
+from .version import __version__
 
 
 class LearningModel:
@@ -56,6 +57,11 @@ class LearningModel:
         self._states: torch.Tensor | None = None
         self._fitted = False
         self.fit_result: FitResult | None = None
+        self.artifact_metadata = {
+            "format_version": 1,
+            "package": "interpretable-learning-energy-model",
+            "package_version": __version__,
+        }
         self.sampler = GibbsSampler(
             samples=mc_samples,
             burn_in=mc_burn_in,
@@ -392,6 +398,7 @@ class LearningModel:
         self._require_fitted()
         assert self.h is not None and self.J is not None
         payload = {
+            "artifact": self.artifact_metadata,
             "config": asdict(self.config),
             "preprocessor": {
                 "feature_names": self.preprocessor.feature_names,
@@ -403,6 +410,10 @@ class LearningModel:
             "h": self.h.detach().cpu(),
             "J": self.J.detach().cpu(),
             "fit_result": asdict(self.fit_result) if self.fit_result else None,
+            "random_state": {
+                "torch": torch.get_rng_state(),
+                "numpy": np.random.get_state(),
+            },
             "settings": {
                 "learning_rate": self.learning_rate,
                 "max_epochs": self.max_epochs,
@@ -423,6 +434,14 @@ class LearningModel:
         payload = torch.load(Path(path), map_location=map_location, weights_only=False)
         config = DataConfig(**payload["config"])
         model = cls(config, **payload["settings"], device=map_location)
+        model.artifact_metadata = payload.get(
+            "artifact",
+            {
+                "format_version": 1,
+                "package": "interpretable-learning-energy-model",
+                "package_version": __version__,
+            },
+        )
         model.preprocessor = BinaryPreprocessor(config)
         state = payload["preprocessor"]
         model.preprocessor.feature_names = tuple(state["feature_names"])

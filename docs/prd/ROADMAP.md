@@ -18,6 +18,7 @@
 - Add aggregate result export. **Implemented: result objects expose JSON-compatible `to_dict()` and `to_json()`.**
 - Add third- and fourth-order joint moment outputs for reproduction checks. **Implemented: `AnalysisResult.higher_order_moments` is available on exact and sampled paths.**
 - Include observed/model moments in fit results. **Implemented: `FitResult` now carries first- and second-order moment arrays.**
+- Add versioned artifact metadata and caller-supplied configuration metadata. **Implemented: saved artifacts include format/package metadata, random state, and `DataConfig.metadata`.**
 - Add a dependency-light named-column preparation helper. **Implemented: `PreparedData` and `prepare_tabular_data` are available.**
 
 ## v0.2 - robust computation

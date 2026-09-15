@@ -1,6 +1,6 @@
 """Configuration and preprocessing contracts."""
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 
@@ -20,6 +20,7 @@ class DataConfig:
     threshold_method: str = "median"
     quantile: float = 0.5
     missing_strategy: str = "error"
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.threshold_method not in {"median", "quantile"}:

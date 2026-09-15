@@ -14,6 +14,7 @@ Describe the structured data contracts and result objects needed for the MVP.
 - optional sample-weight field;
 - variable metadata and semantic descriptions;
 - preprocessing version and review status.
+- free-form variable/source metadata supplied by the caller.
 
 ## Model and Results
 
@@ -26,7 +27,7 @@ Describe the structured data contracts and result objects needed for the MVP.
 
 ## Serialization Contract
 
-Saved artifacts include parameters, variable names, preprocessing rules, package/model version, random seed, sampler state, training logs, and evaluation results. Raw user data is excluded by default.
+Saved artifacts include parameters, variable names, preprocessing rules, caller metadata, package/model and artifact format versions, random state, sampler settings, training logs, and evaluation results. Raw user data is excluded by default.
 
 ## Review or Quality Status
 
