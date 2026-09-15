@@ -1,9 +1,10 @@
 site_name: Interpretable Learning Energy Framework
 site_description: Interpretable pairwise maximum-entropy energy models for structured data
-site_url: https://sqsssq.github.io/edu-analysis/
+site_url: https://sqsssq.github.io/edu-analysis/docs/
 repo_url: https://github.com/sqsssq/edu-analysis
 repo_name: sqsssq/edu-analysis
 docs_dir: docs
+site_dir: site/docs
 exclude_docs: |
   domain/
   harness/
