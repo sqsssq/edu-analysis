@@ -20,6 +20,9 @@ def test_fit_predict_and_analyze_on_binary_data():
     )
     result = model.fit(X, y)
     assert result.epochs <= 400
+    assert result.observed_means is not None
+    assert result.model_pairwise_moments is not None
+    assert result.observed_means.shape == (3,)
     prediction = model.predict(X[:8])
     assert prediction.probabilities.shape == (8,)
     assert np.all((prediction.probabilities >= 0) & (prediction.probabilities <= 1))
@@ -57,6 +60,8 @@ def test_save_and_load_preserves_predictions(tmp_path):
     model.save(path)
     loaded = LearningModel.load(path)
     np.testing.assert_allclose(model.predict(X).probabilities, loaded.predict(X).probabilities)
+    assert loaded.fit_result is not None
+    np.testing.assert_allclose(loaded.fit_result.observed_means, model.fit_result.observed_means)
 
 
 def test_gibbs_sampler_matches_uniform_exact_moments():

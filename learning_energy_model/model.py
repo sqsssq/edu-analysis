@@ -171,6 +171,7 @@ class LearningModel:
         warnings = []
         if not converged:
             warnings.append("KL/autodiff training did not reach the requested tolerance")
+        model_means, model_pairs, _, _ = self._model_moments()
         self.h = self.h.detach()
         self.J = self.J.detach()
         self._fitted = True
@@ -187,6 +188,10 @@ class LearningModel:
                 "calculation": "exact",
                 "training_method": "kl",
             },
+            observed_means=data_means.detach().cpu().numpy(),
+            model_means=model_means.detach().cpu().numpy(),
+            observed_pairwise_moments=data_pairs.detach().cpu().numpy(),
+            model_pairwise_moments=model_pairs.detach().cpu().numpy(),
         )
         return self.fit_result
 
@@ -258,6 +263,9 @@ class LearningModel:
         warnings = []
         if not converged:
             warnings.append("moment matching did not reach the requested tolerance")
+        final_model_means, final_model_pairs, _, _ = self._model_moments(
+            seed_offset=self.max_epochs + 1
+        )
         self._fitted = True
         self.fit_result = FitResult(
             converged=converged,
@@ -273,6 +281,10 @@ class LearningModel:
                 "training_method": "moment_matching",
                 **sampling_diagnostics,
             },
+            observed_means=data_means.detach().cpu().numpy(),
+            model_means=final_model_means.detach().cpu().numpy(),
+            observed_pairwise_moments=data_pairs.detach().cpu().numpy(),
+            model_pairwise_moments=final_model_pairs.detach().cpu().numpy(),
         )
         return self.fit_result
 

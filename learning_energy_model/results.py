@@ -48,6 +48,10 @@ class FitResult(ResultExportMixin):
     correlation_error: float
     warnings: list[str] = field(default_factory=list)
     diagnostics: dict[str, Any] = field(default_factory=dict)
+    observed_means: np.ndarray | None = None
+    model_means: np.ndarray | None = None
+    observed_pairwise_moments: np.ndarray | None = None
+    model_pairwise_moments: np.ndarray | None = None
 
 
 @dataclass

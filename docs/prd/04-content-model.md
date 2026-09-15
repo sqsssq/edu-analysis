@@ -18,7 +18,7 @@ Describe the structured data contracts and result objects needed for the MVP.
 ## Model and Results
 
 - `LearningModel`: model configuration, `h`, `J`, target node, backend, and serialization metadata.
-- `FitResult`: convergence status, objective history, observed/model moments, sampler diagnostics, and warnings.
+- `FitResult`: convergence status, objective history, observed/model first- and second-order moments, sampler diagnostics, and warnings.
 - `PredictionResult`: target probability, optional energy score, uncertainty interval, and preprocessing metadata.
 - `AnalysisResult`: first- and second-order moments, third- and fourth-order joint moments, node-freezing results, energy/entropy diagnostics, assumptions, and limitations.
 - `model.sample(n_samples)`: draws binary states from the fitted joint distribution, using exact probabilities or Gibbs sampling according to model size.
