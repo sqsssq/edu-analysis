@@ -68,6 +68,7 @@ class AnalysisResult(ResultExportMixin):
     J: np.ndarray
     means: np.ndarray
     pairwise_moments: np.ndarray
+    correlations: np.ndarray
     energy_statistics: dict[str, float]
     interventions: dict[str, dict[str, float]]
     assumptions: list[str]

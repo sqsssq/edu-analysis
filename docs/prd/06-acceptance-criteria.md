@@ -28,6 +28,7 @@
 - Initial model source modules, public API, and Gibbs sampler exist; sampler calibration and plugin components remain.
 - Exact KL/autodiff training is available as a cross-check for models within the exact-enumeration threshold.
 - Analysis results expose third- and fourth-order joint moments for reproducibility checks.
+- Analysis results expose a stable binary-node correlation matrix.
 - Fit results expose observed and model first- and second-order moments.
 - Sampling diagnostics include per-node R-hat and autocorrelation-based effective sample size estimates.
 - Saved artifacts expose format/package version, caller metadata, random state, and training logs without raw observations.

@@ -13,7 +13,7 @@ Describe the structured data contracts and result objects needed for the MVP.
 - missing-value strategy;
 - optional sample-weight field;
 - variable metadata and semantic descriptions;
-- preprocessing version and review status.
+- preprocessing version and review status;
 - free-form variable/source metadata supplied by the caller.
 
 ## Model and Results
@@ -21,7 +21,7 @@ Describe the structured data contracts and result objects needed for the MVP.
 - `LearningModel`: model configuration, `h`, `J`, target node, backend, and serialization metadata.
 - `FitResult`: convergence status, objective history, observed/model first- and second-order moments, sampler diagnostics, and warnings.
 - `PredictionResult`: target probability, optional energy score, uncertainty interval, and preprocessing metadata.
-- `AnalysisResult`: first- and second-order moments, third- and fourth-order joint moments, node-freezing results, energy/entropy diagnostics, assumptions, and limitations.
+- `AnalysisResult`: first- and second-order moments, Pearson correlations, third- and fourth-order joint moments, node-freezing results, energy/entropy diagnostics, assumptions, and limitations.
 - `model.sample(n_samples)`: draws binary states from the fitted joint distribution, using exact probabilities or Gibbs sampling according to model size.
 - `FitResult`, `PredictionResult`, and `AnalysisResult` expose `to_dict()` and `to_json()` for dependency-light aggregate export, plus optional `to_dataframe()` when pandas is installed.
 

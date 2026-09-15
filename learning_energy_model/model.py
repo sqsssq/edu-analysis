@@ -367,11 +367,22 @@ class LearningModel:
             }
         h = self.h.detach().cpu().numpy().copy()
         J = self.J.detach().cpu().numpy().copy()
+        means_array = means.detach().cpu().numpy()
+        pairs_array = pairs.detach().cpu().numpy()
+        variances = means_array * (1.0 - means_array)
+        denominator = np.sqrt(np.outer(variances, variances))
+        correlations = np.divide(
+            pairs_array - np.outer(means_array, means_array),
+            denominator,
+            out=np.zeros_like(pairs_array),
+            where=denominator > 1e-12,
+        )
         return AnalysisResult(
             h=h,
             J=J,
-            means=means.detach().cpu().numpy(),
-            pairwise_moments=pairs.detach().cpu().numpy(),
+            means=means_array,
+            pairwise_moments=pairs_array,
+            correlations=correlations,
             energy_statistics={
                 "mean": float(energies.mean()),
                 "std": float(energies.std()),

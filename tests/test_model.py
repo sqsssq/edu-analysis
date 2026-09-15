@@ -29,6 +29,8 @@ def test_fit_predict_and_analyze_on_binary_data():
     analysis = model.analyze()
     assert analysis.h.shape == (3,)
     assert analysis.J.shape == (3, 3)
+    assert analysis.correlations.shape == (3, 3)
+    np.testing.assert_allclose(np.diag(analysis.correlations), 1.0)
     assert set(analysis.interventions) == {"home", "support"}
     assert "0×1×2" in analysis.higher_order_moments
     samples = model.sample(25)
