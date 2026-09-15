@@ -59,3 +59,8 @@ jobs:
           else
             echo "No Python package metadata yet; Stage 0 harness checks remain authoritative."
           fi
+      - name: Check optional PISA dependencies
+        if: matrix.python-version == '3.12'
+        run: |
+          python -m pip install -e ".[pisa]"
+          python -c "import pandas, pyreadstat; print('PISA optional dependencies import successfully')"

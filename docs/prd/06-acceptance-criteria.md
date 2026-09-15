@@ -41,4 +41,4 @@
 - A pre-training tabular quality report exposes aggregate missingness, shape, infinity, and sample-weight checks without retaining raw rows.
 - Monte Carlo diagnostics expose per-node and aggregate MC standard error estimates in addition to R-hat and ESS.
 - Monte Carlo fit reports evaluate configurable R-hat, ESS, and MCSE quality thresholds and emit a warning when a sampled run fails them.
-- PyTorch dependency policy is encoded in `pyproject.toml`; lock files remain, while CI now strictly installs and verifies the declared development dependencies.
+- PyTorch dependency policy is encoded in `pyproject.toml`; lock files remain, while CI now strictly installs development dependencies and smoke-tests the optional PISA extra.
