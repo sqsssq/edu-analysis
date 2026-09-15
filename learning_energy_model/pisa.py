@@ -4,9 +4,12 @@ This module never downloads or packages PISA data. File readers are optional so
 the core package remains usable without pandas/pyreadstat.
 """
 
+import shutil
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from zipfile import ZipFile
 
 import numpy as np
 
@@ -57,10 +60,11 @@ def _replace_missing_codes(table: Any, missing_values: tuple[float, ...]) -> Any
 
 
 def read_pisa_file(path: str | Path) -> Any:
-    """Read a local PISA CSV, SAS, or SPSS file using optional dependencies.
+    """Read a local PISA CSV, SAS, SPSS, or single-data-file ZIP.
 
     The returned table stays in memory only. No source file is copied or
-    included in model serialization.
+    included in model serialization. ZIP members are extracted to a temporary
+    file and are never unpacked into the project directory.
     """
     try:
         import pandas as pd  # type: ignore[import-untyped]
@@ -71,6 +75,25 @@ def read_pisa_file(path: str | Path) -> Any:
         ) from exc
     source = Path(path)
     suffix = source.suffix.lower()
+    if suffix == ".zip":
+        supported = {".csv", ".sav", ".zsav", ".sas7bdat", ".xpt", ".xpt7", ".tsv", ".txt"}
+        with ZipFile(source) as archive:
+            candidates = [
+                name
+                for name in archive.namelist()
+                if not name.endswith("/") and Path(name).suffix.lower() in supported
+            ]
+            if len(candidates) != 1:
+                raise ValueError(
+                    "ZIP must contain exactly one supported data file; "
+                    f"found {len(candidates)}"
+                )
+            member = candidates[0]
+            with tempfile.NamedTemporaryFile(suffix=Path(member).suffix) as temporary:
+                with archive.open(member) as source_file:
+                    shutil.copyfileobj(source_file, temporary)
+                temporary.flush()
+                return read_pisa_file(temporary.name)
     if suffix == ".csv":
         return pd.read_csv(source)
     if suffix in {".tsv", ".txt"}:
@@ -79,7 +102,7 @@ def read_pisa_file(path: str | Path) -> Any:
         return pd.read_spss(source)
     if suffix in {".sas7bdat", ".xpt", ".xpt7"}:
         return pd.read_sas(source)
-    raise ValueError("unsupported file type; use CSV, TSV, SAS, or SPSS")
+    raise ValueError("unsupported file type; use CSV, TSV, SAS, SPSS, or ZIP")
 
 
 def prepare_pisa_file(path: str | Path, mapping: PISAMapping) -> PreparedData:

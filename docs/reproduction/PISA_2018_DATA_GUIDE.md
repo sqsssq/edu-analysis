@@ -27,7 +27,7 @@ data/
   README.local.md      # optional local notes, no raw values
 ```
 
-The repository should contain only scripts, field mappings, synthetic fixtures, and documentation. A local workflow can load an OECD file with an appropriate SAS/SPSS reader, select the documented columns, and pass a table-like object to `prepare_tabular_data`.
+The repository should contain only scripts, field mappings, synthetic fixtures, and documentation. A local workflow can load an OECD CSV/SAS/SPSS file—or a ZIP containing exactly one such data file—select the documented columns, and pass a table-like object to `prepare_tabular_data`.
 
 ## Preparation checklist
 
@@ -50,7 +50,7 @@ mapping = PISAMapping(
     weight_name="W_FSTUWT",
     missing_values=(-9999.0, -999.0),  # confirm against the matching codebook
 )
-prepared = prepare_pisa_file("data/raw/pisa2018.sav", mapping)
+prepared = prepare_pisa_file("data/raw/pisa2018.zip", mapping)
 model = LearningModel(DataConfig(feature_names=prepared.feature_names, target_name=prepared.target_name, missing_strategy="median"))
 result = model.fit(prepared.X, prepared.y, sample_weight=prepared.sample_weight)
 model.save("data/prepared/local-model.pt")

@@ -14,6 +14,7 @@
 - Add PISA reproduction benchmark contracts and preparation instructions. **Implemented: the aggregate-only contract is documented in `docs/reproduction/PISA_BENCHMARK_CONTRACT.md`; local data and aligned mappings remain required.**
 - Add PISA source and local-data instructions. **Implemented: official source, access boundary, and preparation checklist are documented.**
 - Add an optional local PISA reader and explicit mapping adapter. **Implemented: `PISAMapping` and `prepare_pisa_file` are available; survey inference remains out of scope.**
+- Support OECD compressed local files without project-directory extraction. **Implemented: `read_pisa_file` accepts ZIPs containing exactly one supported data file and extracts only to a temporary file.**
 - Add a runnable synthetic end-to-end example. **Implemented: `examples/fit_synthetic.py` and `examples/synthetic_workflow.ipynb` cover preparation, fit, analysis, comparison, and save/load without restricted data.**
 - Add aggregate result export. **Implemented: result objects expose JSON-compatible `to_dict()` and `to_json()`.**
 - Add third- and fourth-order joint moment outputs for reproduction checks. **Implemented: `AnalysisResult.higher_order_moments` is available on exact and sampled paths.**
