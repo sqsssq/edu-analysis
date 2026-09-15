@@ -40,8 +40,8 @@ class DataConfig:
             raise ValueError("threshold_method must be 'median' or 'quantile'")
         if not 0 < self.quantile < 1:
             raise ValueError("quantile must be between 0 and 1")
-        if self.missing_strategy not in {"error", "median"}:
-            raise ValueError("missing_strategy must be 'error' or 'median'")
+        if self.missing_strategy not in {"error", "median", "mean", "zero"}:
+            raise ValueError("missing_strategy must be 'error', 'median', 'mean', or 'zero'")
         if len(set(self.feature_names)) != len(self.feature_names):
             raise ValueError("feature_names must be unique")
         if self.thresholds is not None and not all(

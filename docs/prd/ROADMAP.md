@@ -33,7 +33,7 @@
 
 - Automatic Monte Carlo selection for larger systems. **In progress: Gibbs sampling is present.**
 - Multiple chains, convergence diagnostics, burn-in, effective sample size, and error estimates. **In progress: multi-chain R-hat, autocorrelation-based ESS, and ESS-derived MCSE are present with sampler-parameter validation; calibration thresholds remain.**
-- More missing-value strategies and sample-weight handling.
+- More missing-value strategies and sample-weight handling. **Partially implemented: `error`, `median`, `mean`, and `zero` preserve rows; PISA-specific missing codes and row-dropping policy remain caller-owned.**
 - Example pretrained model artifact only if its data and redistribution rights are clear.
 
 ## v0.3 - extensibility

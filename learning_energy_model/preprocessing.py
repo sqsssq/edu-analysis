@@ -55,15 +55,29 @@ class BinaryPreprocessor:
         if not np.isnan(array).any():
             return array
         if self.config.missing_strategy == "error":
-            raise ValueError("missing values found; choose missing_strategy='median' to impute")
+            raise ValueError(
+                "missing values found; choose missing_strategy='median', 'mean', or 'zero' to impute"
+            )
         if medians is None:
-            medians = np.nanmedian(array, axis=0)
+            if self.config.missing_strategy == "mean":
+                medians = np.nanmean(array, axis=0)
+            elif self.config.missing_strategy == "zero":
+                medians = np.zeros(array.shape[1], dtype=float)
+            else:
+                medians = np.nanmedian(array, axis=0)
         if np.isnan(medians).any():
             raise ValueError("a column contains only missing values")
         result = array.copy()
         rows, cols = np.where(np.isnan(result))
         result[rows, cols] = medians[cols]
         return result
+
+    def _imputation_values(self, array: np.ndarray) -> np.ndarray:
+        if self.config.missing_strategy == "mean":
+            return np.nanmean(array, axis=0)
+        if self.config.missing_strategy == "zero":
+            return np.zeros(array.shape[1], dtype=float)
+        return np.nanmedian(array, axis=0)
 
     @staticmethod
     def _binarize(values: np.ndarray, threshold: float) -> np.ndarray:
@@ -79,7 +93,9 @@ class BinaryPreprocessor:
         if len(features) != len(target_values):
             raise ValueError("X and y must have the same number of rows")
         self.feature_names = self._names_for_features(features.shape[1])
-        self.feature_medians = np.nanmedian(features, axis=0)
+        self.feature_medians = self._imputation_values(features)
+        target_fill = self._imputation_values(target_values.reshape(-1, 1))
+        self.target_median = float(target_fill[0])
         self.target_median = float(np.nanmedian(target_values))
         features = self._fill_missing(features, self.feature_medians)
         target_values = self._fill_missing(
