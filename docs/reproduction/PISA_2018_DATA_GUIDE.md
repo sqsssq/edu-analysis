@@ -56,6 +56,11 @@ result = model.fit(prepared.X, prepared.y, sample_weight=prepared.sample_weight)
 model.save("data/prepared/local-model.pt")
 ```
 
+For a complete local workflow that also writes an aggregate JSON report, use
+`python examples/pisa_local_workflow.py --input ... --features ... --target ...`.
+The variable names and missing codes must come from the matching codebook; the
+script does not infer them.
+
 ## Current project limitation
 
 The package currently supports ordinary row weights as `sample_weight`; it does not yet implement PISA’s full complex-survey variance estimation, replicate-weight procedure, plausible-value aggregation, or country-specific field mapping. Until those components are added, results should be described as model estimates on the prepared sample, not official PISA estimates.

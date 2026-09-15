@@ -56,3 +56,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-020-multi-domain-manager.md` | Review Ready | `docs/prd/PRODUCT_BRIEF.md`, `docs/prd/ROADMAP.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-021-cli-workflow.md` | Review Ready | `docs/prd/ROADMAP.md`, `docs/prd/PRODUCT_BRIEF.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-022-named-inference-columns.md` | Review Ready | `docs/prd/04-content-model.md`, `docs/prd/ROADMAP.md` | `pytest`, `ruff`, mypy, and `bash scripts/verify.sh --strict-instance` |
+| `task-023-pisa-local-workflow.md` | Review Ready | `docs/reproduction/PISA_2018_DATA_GUIDE.md`, `docs/prd/ROADMAP.md` | `ruff`, mypy, and `bash scripts/verify.sh --strict-instance` |
