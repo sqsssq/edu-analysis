@@ -221,8 +221,15 @@ class LearningModel:
             weights = torch.ones(n_samples, dtype=torch.float64, device=self.device)
         else:
             weights = torch.as_tensor(np.asarray(sample_weight, dtype=float).reshape(-1), dtype=torch.float64, device=self.device)
-            if len(weights) != n_samples or torch.any(weights < 0) or float(weights.sum()) <= 0:
-                raise ValueError("sample_weight must be non-negative and match the number of rows")
+            if (
+                len(weights) != n_samples
+                or not torch.all(torch.isfinite(weights))
+                or torch.any(weights < 0)
+                or float(weights.sum()) <= 0
+            ):
+                raise ValueError(
+                    "sample_weight must be finite, non-negative, and match the number of rows"
+                )
 
         self.h = torch.zeros(
             n_features, dtype=torch.float64, device=self.device, requires_grad=method == "kl"

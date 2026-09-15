@@ -79,7 +79,7 @@ def prepare_tabular_data(
         weights = _as_vector(_column(table, weight_name), name=weight_name)
         if weights.shape[0] != target.shape[0]:
             raise ValueError("sample-weight column must have the same number of rows")
-        if np.isnan(weights).any() or (weights < 0).any() or float(weights.sum()) <= 0:
+        if not np.isfinite(weights).all() or (weights < 0).any() or float(weights.sum()) <= 0:
             raise ValueError("sample weights must be finite, non-negative, and not all zero")
     return PreparedData(
         X=features,

@@ -29,3 +29,13 @@ def test_prepare_tabular_data_rejects_bad_weights():
             target_name="y",
             weight_name="weight",
         )
+
+
+def test_prepare_tabular_data_rejects_nonfinite_weights():
+    with pytest.raises(ValueError, match="finite"):
+        prepare_tabular_data(
+            {"x": [1, 2], "y": [0, 1], "weight": [1, np.inf]},
+            feature_names=("x",),
+            target_name="y",
+            weight_name="weight",
+        )

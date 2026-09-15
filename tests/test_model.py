@@ -201,3 +201,11 @@ def test_kl_autodiff_path_rejects_large_models():
     model = LearningModel(DataConfig(feature_names=("a", "b", "c")), max_exact_nodes=2)
     with pytest.raises(ValueError, match="requires exact enumeration"):
         model.fit(X, y, method="kl")
+
+
+def test_weighted_training_rejects_nonfinite_weights():
+    X = np.array([[0.0], [1.0], [0.0], [1.0]])
+    y = np.array([0.0, 1.0, 1.0, 0.0])
+    model = LearningModel(DataConfig(feature_names=("feature",)), max_epochs=1)
+    with pytest.raises(ValueError, match="finite"):
+        model.fit(X, y, sample_weight=np.array([1.0, np.inf, 1.0, 1.0]))
