@@ -37,7 +37,7 @@
 
 - Pluggable trainer, sampler, analyzer, and preprocessor components.
 - sklearn adapter. **Implemented: dependency-free `LearningEnergyClassifier` provides the common estimator methods while preserving the structured analysis API.**
-- Multi-domain manager for independent target models.
+- Multi-domain manager for independent target models. **Implemented: `MultiDomainManager` provides independent fit/predict/analyze/save/load operations per domain.**
 - Better CLI and reporting exports.
 
 ## v1.0 - stable release

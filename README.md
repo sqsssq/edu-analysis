@@ -36,6 +36,17 @@ probabilities = estimator.predict_proba(X_new)
 report = estimator.analyze()
 ```
 
+For independent targets or domains, use `MultiDomainManager`; each domain keeps its own preprocessing rules and parameters:
+
+```python
+from learning_energy_model import MultiDomainManager
+
+manager = MultiDomainManager(model_kwargs={"seed": 7})
+manager.fit("math", X, y_math)
+manager.fit("reading", X, y_reading)
+math_report = manager.analyze("math")
+```
+
 For a runnable end-to-end example using generated data, run `python -m examples.fit_synthetic`.
 
 For an inspectable notebook version of the same workflow, open `examples/synthetic_workflow.ipynb`. It uses generated data only and does not require a PISA download.
