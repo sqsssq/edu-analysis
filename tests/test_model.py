@@ -208,6 +208,39 @@ def test_model_switches_to_monte_carlo_above_exact_threshold():
     assert model.sample(10).shape == (10, 4)
 
 
+def test_calculation_path_can_be_forced_and_is_preserved_on_load(tmp_path):
+    X = np.array([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]] * 4)
+    y = np.array([0.0, 1.0, 1.0, 1.0] * 4)
+    exact = LearningModel(
+        DataConfig(feature_names=("a", "b")), calculation="exact", max_epochs=2
+    )
+    exact.fit(X, y)
+    assert exact.fit_result is not None
+    assert exact.fit_result.diagnostics["calculation"] == "exact"
+
+    with pytest.raises(ValueError, match="calculation='exact'"):
+        LearningModel(
+            DataConfig(feature_names=("a", "b")),
+            calculation="exact",
+            max_exact_nodes=2,
+        ).fit(X, y)
+
+    sampled = LearningModel(
+        DataConfig(feature_names=("a", "b")),
+        calculation="monte_carlo",
+        mc_samples=20,
+        mc_burn_in=5,
+        mc_chains=2,
+        max_epochs=2,
+    )
+    sampled.fit(X, y)
+    assert sampled.fit_result is not None
+    assert sampled.fit_result.diagnostics["calculation"] == "monte_carlo"
+    path = tmp_path / "sampled.pt"
+    sampled.save(path)
+    assert LearningModel.load(path).calculation == "monte_carlo"
+
+
 def test_binary_inputs_are_not_collapsed_by_median_threshold():
     X = np.array([[0.0], [1.0], [0.0], [1.0]])
     y = np.array([0.0, 1.0, 1.0, 0.0])

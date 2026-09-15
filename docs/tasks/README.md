@@ -62,3 +62,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-026-monte-carlo-error-estimates.md` | Review Ready | `docs/tasks/task-010-sampler-diagnostics.md`, `docs/prd/ROADMAP.md` | `pytest`, `ruff`, mypy, and `bash scripts/verify.sh --strict-instance` |
 | `task-027-fit-higher-order-moments.md` | Review Ready | `docs/prd/04-content-model.md`, `docs/reproduction/PISA_BENCHMARK_CONTRACT.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-028-missing-value-strategies.md` | Review Ready | `docs/prd/ROADMAP.md`, `docs/prd/06-acceptance-criteria.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
+| `task-029-calculation-path-control.md` | Review Ready | `docs/prd/ROADMAP.md`, `docs/prd/09-decision-log.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |

@@ -67,6 +67,7 @@ def _fit(args: argparse.Namespace) -> int:
         max_epochs=args.max_epochs,
         min_epochs=args.min_epochs,
         max_exact_nodes=args.max_exact_nodes,
+        calculation=args.calculation,
         seed=args.seed,
     )
     result = model.fit(
@@ -130,6 +131,7 @@ def build_parser() -> argparse.ArgumentParser:
     fit.add_argument("--max-epochs", type=int, default=2_000)
     fit.add_argument("--min-epochs", type=int, default=25)
     fit.add_argument("--max-exact-nodes", type=int, default=20)
+    fit.add_argument("--calculation", choices=("auto", "exact", "monte_carlo"), default="auto")
     fit.add_argument("--seed", type=int, default=0)
     fit.set_defaults(handler=_fit)
     predict = commands.add_parser("predict", help="predict from a saved model and numeric CSV")

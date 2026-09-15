@@ -36,9 +36,12 @@ class LearningModel:
         mc_burn_in: int = 500,
         mc_thinning: int = 1,
         mc_chains: int = 4,
+        calculation: str = "auto",
         device: str | None = None,
         seed: int = 0,
     ) -> None:
+        if calculation not in {"auto", "exact", "monte_carlo"}:
+            raise ValueError("calculation must be 'auto', 'exact', or 'monte_carlo'")
         self.config = config or DataConfig()
         self.learning_rate = learning_rate
         self.max_epochs = max_epochs
@@ -49,6 +52,7 @@ class LearningModel:
         self.mc_burn_in = mc_burn_in
         self.mc_thinning = mc_thinning
         self.mc_chains = mc_chains
+        self.calculation = calculation
         self.device = torch.device(device or "cpu")
         self.seed = seed
         self.preprocessor = BinaryPreprocessor(self.config)
@@ -259,9 +263,21 @@ class LearningModel:
             device=self.device,
             requires_grad=method == "kl",
         )
-        self._states = (
-            self._enumerate_states(n_features) if n_features <= self.max_exact_nodes else None
-        )
+        if self.calculation == "exact":
+            if n_features > self.max_exact_nodes:
+                raise ValueError(
+                    "calculation='exact' requires n_nodes <= max_exact_nodes; "
+                    "use calculation='monte_carlo' or 'auto' for larger models"
+                )
+            self._states = self._enumerate_states(n_features)
+        elif self.calculation == "monte_carlo":
+            self._states = None
+        else:
+            self._states = (
+                self._enumerate_states(n_features)
+                if n_features <= self.max_exact_nodes
+                else None
+            )
         if method == "kl":
             return self._fit_kl(data, weights)
         data_means = self._weighted_mean(data, weights)
@@ -463,6 +479,7 @@ class LearningModel:
                 "mc_burn_in": self.mc_burn_in,
                 "mc_thinning": self.mc_thinning,
                 "mc_chains": self.mc_chains,
+                "calculation": self.calculation,
                 "seed": self.seed,
             },
         }
@@ -472,7 +489,9 @@ class LearningModel:
     def load(cls, path: Any, *, map_location: str = "cpu") -> "LearningModel":
         payload = torch.load(Path(path), map_location=map_location, weights_only=False)
         config = DataConfig(**payload["config"])
-        model = cls(config, **payload["settings"], device=map_location)
+        settings = dict(payload["settings"])
+        settings.setdefault("calculation", "auto")
+        model = cls(config, **settings, device=map_location)
         model.artifact_metadata = payload.get(
             "artifact",
             {
@@ -491,11 +510,16 @@ class LearningModel:
         model.preprocessor._fitted = True
         model.h = payload["h"].to(model.device)
         model.J = payload["J"].to(model.device)
-        model._states = (
-            model._enumerate_states(model.h.numel())
-            if model.h.numel() <= model.max_exact_nodes
-            else None
-        )
+        if model.calculation == "exact":
+            model._states = model._enumerate_states(model.h.numel())
+        elif model.calculation == "monte_carlo":
+            model._states = None
+        else:
+            model._states = (
+                model._enumerate_states(model.h.numel())
+                if model.h.numel() <= model.max_exact_nodes
+                else None
+            )
         model._fitted = True
         if payload["fit_result"] is not None:
             model.fit_result = FitResult(**payload["fit_result"])

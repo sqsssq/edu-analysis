@@ -18,7 +18,7 @@ config = DataConfig(
     feature_names=("home_resources", "teacher_support"),
     target_name="outcome",
 )
-model = LearningModel(config)
+model = LearningModel(config, calculation="auto")
 fit_result = model.fit(X, y)
 prediction = model.predict(X_new)
 analysis = model.analyze()
@@ -76,7 +76,7 @@ if not quality.passed:
     raise ValueError(quality.issues)
 ```
 
-The implementation uses exact enumeration up to the configured node threshold and automatically switches to multi-chain Gibbs sampling for larger models. Sampling diagnostics are returned with fit and analysis results and should be reviewed for large systems.
+The default `calculation="auto"` uses exact enumeration up to `max_exact_nodes` and switches to multi-chain Gibbs sampling for larger models. Use `calculation="exact"` or `"monte_carlo"` to force and record a path for reproducibility. Sampling diagnostics are returned with fit and analysis results and should be reviewed for large systems.
 
 Missing values can be handled with `missing_strategy="error"`, `"median"`, `"mean"`, or `"zero"`; the latter three impute without dropping rows. PISA-specific nonresponse codes must be recoded before fitting.
 
