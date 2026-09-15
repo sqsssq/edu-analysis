@@ -8,7 +8,7 @@
 - Implement exact state enumeration for 19 nodes. **In progress: exact enumeration is present.**
 - Implement weighted empirical moments and moment-matching trainer. **In progress: initial trainer is present.**
 - Implement conditional target probability and structured diagnostics. **In progress: initial API is present.**
-- Add synthetic recovery tests. **In progress: initial API tests are present; parameter-recovery coverage remains.**
+- Add synthetic recovery tests. **Implemented: small-model parameter recovery is covered; broader calibration remains.**
 - Add exact-vs-Monte-Carlo agreement tests on small systems.
 - Add PISA reproduction benchmark contracts and preparation instructions.
 - Add PISA source and local-data instructions. **Implemented: official source, access boundary, and preparation checklist are documented.**

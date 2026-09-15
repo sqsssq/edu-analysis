@@ -97,3 +97,51 @@ def test_model_switches_to_monte_carlo_above_exact_threshold():
     analysis = model.analyze()
     assert analysis.diagnostics["chains"] == 2
     assert model.sample(10).shape == (10, 4)
+
+
+def test_binary_inputs_are_not_collapsed_by_median_threshold():
+    X = np.array([[0.0], [1.0], [0.0], [1.0]])
+    y = np.array([0.0, 1.0, 1.0, 0.0])
+    model = LearningModel(DataConfig(feature_names=("binary",), target_name="target"), max_epochs=1)
+    binary_X, binary_y = model.preprocessor.fit(X, y).transform(X, y)
+    np.testing.assert_array_equal(binary_X[:, 0], X[:, 0])
+    np.testing.assert_array_equal(binary_y, y)
+
+
+def test_moment_matching_recovers_a_small_known_model():
+    import torch
+
+    true_h = torch.tensor([-0.35, 0.2, 0.45], dtype=torch.float64)
+    true_J = torch.tensor(
+        [[0.0, -0.3, 0.15], [-0.3, 0.0, 0.25], [0.15, 0.25, 0.0]],
+        dtype=torch.float64,
+    )
+    states = torch.tensor(
+        [[(value >> shift) & 1 for shift in (2, 1, 0)] for value in range(8)],
+        dtype=torch.float64,
+    )
+    energies = states @ true_h + 0.5 * ((states @ true_J) * states).sum(dim=1)
+    probabilities = torch.softmax(-energies, dim=0)
+    indices = torch.multinomial(
+        probabilities,
+        12_000,
+        replacement=True,
+        generator=torch.Generator().manual_seed(31),
+    )
+    observations = states[indices].numpy()
+    model = LearningModel(
+        DataConfig(feature_names=("a", "b"), target_name="outcome"),
+        learning_rate=0.08,
+        max_epochs=500,
+        tolerance=0.025,
+        min_epochs=25,
+        seed=5,
+    )
+    result = model.fit(observations[:, :2], observations[:, 2])
+    assert result.converged
+    np.testing.assert_allclose(model.h.numpy(), true_h.numpy(), atol=0.4)
+    np.testing.assert_allclose(
+        model.J.numpy()[np.triu_indices(3, 1)],
+        true_J.numpy()[np.triu_indices(3, 1)],
+        atol=0.4,
+    )

@@ -139,8 +139,10 @@ class LearningModel:
             model_means, model_pairs, energies, sampling_diagnostics = self._model_moments(
                 seed_offset=epoch
             )
-            mean_delta = data_means - model_means
-            pair_delta = data_pairs - model_pairs
+            # For p(s) ∝ exp(-E), the log-likelihood gradient is
+            # model_moment - empirical_moment for both h and J.
+            mean_delta = model_means - data_means
+            pair_delta = model_pairs - data_pairs
             pair_delta.fill_diagonal_(0.0)
             mean_error = float(torch.max(torch.abs(mean_delta)))
             correlation_error = float(torch.max(torch.abs(pair_delta)))

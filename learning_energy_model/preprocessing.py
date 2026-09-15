@@ -49,6 +49,14 @@ class BinaryPreprocessor:
         result[rows, cols] = medians[cols]
         return result
 
+    @staticmethod
+    def _binarize(values: np.ndarray, threshold: float) -> np.ndarray:
+        """Preserve native 0/1 columns instead of thresholding at a zero median."""
+        observed = values[~np.isnan(values)]
+        if observed.size and np.isin(observed, (0.0, 1.0)).all():
+            return values.astype(np.float64, copy=True)
+        return (values >= threshold).astype(np.float64)
+
     def fit(self, X: Any, y: Any) -> "BinaryPreprocessor":
         features = _as_array(X)
         target_values = _as_array(y).reshape(-1)
@@ -87,7 +95,9 @@ class BinaryPreprocessor:
             raise ValueError("X has a different number of columns from the fitted data")
         features = self._fill_missing(features, self.feature_medians)
         threshold_array = np.array([self.thresholds[name] for name in self.feature_names])
-        return (features >= threshold_array).astype(np.float64)
+        return np.column_stack(
+            [self._binarize(features[:, i], threshold_array[i]) for i in range(features.shape[1])]
+        )
 
     def transform_target(self, y: Any) -> np.ndarray:
         if not self._fitted or self.target_threshold is None:
@@ -96,7 +106,7 @@ class BinaryPreprocessor:
         target_values = self._fill_missing(
             target_matrix, np.array([self.target_median])
         ).reshape(-1)
-        return (target_values >= self.target_threshold).astype(np.float64)
+        return self._binarize(target_values, self.target_threshold)
 
     def transform(self, X: Any, y: Any) -> tuple[np.ndarray, np.ndarray]:
         return self.transform_features(X), self.transform_target(y)

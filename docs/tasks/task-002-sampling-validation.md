@@ -41,6 +41,7 @@ Adds feedback sensors for the exact/Monte Carlo boundary and basic sampler agree
 ## Acceptance Criteria
 
 - A small known model has sampled first- and second-order moments close to exact moments within a declared tolerance.
+- Moment matching recovers a small known model within a declared parameter tolerance.
 - A model above `max_exact_nodes` reports `calculation=monte_carlo` and exposes diagnostics.
 - Existing pytest, ruff, mypy, wheel build, and strict HarnessWeaver verification pass.
 
