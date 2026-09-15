@@ -1,0 +1,31 @@
+import numpy as np
+import pytest
+
+from learning_energy_model import prepare_tabular_data
+
+
+def test_prepare_tabular_data_extracts_named_columns_and_weights():
+    prepared = prepare_tabular_data(
+        {
+            "support": [1.0, 2.0, np.nan],
+            "resources": [3.0, 4.0, 5.0],
+            "outcome": [0.0, 1.0, 1.0],
+            "weight": [1.0, 2.0, 1.0],
+        },
+        feature_names=("support", "resources"),
+        target_name="outcome",
+        weight_name="weight",
+    )
+    assert prepared.X.shape == (3, 2)
+    np.testing.assert_array_equal(prepared.y, [0.0, 1.0, 1.0])
+    np.testing.assert_array_equal(prepared.sample_weight, [1.0, 2.0, 1.0])
+
+
+def test_prepare_tabular_data_rejects_bad_weights():
+    with pytest.raises(ValueError, match="sample weights"):
+        prepare_tabular_data(
+            {"x": [1, 2], "y": [0, 1], "weight": [0, 0]},
+            feature_names=("x",),
+            target_name="y",
+            weight_name="weight",
+        )

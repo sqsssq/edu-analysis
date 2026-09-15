@@ -11,6 +11,7 @@
 - Add synthetic recovery tests. **In progress: initial API tests are present; parameter-recovery coverage remains.**
 - Add exact-vs-Monte-Carlo agreement tests on small systems.
 - Add PISA reproduction benchmark contracts and preparation instructions.
+- Add a dependency-light named-column preparation helper. **Implemented: `PreparedData` and `prepare_tabular_data` are available.**
 
 ## v0.2 - robust computation
 
@@ -35,4 +36,4 @@
 
 ## Current status
 
-The repository is currently at Stage 2 for the paper-scale core. Package source, metadata, tests, CI, and initial Gibbs sampling are present; PISA preparation, reproduction notebooks, complete parameter-recovery benchmarks, and production release work remain.
+The repository is currently at Stage 2 for the paper-scale core. Package source, metadata, tests, CI, initial Gibbs sampling, and generic named-column preparation are present; PISA-specific mappings, reproduction notebooks, complete parameter-recovery benchmarks, and production release work remain.
