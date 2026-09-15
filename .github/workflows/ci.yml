@@ -52,6 +52,10 @@ jobs:
             if command -v ruff >/dev/null 2>&1; then ruff check .; fi
             if command -v mypy >/dev/null 2>&1; then mypy learning_energy_model; fi
             if [[ -f pyproject.toml ]]; then python -m build; fi
+            if [[ -f pyproject.toml ]]; then
+              learning-energy-model --help >/dev/null
+              python -m learning_energy_model --help >/dev/null
+            fi
           else
             echo "No Python package metadata yet; Stage 0 harness checks remain authoritative."
           fi

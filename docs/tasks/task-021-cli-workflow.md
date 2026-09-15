@@ -27,6 +27,7 @@ Provide a repeatable command-line path for callers who want to train and use a m
 - Prediction output contains class probabilities and a binary cutoff prediction.
 - Analysis output contains parameters, correlations, higher-order moments, and diagnostics.
 - Invalid input produces an actionable error through the quality checks.
+- The installed console entry point and module entry point are smoke-tested in CI.
 - Standard package verification passes.
 
 ## Handoff

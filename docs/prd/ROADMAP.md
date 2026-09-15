@@ -2,7 +2,7 @@
 
 ## v0.1 - verified paper-scale core
 
-- Add GitHub Actions CI for strict harness verification and the supported Python matrix. **Implemented: CI now also cancels superseded runs per branch or pull request.**
+- Add GitHub Actions CI for strict harness verification and the supported Python matrix. **Implemented: CI now installs the package, smoke-tests both CLI entry points, and cancels superseded runs per branch or pull request.**
 - Define package layout and public API. **Implemented: the installable package and documented high-level API are present.**
 - Implement binary pairwise energy model. **Implemented: the exact binary pairwise model is present and tested.**
 - Implement exact state enumeration for 19 nodes. **Implemented: configurable exact enumeration supports the paper-scale boundary and is tested on small systems.**

@@ -13,7 +13,7 @@
 - `config/init-project.example.env` documents repeatable project configuration.
 - `docs/tasks/TASK_TEMPLATE.md` enforces small scope, acceptance criteria, verification, and handoff.
 - `scripts/verify.sh` runs successfully.
-- `.github/workflows/ci.yml` runs strict harness verification on pushes and pull requests.
+- `.github/workflows/ci.yml` runs strict harness verification, package checks, and CLI entry-point smoke tests on pushes and pull requests.
 
 ## Future Product Acceptance Criteria
 
