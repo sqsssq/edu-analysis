@@ -9,6 +9,12 @@ init-project.env
 data/raw/
 data/prepared/
 
+# Locally generated model artifacts.
+*.pt
+*.pth
+learning-model.pt
+recovery.json
+
 # Python build and test artifacts.
 build/
 dist/
