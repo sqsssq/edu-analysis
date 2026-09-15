@@ -83,8 +83,10 @@ and the configured thresholds (`mc_max_rhat`,
 `mc_min_effective_sample_size`, and `mc_max_mcse`). These are review guardrails,
 not universal scientific cutoffs.
 
-Advanced callers can inject compatible preprocessing or sampling components via
-`preprocessor=` and `sampler=`; the built-in implementations remain the default.
+Advanced callers can inject compatible preprocessing, sampling, training, or
+analysis components via `preprocessor=`, `sampler=`, `trainer=`, and
+`analyzer=`; the built-in implementations remain the default. Custom components
+are runtime-only and must be serialized separately if needed.
 
 Missing values can be handled with `missing_strategy="error"`, `"median"`, `"mean"`, or `"zero"`; the latter three impute without dropping rows. PISA-specific nonresponse codes must be recoded before fitting.
 

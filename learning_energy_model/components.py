@@ -25,3 +25,23 @@ class SamplerProtocol(Protocol):
     def moments(
         self, h: torch.Tensor, J: torch.Tensor, **kwargs: Any
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, dict[str, Any]]: ...
+
+
+class TrainerProtocol(Protocol):
+    """Minimum interface for a caller-provided training lifecycle."""
+
+    def fit(
+        self,
+        model: Any,
+        X: Any,
+        y: Any,
+        *,
+        sample_weight: Any | None = None,
+        method: str = "moment_matching",
+    ) -> Any: ...
+
+
+class AnalyzerProtocol(Protocol):
+    """Minimum interface for a caller-provided aggregate analysis lifecycle."""
+
+    def analyze(self, model: Any) -> Any: ...

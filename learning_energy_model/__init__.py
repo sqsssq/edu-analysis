@@ -1,7 +1,12 @@
 """Interpretable pairwise maximum-entropy energy models."""
 
 from .adapters import LearningEnergyClassifier
-from .components import PreprocessorProtocol, SamplerProtocol
+from .components import (
+    AnalyzerProtocol,
+    PreprocessorProtocol,
+    SamplerProtocol,
+    TrainerProtocol,
+)
 from .config import DataConfig
 from .data import PreparedData, TabularQualityReport, prepare_tabular_data, validate_tabular_data
 from .evaluation import MomentComparison, compare_moment_orders
@@ -13,6 +18,7 @@ from .version import __version__
 
 __all__ = [
     "AnalysisResult",
+    "AnalyzerProtocol",
     "DataConfig",
     "FitResult",
     "LearningEnergyClassifier",
@@ -25,6 +31,7 @@ __all__ = [
     "PreprocessorProtocol",
     "SamplerProtocol",
     "TabularQualityReport",
+    "TrainerProtocol",
     "__version__",
     "compare_moment_orders",
     "prepare_pisa_file",

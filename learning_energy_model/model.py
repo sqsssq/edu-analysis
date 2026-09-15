@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 import torch
 
-from .components import PreprocessorProtocol, SamplerProtocol
+from .components import AnalyzerProtocol, PreprocessorProtocol, SamplerProtocol, TrainerProtocol
 from .config import DataConfig
 from .preprocessing import BinaryPreprocessor
 from .results import AnalysisResult, FitResult, PredictionResult
@@ -43,6 +43,8 @@ class LearningModel:
         mc_max_mcse: float = 0.05,
         preprocessor: PreprocessorProtocol | None = None,
         sampler: SamplerProtocol | None = None,
+        trainer: TrainerProtocol | None = None,
+        analyzer: AnalyzerProtocol | None = None,
         device: str | None = None,
         seed: int = 0,
     ) -> None:
@@ -71,6 +73,8 @@ class LearningModel:
         self.device = torch.device(device or "cpu")
         self.seed = seed
         self.preprocessor = preprocessor or BinaryPreprocessor(self.config)
+        self.trainer = trainer
+        self.analyzer = analyzer
         self.h: torch.Tensor | None = None
         self.J: torch.Tensor | None = None
         self._states: torch.Tensor | None = None
@@ -272,6 +276,11 @@ class LearningModel:
         method: str = "moment_matching",
     ) -> FitResult:
         """Fit parameters by moment matching or exact KL/autodiff training."""
+        if self.trainer is not None:
+            result = self.trainer.fit(self, X, y, sample_weight=sample_weight, method=method)
+            if not isinstance(result, FitResult):
+                raise TypeError("custom trainer must return a FitResult")
+            return result
         if method not in {"moment_matching", "kl"}:
             raise ValueError("method must be 'moment_matching' or 'kl'")
         torch.manual_seed(self.seed)
@@ -426,6 +435,16 @@ class LearningModel:
     def analyze(self) -> AnalysisResult:
         """Return parameters, exact moments, energy statistics, and node freezing results."""
         self._require_fitted()
+        if self.analyzer is not None:
+            result = self.analyzer.analyze(self)
+            if not isinstance(result, AnalysisResult):
+                raise TypeError("custom analyzer must return an AnalysisResult")
+            return result
+        return self._builtin_analyze()
+
+    def _builtin_analyze(self) -> AnalysisResult:
+        """Run the built-in aggregate analysis implementation."""
+        self._require_fitted()
         assert self.h is not None and self.J is not None
         means, pairs, energies, sampling_diagnostics = self._model_moments()
         baseline_target = float(means[self.target_index])
@@ -504,6 +523,11 @@ class LearningModel:
             raise TypeError(
                 "saving models with a custom sampler is unsupported; "
                 "serialize its configuration separately and use it at runtime"
+            )
+        if self.trainer is not None or self.analyzer is not None:
+            raise TypeError(
+                "saving models with custom trainer or analyzer components is unsupported; "
+                "serialize those components separately and use them at runtime"
             )
         payload = {
             "artifact": self.artifact_metadata,

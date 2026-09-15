@@ -20,6 +20,7 @@ Describe the structured data contracts and result objects needed for the MVP.
 ## Model and Results
 
 - `LearningModel`: model configuration, `h`, `J`, target node, backend, and serialization metadata.
+- `LearningModel` accepts optional protocol-compatible preprocessor, sampler, trainer, and analyzer components; custom components are not serialized automatically.
 - `FitResult`: convergence status, objective history, observed/model first- through fourth-order joint moments, sampler diagnostics, and warnings.
 - `PredictionResult`: target probability, optional energy score, uncertainty interval, and preprocessing metadata.
 - `AnalysisResult`: first- and second-order moments, Pearson correlations, third- and fourth-order joint moments, node-freezing results, energy/entropy diagnostics, assumptions, and limitations.

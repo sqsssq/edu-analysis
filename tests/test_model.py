@@ -21,6 +21,25 @@ class DelegatingSampler:
         return self.inner.sample(h, J, **kwargs)
 
 
+class DelegatingTrainer:
+    def fit(self, model, X, y, *, sample_weight=None, method="moment_matching"):
+        original = model.trainer
+        model.trainer = None
+        try:
+            return model.fit(X, y, sample_weight=sample_weight, method=method)
+        finally:
+            model.trainer = original
+
+
+class FixedAnalyzer:
+    def __init__(self):
+        self.calls = 0
+
+    def analyze(self, model):
+        self.calls += 1
+        return model._builtin_analyze()
+
+
 def test_fit_predict_and_analyze_on_binary_data():
     rng = np.random.default_rng(7)
     X = rng.normal(size=(400, 2))
@@ -250,6 +269,23 @@ def test_model_accepts_a_replaceable_sampler_component():
     )
     model.fit(X, y)
     assert sampler.calls > 0
+
+
+def test_model_accepts_replaceable_trainer_and_analyzer_components():
+    X = np.array([[0.0], [1.0], [0.0], [1.0]])
+    y = np.array([0.0, 1.0, 1.0, 0.0])
+    analyzer = FixedAnalyzer()
+    model = LearningModel(
+        DataConfig(feature_names=("feature",)),
+        trainer=DelegatingTrainer(),
+        analyzer=analyzer,
+        max_epochs=2,
+    )
+    result = model.fit(X, y)
+    assert isinstance(result, type(model.fit_result))
+    report = model.analyze()
+    assert report.h.shape == (2,)
+    assert analyzer.calls == 1
 
 
 def test_calculation_path_can_be_forced_and_is_preserved_on_load(tmp_path):
