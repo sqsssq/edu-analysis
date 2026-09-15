@@ -4,7 +4,7 @@ This repository will turn the paper *A Neural Network Model for Learning - Appli
 
 ## Current status
 
-The initial package core and an automatic Gibbs-sampling path are implemented. PISA preparation, reproduction notebooks, and final numerical calibration remain planned work.
+The initial package core, automatic Gibbs-sampling path, and a runnable synthetic workflow are implemented. PISA preparation is available through an explicit local adapter; reproduction notebooks and final numerical calibration remain planned work.
 
 ## Quick start
 
@@ -26,6 +26,8 @@ model.save("learning-model.pt")
 ```
 
 For a runnable end-to-end example using generated data, run `python -m examples.fit_synthetic`.
+
+For an inspectable notebook version of the same workflow, open `examples/synthetic_workflow.ipynb`. It uses generated data only and does not require a PISA download.
 
 The implementation uses exact enumeration up to the configured node threshold and automatically switches to multi-chain Gibbs sampling for larger models. Sampling diagnostics are returned with fit and analysis results and should be reviewed for large systems.
 

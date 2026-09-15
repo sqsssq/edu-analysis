@@ -14,7 +14,7 @@
 - Add PISA reproduction benchmark contracts and preparation instructions.
 - Add PISA source and local-data instructions. **Implemented: official source, access boundary, and preparation checklist are documented.**
 - Add an optional local PISA reader and explicit mapping adapter. **Implemented: `PISAMapping` and `prepare_pisa_file` are available; survey inference remains out of scope.**
-- Add a runnable synthetic end-to-end example. **Implemented: `examples/fit_synthetic.py` covers fit, analyze, and save without restricted data.**
+- Add a runnable synthetic end-to-end example. **Implemented: `examples/fit_synthetic.py` and `examples/synthetic_workflow.ipynb` cover preparation, fit, analysis, comparison, and save/load without restricted data.**
 - Add aggregate result export. **Implemented: result objects expose JSON-compatible `to_dict()` and `to_json()`.**
 - Add third- and fourth-order joint moment outputs for reproduction checks. **Implemented: `AnalysisResult.higher_order_moments` is available on exact and sampled paths.**
 - Include observed/model moments in fit results. **Implemented: `FitResult` now carries first- and second-order moment arrays.**
@@ -46,4 +46,4 @@
 
 ## Current status
 
-The repository is currently at Stage 2 for the paper-scale core. Package source, metadata, tests, CI, initial Gibbs sampling, generic named-column preparation, and an optional local PISA adapter are present; country-specific mappings, reproduction notebooks, complete parameter-recovery benchmarks, and production release work remain.
+The repository is currently at Stage 2 for the paper-scale core. Package source, metadata, tests, CI, initial Gibbs sampling, generic named-column preparation, an optional local PISA adapter, and a runnable synthetic notebook are present; country-specific mappings, PISA reproduction notebooks, complete parameter-recovery benchmarks, and production release work remain.

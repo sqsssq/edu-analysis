@@ -35,5 +35,5 @@
 - Training and tabular preparation reject non-finite sample weights before moment calculation.
 - The public model can draw joint binary states with exact or Gibbs sampling according to model size.
 - Initial `tests/` coverage exists; exact parameter recovery and full numerical acceptance thresholds remain.
-- A PISA local-data guide, generic tabular preparation helper, and runnable synthetic workflow exist; PISA-specific mappings and reproduction notebooks remain.
+- A PISA local-data guide, generic tabular preparation helper, runnable synthetic script, and executed synthetic workflow notebook exist; PISA-specific mappings and reproduction notebooks remain.
 - PyTorch dependency policy is encoded in `pyproject.toml`; lock files and CI installation verification remain.
