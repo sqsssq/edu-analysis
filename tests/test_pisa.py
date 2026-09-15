@@ -25,6 +25,21 @@ def test_pisa_mapping_replaces_codebook_missing_values():
     np.testing.assert_array_equal(prepared.sample_weight, [1.0, 1.0, 2.0])
 
 
+def test_mapping_contract_round_trips_without_rows(tmp_path):
+    mapping = PISAMapping(
+        feature_names=("ST123", "ST456"),
+        target_name="PV1MATH",
+        weight_name="W_FSTUWT",
+        missing_values=(-9999.0,),
+        metadata={"cycle": "PISA 2022", "scope": "JPN", "codebook": "reviewed.pdf"},
+    )
+    path = tmp_path / "mapping.json"
+    mapping.save(path)
+    loaded = PISAMapping.load(path)
+    assert loaded == mapping
+    assert "rows" not in loaded.to_dict()
+
+
 @pytest.mark.parametrize(
     "kwargs, message",
     [

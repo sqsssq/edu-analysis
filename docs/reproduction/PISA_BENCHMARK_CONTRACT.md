@@ -23,6 +23,11 @@ required arguments and stores them in `DataConfig.metadata`:
 Raw files, row-level extracts, and artifacts containing raw observations must stay
 outside Git and must not be included in a benchmark report.
 
+The explicit `PISAMapping` contract can be saved as a small JSON file containing
+only selected column names, missing codes, and provenance metadata. Review that
+file against the matching OECD codebook before using it, and keep it separate
+from the raw data file.
+
 ## Required numerical outputs
 
 The report must include aggregate values for the same ordered node list:

@@ -4,9 +4,10 @@ This module never downloads or packages PISA data. File readers are optional so
 the core package remains usable without pandas/pyreadstat.
 """
 
+import json
 import shutil
 import tempfile
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 from zipfile import ZipFile
@@ -30,6 +31,7 @@ class PISAMapping:
     target_name: str
     weight_name: str | None = None
     missing_values: tuple[float, ...] = ()
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if not self.feature_names:
@@ -43,6 +45,36 @@ class PISAMapping:
         missing_values = np.asarray(self.missing_values, dtype=float)
         if not np.isfinite(missing_values).all():
             raise ValueError("missing_values must be finite numeric codes")
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-compatible, row-free mapping contract."""
+        result = asdict(self)
+        result["feature_names"] = list(self.feature_names)
+        result["missing_values"] = list(self.missing_values)
+        return result
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "PISAMapping":
+        """Build a mapping from a reviewed JSON/YAML-decoded contract."""
+        values = dict(payload)
+        values["feature_names"] = tuple(values.get("feature_names", ()))
+        values["missing_values"] = tuple(values.get("missing_values", ()))
+        return cls(**values)
+
+    def save(self, path: str | Path) -> None:
+        """Save only mapping and provenance metadata, never source rows."""
+        Path(path).write_text(
+            json.dumps(self.to_dict(), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+    @classmethod
+    def load(cls, path: str | Path) -> "PISAMapping":
+        """Load a mapping contract previously written by :meth:`save`."""
+        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            raise TypeError("PISA mapping JSON must contain an object")
+        return cls.from_dict(payload)
 
     def prepare(self, table: Any) -> PreparedData:
         if self.missing_values:
