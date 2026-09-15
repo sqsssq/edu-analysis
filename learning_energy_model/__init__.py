@@ -2,6 +2,7 @@
 
 from .config import DataConfig
 from .data import PreparedData, prepare_tabular_data
+from .evaluation import MomentComparison, compare_moment_orders
 from .model import LearningModel
 from .pisa import PISAMapping, prepare_pisa_file, read_pisa_file
 from .results import AnalysisResult, FitResult, PredictionResult
@@ -12,10 +13,12 @@ __all__ = [
     "DataConfig",
     "FitResult",
     "LearningModel",
+    "MomentComparison",
     "PISAMapping",
     "PredictionResult",
     "PreparedData",
     "__version__",
+    "compare_moment_orders",
     "prepare_pisa_file",
     "prepare_tabular_data",
     "read_pisa_file",

@@ -20,6 +20,7 @@
 - Include observed/model moments in fit results. **Implemented: `FitResult` now carries first- and second-order moment arrays.**
 - Add correlation outputs to analysis results. **Implemented: `AnalysisResult.correlations` uses stable Bernoulli Pearson correlations.**
 - Add versioned artifact metadata and caller-supplied configuration metadata. **Implemented: saved artifacts include format/package metadata, random state, and `DataConfig.metadata`.**
+- Add aggregate moment-order comparison for reproduction checks. **Implemented: `compare_moment_orders` reports per-order errors and pass/fail status.**
 - Add a dependency-light named-column preparation helper. **Implemented: `PreparedData` and `prepare_tabular_data` are available.**
 
 ## v0.2 - robust computation

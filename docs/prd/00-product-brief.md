@@ -22,3 +22,4 @@ The MVP succeeds when:
 - `A user can fit a paper-sized binary model and obtain structured diagnostics.`
 - `Synthetic recovery and exact-versus-Monte-Carlo tests pass.`
 - `PISA reproduction benchmarks document first- through fourth-order correlation agreement and known gaps.`
+- `Moment-order comparison is available as an aggregate, data-free evaluation helper.`

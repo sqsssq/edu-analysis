@@ -47,3 +47,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-011-versioned-artifacts.md` | Review Ready | `docs/prd/04-content-model.md`, `docs/prd/06-acceptance-criteria.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-012-correlation-output.md` | Review Ready | `docs/prd/04-content-model.md`, `docs/prd/06-acceptance-criteria.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-013-weight-validation.md` | Review Ready | `docs/domain/PROJECT_RULES.md`, `docs/prd/06-acceptance-criteria.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
+| `task-014-moment-comparison.md` | Review Ready | `docs/prd/00-product-brief.md`, `docs/prd/ROADMAP.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
