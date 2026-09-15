@@ -86,3 +86,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-050-wheel-training-smoke.md` | Review Ready | `.github/workflows/ci.yml`, `docs/API.md` | GitHub Actions wheel training smoke test, `pytest`, and `bash scripts/verify.sh --strict-instance` |
 | `task-051-wheel-content-hygiene.md` | Review Ready | `.github/workflows/ci.yml`, `docs/prd/06-acceptance-criteria.md` | wheel content inspection, `pytest`, ruff, mypy, and `bash scripts/verify.sh --strict-instance` |
 | `task-052-ignore-generated-artifacts.md` | Review Ready | `.gitignore`, `README.md` | synthetic example, `pytest`, ruff, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
+| `task-053-dependency-lock.md` | Review Ready | `uv.lock`, `.github/workflows/ci.yml`, `docs/prd/ROADMAP.md` | `uv lock --check`, locked dependency export, `pytest`, ruff, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |

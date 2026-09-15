@@ -24,7 +24,7 @@
 
 ## Current Gap Register
 
-- `pyproject.toml` and an initial installable package now exist; dependency locking and final release publication remain.
+- `pyproject.toml` and an initial installable package now exist; dependency locking is recorded in `uv.lock`, while final release publication remains.
 - Initial model source modules, public API, Gibbs sampler, and injectable lifecycle components exist.
 - Configured missing-value strategies include fail-fast, median, mean, and zero imputation; PISA-specific missing codes remain an explicit preparation responsibility.
 - Exact KL/autodiff training is available as a cross-check for models within the exact-enumeration threshold.
@@ -42,4 +42,4 @@
 - A pre-training tabular quality report exposes aggregate missingness, shape, infinity, and sample-weight checks without retaining raw rows.
 - Monte Carlo diagnostics expose per-node and aggregate MC standard error estimates in addition to R-hat and ESS.
 - Monte Carlo fit reports evaluate configurable R-hat, ESS, and MCSE quality thresholds and emit a warning when a sampled run fails them.
-- PyTorch dependency policy is encoded in `pyproject.toml`; lock files remain, while CI now strictly installs development dependencies and smoke-tests the optional PISA extra.
+- PyTorch dependency policy is encoded in `pyproject.toml`; `uv.lock` records resolved dependencies, while CI installs locked development dependencies and smoke-tests the optional PISA extra.
