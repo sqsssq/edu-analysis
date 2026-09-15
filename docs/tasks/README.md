@@ -66,3 +66,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-030-pisa-mapping-contract.md` | Review Ready | `docs/reproduction/PISA_BENCHMARK_CONTRACT.md`, `docs/prd/ROADMAP.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-031-monte-carlo-quality-thresholds.md` | Review Ready | `docs/prd/ROADMAP.md`, `docs/prd/06-acceptance-criteria.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-032-component-protocols.md` | Review Ready | `docs/prd/ROADMAP.md`, `docs/prd/04-content-model.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
+| `task-033-pisa-2022-data-guide.md` | Review Ready | `docs/reproduction/PISA_2022_DATA_GUIDE.md`, `docs/prd/ROADMAP.md` | markdown-link validation and `bash scripts/verify.sh --strict-instance` |
