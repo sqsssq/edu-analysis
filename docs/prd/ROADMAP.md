@@ -3,10 +3,10 @@
 ## v0.1 - verified paper-scale core
 
 - Add GitHub Actions CI for strict harness verification and the supported Python matrix.
-- Define package layout and public API. **In progress: initial package skeleton is present.**
-- Implement binary pairwise energy model. **In progress: exact binary model is present.**
-- Implement exact state enumeration for 19 nodes. **In progress: exact enumeration is present.**
-- Implement weighted empirical moments and moment-matching trainer. **In progress: initial trainer is present.**
+- Define package layout and public API. **Implemented: the installable package and documented high-level API are present.**
+- Implement binary pairwise energy model. **Implemented: the exact binary pairwise model is present and tested.**
+- Implement exact state enumeration for 19 nodes. **Implemented: configurable exact enumeration supports the paper-scale boundary and is tested on small systems.**
+- Implement weighted empirical moments and moment-matching trainer. **Implemented: weighted moments, default moment matching, and deterministic recovery checks are present.**
 - Implement exact KL/autodiff training as a cross-check path. **Implemented: `fit(..., method="kl")` is available for exact models.**
 - Implement conditional target probability and structured diagnostics. **Implemented: `predict` exposes the energy-derived conditional probability and diagnostics; the formula is regression-tested.**
 - Add synthetic recovery tests. **Implemented: sampled and deterministic exact-distribution parameter recovery are covered; broader calibration remains.**
