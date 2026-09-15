@@ -41,6 +41,26 @@ def test_fit_predict_and_analyze_on_binary_data():
     assert "higher_order_moments" in exported
 
 
+def test_predict_matches_the_model_conditional_energy():
+    X = np.array([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]] * 20)
+    y = np.array([0.0, 1.0, 1.0, 1.0] * 20)
+    model = LearningModel(
+        DataConfig(feature_names=("a", "b"), target_name="outcome"),
+        max_epochs=80,
+        tolerance=0.05,
+        min_epochs=10,
+        seed=4,
+    )
+    model.fit(X, y)
+
+    result = model.predict(X[:4])
+    expected_field = float(model.h[-1]) + X[:4] @ model.J[:2, 2].detach().cpu().numpy()
+    expected = 1.0 / (1.0 + np.exp(expected_field))
+    np.testing.assert_allclose(result.probabilities, expected)
+    assert result.diagnostics["target_name"] == "outcome"
+    assert result.diagnostics["conditional_on"] == ["a", "b"]
+
+
 def test_analysis_can_export_one_row_dataframe_when_pandas_is_available():
     pytest.importorskip("pandas")
     X = np.array([[0.0], [1.0], [0.0], [1.0]])

@@ -8,7 +8,7 @@
 - Implement exact state enumeration for 19 nodes. **In progress: exact enumeration is present.**
 - Implement weighted empirical moments and moment-matching trainer. **In progress: initial trainer is present.**
 - Implement exact KL/autodiff training as a cross-check path. **Implemented: `fit(..., method="kl")` is available for exact models.**
-- Implement conditional target probability and structured diagnostics. **In progress: initial API is present.**
+- Implement conditional target probability and structured diagnostics. **Implemented: `predict` exposes the energy-derived conditional probability and diagnostics; the formula is regression-tested.**
 - Add synthetic recovery tests. **Implemented: sampled and deterministic exact-distribution parameter recovery are covered; broader calibration remains.**
 - Add exact-vs-Monte-Carlo agreement tests on small systems. **Implemented: known-model moment agreement and computation-path switching are covered; deterministic exact-distribution recovery is also tested.**
 - Add PISA reproduction benchmark contracts and preparation instructions.
