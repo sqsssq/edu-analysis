@@ -26,6 +26,7 @@
 
 - `pyproject.toml` and an initial installable package now exist; dependency locking and release metadata remain.
 - Initial model source modules, public API, and Gibbs sampler exist; sampler calibration and plugin components remain.
+- The public model can draw joint binary states with exact or Gibbs sampling according to model size.
 - Initial `tests/` coverage exists; exact parameter recovery and full numerical acceptance thresholds remain.
 - No synthetic fixtures, PISA preparation scripts, or reproduction notebooks exist yet.
 - PyTorch dependency policy is encoded in `pyproject.toml`; lock files and CI installation verification remain.

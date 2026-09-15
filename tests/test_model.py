@@ -24,6 +24,8 @@ def test_fit_predict_and_analyze_on_binary_data():
     assert analysis.h.shape == (3,)
     assert analysis.J.shape == (3, 3)
     assert set(analysis.interventions) == {"home", "support"}
+    samples = model.sample(25)
+    assert samples.shape == (25, 3)
 
 
 def test_save_and_load_preserves_predictions(tmp_path):
@@ -66,3 +68,4 @@ def test_model_switches_to_monte_carlo_above_exact_threshold():
     assert result.diagnostics["calculation"] == "monte_carlo"
     analysis = model.analyze()
     assert analysis.diagnostics["chains"] == 2
+    assert model.sample(10).shape == (10, 4)

@@ -192,6 +192,30 @@ class LearningModel:
             diagnostics={"target_name": self.config.target_name, "conditional_on": list(self.preprocessor.feature_names)},
         )
 
+    def sample(self, n_samples: int = 1_000) -> np.ndarray:
+        """Draw binary states from the fitted joint model distribution."""
+        self._require_fitted()
+        if n_samples <= 0:
+            raise ValueError("n_samples must be positive")
+        assert self.h is not None and self.J is not None
+        if self._states is not None:
+            energies = self._energies(self._states)
+            probabilities = torch.softmax(-energies, dim=0)
+            generator = torch.Generator(device=self.device)
+            generator.manual_seed(self.seed)
+            indices = torch.multinomial(
+                probabilities, n_samples, replacement=True, generator=generator
+            )
+            return self._states[indices].detach().cpu().numpy()
+        sampler = GibbsSampler(
+            samples=n_samples,
+            burn_in=self.mc_burn_in,
+            thinning=self.mc_thinning,
+            chains=self.mc_chains,
+            seed=self.seed,
+        )
+        return sampler.sample(self.h, self.J).samples[:n_samples].detach().cpu().numpy()
+
     def analyze(self) -> AnalysisResult:
         """Return parameters, exact moments, energy statistics, and node freezing results."""
         self._require_fitted()

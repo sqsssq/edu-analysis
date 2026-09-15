@@ -21,6 +21,7 @@ Describe the structured data contracts and result objects needed for the MVP.
 - `FitResult`: convergence status, objective history, observed/model moments, sampler diagnostics, and warnings.
 - `PredictionResult`: target probability, optional energy score, uncertainty interval, and preprocessing metadata.
 - `AnalysisResult`: correlations, higher-order moments, node-freezing results, energy/entropy diagnostics, assumptions, and limitations.
+- `model.sample(n_samples)`: draws binary states from the fitted joint distribution, using exact probabilities or Gibbs sampling according to model size.
 
 ## Serialization Contract
 
