@@ -2,6 +2,14 @@
 
 a reusable PyTorch package for fitting and analyzing an interpretable pairwise maximum-entropy energy model。
 
+无需 PISA 数据即可运行完整示例：
+
+```bash
+python -m examples.fit_synthetic
+```
+
+该示例会生成合成数据，执行 `fit -> analyze -> save`，不会写入任何受限研究数据。
+
 ## 项目背景
 
 - 领域：`research Python package for educational and structured-data energy modeling`

@@ -11,6 +11,9 @@ The initial package core and an automatic Gibbs-sampling path are implemented. P
 ```python
 from learning_energy_model import DataConfig, LearningModel
 
+X = ...       # rows x feature values from your own dataset
+y = ...       # one target value per row
+X_new = ...   # rows with the same feature columns
 config = DataConfig(
     feature_names=("home_resources", "teacher_support"),
     target_name="outcome",
@@ -21,6 +24,8 @@ prediction = model.predict(X_new)
 analysis = model.analyze()
 model.save("learning-model.pt")
 ```
+
+For a runnable end-to-end example using generated data, run `python -m examples.fit_synthetic`.
 
 The implementation uses exact enumeration up to the configured node threshold and automatically switches to multi-chain Gibbs sampling for larger models. Sampling diagnostics are returned with fit and analysis results and should be reviewed for large systems.
 

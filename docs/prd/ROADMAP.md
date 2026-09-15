@@ -13,6 +13,7 @@
 - Add PISA reproduction benchmark contracts and preparation instructions.
 - Add PISA source and local-data instructions. **Implemented: official source, access boundary, and preparation checklist are documented.**
 - Add an optional local PISA reader and explicit mapping adapter. **Implemented: `PISAMapping` and `prepare_pisa_file` are available; survey inference remains out of scope.**
+- Add a runnable synthetic end-to-end example. **Implemented: `examples/fit_synthetic.py` covers fit, analyze, and save without restricted data.**
 - Add a dependency-light named-column preparation helper. **Implemented: `PreparedData` and `prepare_tabular_data` are available.**
 
 ## v0.2 - robust computation
