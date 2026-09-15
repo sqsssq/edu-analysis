@@ -25,7 +25,15 @@ class GibbsSampler:
         chains: int = 4,
         seed: int = 0,
     ) -> None:
-        if min(samples, chains) <= 0 or burn_in < 0 or thinning <= 0:
+        if (
+            not isinstance(samples, int)
+            or not isinstance(burn_in, int)
+            or not isinstance(thinning, int)
+            or not isinstance(chains, int)
+            or min(samples, chains) <= 0
+            or burn_in < 0
+            or thinning <= 0
+        ):
             raise ValueError("samples and chains must be positive; burn_in must be non-negative")
         self.samples = samples
         self.burn_in = burn_in
@@ -43,6 +51,7 @@ class GibbsSampler:
         seed_offset: int = 0,
     ) -> SamplingResult:
         """Return post-burn-in samples and simple convergence diagnostics."""
+        self._validate_parameters(h, J)
         if clamp_index is not None and not 0 <= clamp_index < h.numel():
             raise ValueError("clamp_index is outside the model node range")
         if clamp_value not in {0.0, 1.0}:
@@ -103,6 +112,17 @@ class GibbsSampler:
                 "effective_sample_size_by_node": effective_size.detach().cpu().tolist(),
             },
         )
+
+    @staticmethod
+    def _validate_parameters(h: torch.Tensor, J: torch.Tensor) -> None:
+        if h.ndim != 1 or J.ndim != 2 or J.shape != (h.numel(), h.numel()):
+            raise ValueError("h must be one-dimensional and J must be a matching square matrix")
+        if not torch.is_floating_point(h) or not torch.is_floating_point(J):
+            raise ValueError("h and J must use floating-point tensors")
+        if not torch.isfinite(h).all() or not torch.isfinite(J).all():
+            raise ValueError("h and J must contain only finite values")
+        if not torch.allclose(J, J.T):
+            raise ValueError("J must be symmetric")
 
     def _effective_sample_size(
         self, by_chain: torch.Tensor, within: torch.Tensor

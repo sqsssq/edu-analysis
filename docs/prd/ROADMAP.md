@@ -29,7 +29,7 @@
 ## v0.2 - robust computation
 
 - Automatic Monte Carlo selection for larger systems. **In progress: Gibbs sampling is present.**
-- Multiple chains, convergence diagnostics, burn-in, effective sample size, and error estimates. **In progress: multi-chain R-hat and autocorrelation-based ESS are present; calibration thresholds remain.**
+- Multiple chains, convergence diagnostics, burn-in, effective sample size, and error estimates. **In progress: multi-chain R-hat and autocorrelation-based ESS are present with sampler-parameter validation; calibration thresholds remain.**
 - More missing-value strategies and sample-weight handling.
 - Example pretrained model artifact only if its data and redistribution rights are clear.
 

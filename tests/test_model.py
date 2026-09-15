@@ -123,6 +123,19 @@ def test_gibbs_sampler_matches_uniform_exact_moments():
     assert len(diagnostics["rhat_by_node"]) == 3
 
 
+def test_gibbs_sampler_rejects_invalid_configuration_and_parameters():
+    import torch
+
+    with pytest.raises(ValueError, match="positive"):
+        GibbsSampler(samples=0)
+    with pytest.raises(ValueError, match="positive"):
+        GibbsSampler(samples=10, chains=1.5)
+    with pytest.raises(ValueError, match="matching square"):
+        GibbsSampler(samples=10).sample(torch.zeros(2), torch.zeros((2, 3)))
+    with pytest.raises(ValueError, match="symmetric"):
+        GibbsSampler(samples=10).sample(torch.zeros(2), torch.tensor([[0.0, 1.0], [0.0, 0.0]]))
+
+
 def test_gibbs_sampler_agrees_with_exact_moments_on_known_model():
     import torch
 
