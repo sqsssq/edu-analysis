@@ -84,3 +84,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-048-estimator-fit-table.md` | Review Ready | `docs/API.md`, `docs/prd/ROADMAP.md` | `pytest`, ruff, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-049-wheel-install-smoke.md` | Review Ready | `.github/workflows/ci.yml`, `docs/prd/06-acceptance-criteria.md` | GitHub Actions wheel-install smoke test, `pytest`, and `bash scripts/verify.sh --strict-instance` |
 | `task-050-wheel-training-smoke.md` | Review Ready | `.github/workflows/ci.yml`, `docs/API.md` | GitHub Actions wheel training smoke test, `pytest`, and `bash scripts/verify.sh --strict-instance` |
+| `task-051-wheel-content-hygiene.md` | Review Ready | `.github/workflows/ci.yml`, `docs/prd/06-acceptance-criteria.md` | wheel content inspection, `pytest`, ruff, mypy, and `bash scripts/verify.sh --strict-instance` |

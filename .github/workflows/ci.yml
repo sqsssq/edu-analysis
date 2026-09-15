@@ -55,6 +55,10 @@ jobs:
             if [[ -f pyproject.toml ]]; then
               wheel_path="$(find dist -maxdepth 1 -name '*.whl' -print -quit)"
               wheel_smoke_dir="$RUNNER_TEMP/wheel-smoke"
+              if unzip -Z1 "$wheel_path" | grep -E '(^|/)\.DS_Store$' >/dev/null; then
+                echo "wheel contains an unwanted .DS_Store entry"
+                exit 1
+              fi
               python -m pip install --no-deps --target "$wheel_smoke_dir" "$wheel_path"
               (cd "$RUNNER_TEMP" && PYTHONPATH="$wheel_smoke_dir" python -c "import numpy as np; from learning_energy_model import DataConfig, LearningModel; model=LearningModel(DataConfig(target_name='y'), max_epochs=2); model.fit_table({'x':[0.,1.,0.,1.], 'y':[0.,1.,1.,0.]}, feature_names=('x',)); assert model.predict({'x':[0.,1.]}).probabilities.shape == (2,); print('wheel training smoke succeeded')")
             fi
