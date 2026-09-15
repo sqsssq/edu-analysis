@@ -34,6 +34,7 @@
 - Sampling diagnostics include per-node R-hat and autocorrelation-based effective sample size estimates.
 - Saved artifacts expose format/package version, caller metadata, random state, and training logs without raw observations.
 - Training and tabular preparation reject non-finite sample weights before moment calculation.
+- Core preprocessing rejects positive and negative infinity while leaving configured NaN handling explicit.
 - The public model can draw joint binary states with exact or Gibbs sampling according to model size.
 - Initial `tests/` coverage includes deterministic exact-distribution parameter recovery and a repeatable aggregate benchmark; domain-specific numerical calibration remains.
 - PISA 2018/2022 local-data guides, generic tabular preparation, reusable reviewed mappings, runnable local workflow, executed synthetic notebook, and local-only reproduction notebook template exist; real-data reproduction remains caller-run.

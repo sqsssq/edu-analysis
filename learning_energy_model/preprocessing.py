@@ -16,6 +16,8 @@ def _as_array(data: Any) -> np.ndarray:
         array = array.reshape(-1, 1)
     if array.ndim != 2:
         raise ValueError("data must be a two-dimensional array or table")
+    if np.isinf(array).any():
+        raise ValueError("data must not contain positive or negative infinity")
     return array
 
 

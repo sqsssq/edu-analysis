@@ -75,6 +75,12 @@ def test_validate_tabular_data_accepts_missing_values_when_otherwise_valid():
     assert report.infinite_count == {"x": 0, "y": 0, "weight": 0}
 
 
+def test_core_preprocessor_rejects_infinite_values():
+    model = LearningModel(DataConfig(feature_names=("x",)))
+    with pytest.raises(ValueError, match="infinity"):
+        model.preprocessor.fit(np.array([[1.0], [np.inf]]), np.array([0.0, 1.0]))
+
+
 @pytest.mark.parametrize(
     ("strategy", "expected"),
     [("median", 2.0), ("mean", 2.0), ("zero", 0.0)],
