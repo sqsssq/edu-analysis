@@ -51,7 +51,7 @@ mapping = PISAMapping(
     missing_values=(-9999.0, -999.0),  # confirm against the matching codebook
 )
 prepared = prepare_pisa_file("data/raw/pisa2018.zip", mapping)
-model = LearningModel(DataConfig(feature_names=prepared.feature_names, target_name=prepared.target_name, missing_strategy="median"))
+model = LearningModel(DataConfig(feature_names=prepared.feature_names, target_name=prepared.target_name, sample_weight_name=mapping.weight_name, missing_strategy="median"))
 result = model.fit(prepared.X, prepared.y, sample_weight=prepared.sample_weight)
 model.save("data/prepared/local-model.pt")
 ```

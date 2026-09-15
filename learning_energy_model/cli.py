@@ -57,6 +57,7 @@ def _fit(args: argparse.Namespace) -> int:
     config = DataConfig(
         feature_names=prepared.feature_names,
         target_name=prepared.target_name,
+        sample_weight_name=args.weight,
         missing_strategy=args.missing_strategy,
         metadata={"input": str(args.input), "interface": "cli"},
     )

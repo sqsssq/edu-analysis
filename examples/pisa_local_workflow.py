@@ -51,6 +51,7 @@ def run(args: argparse.Namespace) -> None:
         DataConfig(
             feature_names=prepared.feature_names,
             target_name=prepared.target_name,
+            sample_weight_name=args.weight,
             missing_strategy=args.missing_strategy,
             metadata={"interface": "pisa-local-workflow", "input": str(args.input)},
         ),

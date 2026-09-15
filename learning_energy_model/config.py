@@ -22,6 +22,7 @@ class DataConfig:
     quantile: float = 0.5
     missing_strategy: str = "error"
     metadata: dict[str, Any] = field(default_factory=dict)
+    sample_weight_name: str | None = None
 
     def __post_init__(self) -> None:
         if any(not isinstance(name, str) or not name for name in self.feature_names):
@@ -30,6 +31,11 @@ class DataConfig:
             raise ValueError("target_name must be a non-empty string")
         if self.target_name in self.feature_names:
             raise ValueError("target_name must not also be a feature name")
+        if self.sample_weight_name is not None and (
+            not self.sample_weight_name
+            or self.sample_weight_name in (*self.feature_names, self.target_name)
+        ):
+            raise ValueError("sample_weight_name must identify a separate non-empty column")
         if self.threshold_method not in {"median", "quantile"}:
             raise ValueError("threshold_method must be 'median' or 'quantile'")
         if not 0 < self.quantile < 1:

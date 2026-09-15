@@ -124,6 +124,7 @@ def test_save_and_load_preserves_predictions(tmp_path):
     assert loaded.fit_result is not None
     np.testing.assert_allclose(loaded.fit_result.observed_means, model.fit_result.observed_means)
     assert loaded.config.metadata == {"source": "synthetic"}
+    assert loaded.config.sample_weight_name is None
     assert loaded.artifact_metadata["package_version"] == __version__
 
 

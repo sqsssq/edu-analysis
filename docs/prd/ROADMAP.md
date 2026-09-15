@@ -27,6 +27,7 @@
 - Validate configuration names and thresholds early. **Implemented: `DataConfig` rejects collisions, empty names, and non-finite explicit thresholds.**
 - Preserve named-column semantics during inference. **Implemented: fitted feature names select reordered mapping/DataFrame columns and reject missing columns.**
 - Add a runnable local PISA workflow template. **Implemented: `examples/pisa_local_workflow.py` performs explicit mapping, quality checks, fit, and aggregate report export without downloading or bundling data.**
+- Preserve ordinary weight-field provenance. **Implemented: `DataConfig.sample_weight_name` is validated and serialized with fitted artifacts and used by the local workflows.**
 
 ## v0.2 - robust computation
 

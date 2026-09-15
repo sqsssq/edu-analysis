@@ -77,6 +77,8 @@ def test_validate_tabular_data_accepts_missing_values_when_otherwise_valid():
         ({"feature_names": ("x",), "target_name": "x"}, "target_name"),
         ({"feature_names": ("x",), "thresholds": {"x": np.inf}}, "thresholds"),
         ({"feature_names": ("x",), "target_threshold": np.nan}, "target_threshold"),
+        ({"feature_names": ("x",), "sample_weight_name": "x"}, "sample_weight_name"),
+        ({"feature_names": ("x",), "sample_weight_name": ""}, "sample_weight_name"),
     ],
 )
 def test_data_config_rejects_invalid_names_and_thresholds(kwargs, message):

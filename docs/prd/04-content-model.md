@@ -12,6 +12,7 @@ Describe the structured data contracts and result objects needed for the MVP.
 - threshold or binarization rule for each variable;
 - missing-value strategy;
 - optional sample-weight field;
+- the recorded sample-weight field name when ordinary row weights are used;
 - variable metadata and semantic descriptions;
 - preprocessing version and review status;
 - free-form variable/source metadata supplied by the caller.
