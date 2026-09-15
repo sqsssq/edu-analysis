@@ -36,7 +36,7 @@
 - Training and tabular preparation reject non-finite sample weights before moment calculation.
 - The public model can draw joint binary states with exact or Gibbs sampling according to model size.
 - Initial `tests/` coverage includes deterministic exact-distribution parameter recovery and a repeatable aggregate benchmark; domain-specific numerical calibration remains.
-- PISA 2018/2022 local-data guides, generic tabular preparation, reusable reviewed mappings, runnable local workflow, and executed synthetic notebook exist; real-data reproduction notebooks remain.
+- PISA 2018/2022 local-data guides, generic tabular preparation, reusable reviewed mappings, runnable local workflow, executed synthetic notebook, and local-only reproduction notebook template exist; real-data reproduction remains caller-run.
 - A dependency-free sklearn-style adapter exposes `fit`, `predict`, `predict_proba`, and parameter access without changing the core model contract.
 - A pre-training tabular quality report exposes aggregate missingness, shape, infinity, and sample-weight checks without retaining raw rows.
 - Monte Carlo diagnostics expose per-node and aggregate MC standard error estimates in addition to R-hat and ESS.

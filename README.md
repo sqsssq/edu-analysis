@@ -4,7 +4,7 @@ This repository will turn the paper *A Neural Network Model for Learning - Appli
 
 ## Current status
 
-The initial package core, automatic Gibbs-sampling path, and a runnable synthetic workflow are implemented. PISA preparation is available through an explicit local adapter; reproduction notebooks and final numerical calibration remain planned work.
+The initial package core, automatic Gibbs-sampling path, and runnable synthetic workflows are implemented. PISA preparation and a local-only reproduction notebook template are available; real-data reproduction and final numerical calibration remain caller-run work.
 
 ## Quick start
 
@@ -63,6 +63,8 @@ For a deterministic parameter-recovery check with an aggregate JSON report, run
 `python examples/parameter_recovery_benchmark.py --output recovery.json`.
 
 For an inspectable notebook version of the same workflow, open `examples/synthetic_workflow.ipynb`. It uses generated data only and does not require a PISA download.
+
+For a local-only PISA reproduction template (synthetic smoke mode by default), open `examples/pisa_reproduction_workflow.ipynb`. Set `PISA_INPUT` and `PISA_MAPPING` to run against a reviewed local mapping contract.
 
 Before fitting a local table, callers can inspect input quality without changing the data:
 
