@@ -22,6 +22,8 @@ def test_fit_predict_and_analyze_on_binary_data():
     assert result.epochs <= 400
     assert result.observed_means is not None
     assert result.model_pairwise_moments is not None
+    assert "0×1×2" in result.observed_higher_order_moments
+    assert "0×1×2" in result.model_higher_order_moments
     assert result.observed_means.shape == (3,)
     prediction = model.predict(X[:8])
     assert prediction.probabilities.shape == (8,)
@@ -125,6 +127,7 @@ def test_save_and_load_preserves_predictions(tmp_path):
     np.testing.assert_allclose(loaded.fit_result.observed_means, model.fit_result.observed_means)
     assert loaded.config.metadata == {"source": "synthetic"}
     assert loaded.config.sample_weight_name is None
+    assert loaded.fit_result.observed_higher_order_moments == model.fit_result.observed_higher_order_moments
     assert loaded.artifact_metadata["package_version"] == __version__
 
 

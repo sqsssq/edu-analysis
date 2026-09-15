@@ -52,6 +52,8 @@ class FitResult(ResultExportMixin):
     model_means: np.ndarray | None = None
     observed_pairwise_moments: np.ndarray | None = None
     model_pairwise_moments: np.ndarray | None = None
+    observed_higher_order_moments: dict[str, float] = field(default_factory=dict)
+    model_higher_order_moments: dict[str, float] = field(default_factory=dict)
 
 
 @dataclass

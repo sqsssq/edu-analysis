@@ -17,7 +17,7 @@
 - Support OECD compressed local files without project-directory extraction. **Implemented: `read_pisa_file` accepts ZIPs containing exactly one supported data file and extracts only to a temporary file.**
 - Add a runnable synthetic end-to-end example. **Implemented: `examples/fit_synthetic.py` and `examples/synthetic_workflow.ipynb` cover preparation, fit, analysis, comparison, and save/load without restricted data.**
 - Add aggregate result export. **Implemented: result objects expose JSON-compatible `to_dict()` and `to_json()`.**
-- Add third- and fourth-order joint moment outputs for reproduction checks. **Implemented: `AnalysisResult.higher_order_moments` is available on exact and sampled paths.**
+- Add third- and fourth-order joint moment outputs for reproduction checks. **Implemented: `AnalysisResult.higher_order_moments` and observed/model higher-order fields in `FitResult` are available on exact and sampled paths.**
 - Include observed/model moments in fit results. **Implemented: `FitResult` now carries first- and second-order moment arrays.**
 - Add correlation outputs to analysis results. **Implemented: `AnalysisResult.correlations` uses stable Bernoulli Pearson correlations.**
 - Add versioned artifact metadata and caller-supplied configuration metadata. **Implemented: saved artifacts include format/package metadata, random state, and `DataConfig.metadata`.**

@@ -12,7 +12,7 @@ Review Ready
 
 ## Goal
 
-Make the fit result self-contained for numerical inspection by including the observed and fitted first- and second-order moments.
+Make the fit result self-contained for numerical inspection by including the observed and fitted moments through fourth order.
 
 ## User Value
 
@@ -20,14 +20,13 @@ Researchers can inspect whether a training run matched the data without rerunnin
 
 ## Scope
 
-- Add observed/model moment arrays to `FitResult`.
+- Add observed/model moment arrays to `FitResult` for first through fourth order.
 - Populate them for moment matching and exact KL/autodiff training.
 - Preserve them through dict/JSON export and saved model metadata.
 
 ## Out of Scope
 
 - PISA official estimates or complex-survey variance.
-- Higher-order observed moments in the fit result.
 
 ## Domain Requirement
 
@@ -39,7 +38,7 @@ Adds a feedback sensor for moment-matching quality and reproducibility.
 
 ## Acceptance Criteria
 
-- Both supported training methods return observed and model first-/second-order moments.
+- Both supported training methods return observed and model first- through fourth-order moments.
 - The result export includes these arrays.
 - Standard package verification passes.
 

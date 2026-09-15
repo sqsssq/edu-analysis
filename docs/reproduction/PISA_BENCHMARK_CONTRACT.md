@@ -34,7 +34,9 @@ The report must include aggregate values for the same ordered node list:
 5. fitted `h` and symmetric `J` parameters, with the energy convention
    `E(s) = h·s + sum(i<j) J[i,j]s[i]s[j]` stated explicitly.
 
-Use `compare_moment_orders` for observed-versus-modeled comparisons. Declare a
+Use `compare_moment_orders` with `FitResult.observed_higher_order_moments` and
+`FitResult.model_higher_order_moments` for observed-versus-modeled comparisons.
+Declare a
 non-negative tolerance for each reported order and include maximum and mean
 absolute error plus the pass/fail result. Missing orders or mismatched node keys
 must fail the comparison rather than be silently ignored.

@@ -140,6 +140,21 @@ class LearningModel:
                 )
         return moments
 
+    @staticmethod
+    def _empirical_higher_order_moments(
+        data: torch.Tensor, weights: torch.Tensor, *, max_order: int = 4
+    ) -> dict[str, float]:
+        """Return weighted observed joint moments for orders three through four."""
+        moments: dict[str, float] = {}
+        normalised = weights / weights.sum()
+        for order in range(3, min(max_order, data.shape[1]) + 1):
+            for indices in combinations(range(data.shape[1]), order):
+                value = data[:, indices].prod(dim=1)
+                moments["×".join(str(index) for index in indices)] = float(
+                    (value * normalised).sum()
+                )
+        return moments
+
     def _fit_kl(self, data: torch.Tensor, weights: torch.Tensor) -> FitResult:
         """Fit the exact negative log-likelihood with PyTorch autodiff."""
         if self._states is None:
@@ -181,6 +196,8 @@ class LearningModel:
         self.h = self.h.detach()
         self.J = self.J.detach()
         self._fitted = True
+        observed_higher = self._empirical_higher_order_moments(data, weights)
+        model_higher = self._higher_order_moments()
         self.fit_result = FitResult(
             converged=converged,
             epochs=epoch,
@@ -198,6 +215,8 @@ class LearningModel:
             model_means=model_means.detach().cpu().numpy(),
             observed_pairwise_moments=data_pairs.detach().cpu().numpy(),
             model_pairwise_moments=model_pairs.detach().cpu().numpy(),
+            observed_higher_order_moments=observed_higher,
+            model_higher_order_moments=model_higher,
         )
         return self.fit_result
 
@@ -298,6 +317,8 @@ class LearningModel:
             model_means=final_model_means.detach().cpu().numpy(),
             observed_pairwise_moments=data_pairs.detach().cpu().numpy(),
             model_pairwise_moments=final_model_pairs.detach().cpu().numpy(),
+            observed_higher_order_moments=self._empirical_higher_order_moments(data, weights),
+            model_higher_order_moments=self._higher_order_moments(),
         )
         return self.fit_result
 
