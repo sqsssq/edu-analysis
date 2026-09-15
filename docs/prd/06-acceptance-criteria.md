@@ -25,20 +25,20 @@
 ## Current Gap Register
 
 - `pyproject.toml` and an initial installable package now exist; dependency locking and final release metadata remain.
-- Initial model source modules, public API, and Gibbs sampler exist; plugin components remain.
+- Initial model source modules, public API, Gibbs sampler, and injectable lifecycle components exist.
 - Configured missing-value strategies include fail-fast, median, mean, and zero imputation; PISA-specific missing codes remain an explicit preparation responsibility.
 - Exact KL/autodiff training is available as a cross-check for models within the exact-enumeration threshold.
 - Analysis results expose third- and fourth-order joint moments for reproducibility checks.
 - Analysis results expose a stable binary-node correlation matrix.
-- Fit results expose observed and model first- and second-order moments.
+- Fit results expose observed and model moments through fourth order.
 - Sampling diagnostics include per-node R-hat and autocorrelation-based effective sample size estimates.
 - Saved artifacts expose format/package version, caller metadata, random state, and training logs without raw observations.
 - Training and tabular preparation reject non-finite sample weights before moment calculation.
 - The public model can draw joint binary states with exact or Gibbs sampling according to model size.
 - Initial `tests/` coverage includes deterministic exact-distribution parameter recovery; broader numerical acceptance thresholds remain.
-- A PISA local-data guide, generic tabular preparation helper, runnable synthetic script, and executed synthetic workflow notebook exist; PISA-specific mappings and reproduction notebooks remain.
+- PISA 2018/2022 local-data guides, generic tabular preparation, reusable reviewed mappings, runnable local workflow, and executed synthetic notebook exist; real-data reproduction notebooks remain.
 - A dependency-free sklearn-style adapter exposes `fit`, `predict`, `predict_proba`, and parameter access without changing the core model contract.
 - A pre-training tabular quality report exposes aggregate missingness, shape, infinity, and sample-weight checks without retaining raw rows.
 - Monte Carlo diagnostics expose per-node and aggregate MC standard error estimates in addition to R-hat and ESS.
 - Monte Carlo fit reports evaluate configurable R-hat, ESS, and MCSE quality thresholds and emit a warning when a sampled run fails them.
-- PyTorch dependency policy is encoded in `pyproject.toml`; lock files and CI installation verification remain.
+- PyTorch dependency policy is encoded in `pyproject.toml`; lock files remain, while CI now strictly installs and verifies the declared development dependencies.

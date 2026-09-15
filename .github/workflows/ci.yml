@@ -44,7 +44,7 @@ jobs:
           if [[ -f pyproject.toml || -f setup.py || -f setup.cfg ]]; then
             python -m pip install --upgrade pip
             if [[ -f pyproject.toml ]]; then
-              python -m pip install -e ".[dev]" || python -m pip install -e .
+              python -m pip install -e ".[dev]"
             else
               python -m pip install -e .
             fi
