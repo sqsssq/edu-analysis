@@ -8,6 +8,7 @@ from typing import Any
 import numpy as np
 import torch
 
+from .components import PreprocessorProtocol, SamplerProtocol
 from .config import DataConfig
 from .preprocessing import BinaryPreprocessor
 from .results import AnalysisResult, FitResult, PredictionResult
@@ -40,6 +41,8 @@ class LearningModel:
         mc_max_rhat: float = 1.1,
         mc_min_effective_sample_size: float = 100.0,
         mc_max_mcse: float = 0.05,
+        preprocessor: PreprocessorProtocol | None = None,
+        sampler: SamplerProtocol | None = None,
         device: str | None = None,
         seed: int = 0,
     ) -> None:
@@ -67,7 +70,7 @@ class LearningModel:
         self.mc_max_mcse = mc_max_mcse
         self.device = torch.device(device or "cpu")
         self.seed = seed
-        self.preprocessor = BinaryPreprocessor(self.config)
+        self.preprocessor = preprocessor or BinaryPreprocessor(self.config)
         self.h: torch.Tensor | None = None
         self.J: torch.Tensor | None = None
         self._states: torch.Tensor | None = None
@@ -78,13 +81,13 @@ class LearningModel:
             "package": "interpretable-learning-energy-model",
             "package_version": __version__,
         }
-        self.sampler = GibbsSampler(
-            samples=mc_samples,
-            burn_in=mc_burn_in,
-            thinning=mc_thinning,
-            chains=mc_chains,
-            seed=seed,
-        )
+        self.sampler = sampler or GibbsSampler(
+                samples=mc_samples,
+                burn_in=mc_burn_in,
+                thinning=mc_thinning,
+                chains=mc_chains,
+                seed=seed,
+            )
 
     @property
     def n_nodes(self) -> int:
@@ -492,6 +495,16 @@ class LearningModel:
     def save(self, path: Any) -> None:
         self._require_fitted()
         assert self.h is not None and self.J is not None
+        if not isinstance(self.preprocessor, BinaryPreprocessor):
+            raise TypeError(
+                "saving models with a custom preprocessor is unsupported; "
+                "serialize its contract separately and use it at runtime"
+            )
+        if not isinstance(self.sampler, GibbsSampler):
+            raise TypeError(
+                "saving models with a custom sampler is unsupported; "
+                "serialize its configuration separately and use it at runtime"
+            )
         payload = {
             "artifact": self.artifact_metadata,
             "config": asdict(self.config),

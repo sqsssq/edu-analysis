@@ -7,6 +7,20 @@ from learning_energy_model import DataConfig, LearningEnergyClassifier, Learning
 from learning_energy_model.sampler import GibbsSampler
 
 
+class DelegatingSampler:
+    def __init__(self) -> None:
+        self.inner = GibbsSampler(samples=40, burn_in=10, chains=2, seed=19)
+        self.calls = 0
+
+    def moments(self, h, J, **kwargs):
+        self.calls += 1
+        return self.inner.moments(h, J, **kwargs)
+
+    def sample(self, h, J, **kwargs):
+        self.calls += 1
+        return self.inner.sample(h, J, **kwargs)
+
+
 def test_fit_predict_and_analyze_on_binary_data():
     rng = np.random.default_rng(7)
     X = rng.normal(size=(400, 2))
@@ -221,6 +235,21 @@ def test_model_switches_to_monte_carlo_above_exact_threshold():
     analysis = model.analyze()
     assert analysis.diagnostics["chains"] == 2
     assert model.sample(10).shape == (10, 4)
+
+
+def test_model_accepts_a_replaceable_sampler_component():
+    rng = np.random.default_rng(17)
+    X = rng.integers(0, 2, size=(20, 2)).astype(float)
+    y = rng.integers(0, 2, size=20).astype(float)
+    sampler = DelegatingSampler()
+    model = LearningModel(
+        DataConfig(feature_names=("a", "b")),
+        calculation="monte_carlo",
+        sampler=sampler,
+        max_epochs=2,
+    )
+    model.fit(X, y)
+    assert sampler.calls > 0
 
 
 def test_calculation_path_can_be_forced_and_is_preserved_on_load(tmp_path):

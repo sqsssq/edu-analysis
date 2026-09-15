@@ -1,6 +1,7 @@
 """Interpretable pairwise maximum-entropy energy models."""
 
 from .adapters import LearningEnergyClassifier
+from .components import PreprocessorProtocol, SamplerProtocol
 from .config import DataConfig
 from .data import PreparedData, TabularQualityReport, prepare_tabular_data, validate_tabular_data
 from .evaluation import MomentComparison, compare_moment_orders
@@ -21,6 +22,8 @@ __all__ = [
     "PISAMapping",
     "PredictionResult",
     "PreparedData",
+    "PreprocessorProtocol",
+    "SamplerProtocol",
     "TabularQualityReport",
     "__version__",
     "compare_moment_orders",

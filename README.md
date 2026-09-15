@@ -83,6 +83,9 @@ and the configured thresholds (`mc_max_rhat`,
 `mc_min_effective_sample_size`, and `mc_max_mcse`). These are review guardrails,
 not universal scientific cutoffs.
 
+Advanced callers can inject compatible preprocessing or sampling components via
+`preprocessor=` and `sampler=`; the built-in implementations remain the default.
+
 Missing values can be handled with `missing_strategy="error"`, `"median"`, `"mean"`, or `"zero"`; the latter three impute without dropping rows. PISA-specific nonresponse codes must be recoded before fitting.
 
 When passing a named mapping or DataFrame to `predict`, the fitted feature names are used, so column order and extra columns do not silently change the model input.
