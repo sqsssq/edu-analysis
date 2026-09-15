@@ -31,6 +31,19 @@ class PISAMapping:
     weight_name: str | None = None
     missing_values: tuple[float, ...] = ()
 
+    def __post_init__(self) -> None:
+        if not self.feature_names:
+            raise ValueError("feature_names must contain at least one column")
+        if len(set(self.feature_names)) != len(self.feature_names):
+            raise ValueError("feature_names must be unique")
+        if self.target_name in self.feature_names:
+            raise ValueError("target_name must not also be a feature name")
+        if self.weight_name is not None and self.weight_name in (*self.feature_names, self.target_name):
+            raise ValueError("weight_name must identify a separate column")
+        missing_values = np.asarray(self.missing_values, dtype=float)
+        if not np.isfinite(missing_values).all():
+            raise ValueError("missing_values must be finite numeric codes")
+
     def prepare(self, table: Any) -> PreparedData:
         if self.missing_values:
             table = _replace_missing_codes(table, self.missing_values)

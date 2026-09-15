@@ -25,6 +25,21 @@ def test_pisa_mapping_replaces_codebook_missing_values():
     np.testing.assert_array_equal(prepared.sample_weight, [1.0, 1.0, 2.0])
 
 
+@pytest.mark.parametrize(
+    "kwargs, message",
+    [
+        ({"feature_names": (), "target_name": "y"}, "at least one"),
+        ({"feature_names": ("x", "x"), "target_name": "y"}, "unique"),
+        ({"feature_names": ("y",), "target_name": "y"}, "target_name"),
+        ({"feature_names": ("x",), "target_name": "y", "weight_name": "x"}, "weight_name"),
+        ({"feature_names": ("x",), "target_name": "y", "missing_values": (np.inf,)}, "finite"),
+    ],
+)
+def test_pisa_mapping_rejects_invalid_contracts(kwargs, message):
+    with pytest.raises(ValueError, match=message):
+        PISAMapping(**kwargs)
+
+
 def test_prepare_pisa_file_reads_a_single_data_file_zip(tmp_path):
     pytest.importorskip("pandas")
     csv_path = tmp_path / "student.csv"

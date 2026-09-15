@@ -43,6 +43,7 @@ Adds a deterministic adapter boundary without introducing restricted data into t
 - A user can call `prepare_pisa_file(path, PISAMapping(...))` after installing the optional dependencies.
 - A user can pass an OECD ZIP containing exactly one supported data file; extraction is temporary and local.
 - PISA-specific missing codes are explicit rather than silently guessed.
+- Mapping name collisions and non-finite missing-value codes are rejected at construction time.
 - Core installation does not require pandas or pyreadstat.
 - Standard package verification passes.
 
