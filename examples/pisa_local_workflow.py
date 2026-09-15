@@ -53,7 +53,13 @@ def run(args: argparse.Namespace) -> None:
             target_name=prepared.target_name,
             sample_weight_name=args.weight,
             missing_strategy=args.missing_strategy,
-            metadata={"interface": "pisa-local-workflow", "input": str(args.input)},
+            metadata={
+                "interface": "pisa-local-workflow",
+                "input": str(args.input),
+                "assessment_cycle": args.cycle,
+                "scope": args.scope,
+                "codebook_reference": args.codebook,
+            },
         ),
         max_epochs=args.max_epochs,
         min_epochs=args.min_epochs,
@@ -80,6 +86,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--target", required=True, help="codebook target variable name")
     parser.add_argument("--weight", help="ordinary row-weight variable name")
     parser.add_argument("--missing-values", default="", help="comma-separated codebook missing codes")
+    parser.add_argument("--cycle", required=True, help="assessment cycle, e.g. PISA 2018 or PISA 2022")
+    parser.add_argument("--scope", required=True, help="country/economy or multi-country scope")
+    parser.add_argument("--codebook", required=True, help="local codebook reference or version")
     parser.add_argument("--output-model", required=True, help="local model artifact path")
     parser.add_argument("--output-report", required=True, help="aggregate JSON report path")
     parser.add_argument("--missing-strategy", choices=("error", "median"), default="median")

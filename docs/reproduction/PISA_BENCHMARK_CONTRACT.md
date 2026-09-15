@@ -7,7 +7,9 @@ reproduces the paper.
 
 ## Required provenance
 
-Record the following in the run metadata and in the human-readable report:
+Record the following in the run metadata and in the human-readable report. The
+local workflow template accepts the cycle, scope, and codebook reference as
+required arguments and stores them in `DataConfig.metadata`:
 
 - assessment cycle, file name/version, country or economy scope, and respondent level;
 - source codebook and the exact variable names used for every model node;

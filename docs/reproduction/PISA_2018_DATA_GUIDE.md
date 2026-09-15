@@ -57,7 +57,7 @@ model.save("data/prepared/local-model.pt")
 ```
 
 For a complete local workflow that also writes an aggregate JSON report, use
-`python examples/pisa_local_workflow.py --input ... --features ... --target ...`.
+`python examples/pisa_local_workflow.py --input ... --features ... --target ... --cycle "PISA 2018" --scope "..." --codebook "..."`.
 The variable names and missing codes must come from the matching codebook; the
 script does not infer them.
 
