@@ -1,6 +1,7 @@
 """Gibbs sampling for pairwise binary energy models."""
 
 from dataclasses import dataclass
+from typing import Any
 
 import torch
 
@@ -9,7 +10,7 @@ import torch
 class SamplingResult:
     samples: torch.Tensor
     energies: torch.Tensor
-    diagnostics: dict[str, float]
+    diagnostics: dict[str, Any]
 
 
 class GibbsSampler:
@@ -80,11 +81,16 @@ class GibbsSampler:
         energies = torch.stack(chain_energies)
         flat_samples = by_chain.reshape(-1, h.numel())
         chain_means = by_chain.mean(dim=1)
-        within = by_chain.var(dim=1, unbiased=False).mean(dim=0)
-        between = chain_means.var(dim=0, unbiased=False)
-        variance = ((self.samples - 1) / self.samples) * within + between
-        rhat = torch.sqrt(torch.clamp(variance / torch.clamp(within, min=1e-12), min=0.0))
-        effective_size = torch.full_like(rhat, float(flat_samples.shape[0]))
+        within = by_chain.var(dim=1, unbiased=True).mean(dim=0)
+        between = chain_means.var(dim=0, unbiased=True)
+        variance = ((self.samples - 1) / self.samples) * within + between / self.samples
+        stable = within > 1e-12
+        rhat = torch.where(
+            stable,
+            torch.sqrt(torch.clamp(variance / within, min=0.0)),
+            torch.where(between <= 1e-12, torch.ones_like(within), torch.full_like(within, float("inf"))),
+        )
+        effective_size = self._effective_sample_size(by_chain, within)
         return SamplingResult(
             samples=flat_samples,
             energies=energies.reshape(-1),
@@ -93,7 +99,33 @@ class GibbsSampler:
                 "draws": float(flat_samples.shape[0]),
                 "max_rhat": float(rhat.max()),
                 "min_effective_sample_size": float(effective_size.min()),
+                "rhat_by_node": rhat.detach().cpu().tolist(),
+                "effective_sample_size_by_node": effective_size.detach().cpu().tolist(),
             },
+        )
+
+    def _effective_sample_size(
+        self, by_chain: torch.Tensor, within: torch.Tensor
+    ) -> torch.Tensor:
+        """Estimate ESS from the initial positive autocorrelation sequence."""
+        n_draws = by_chain.shape[1]
+        total = float(by_chain.shape[0] * n_draws)
+        if n_draws < 2:
+            return torch.ones(by_chain.shape[2], dtype=torch.float64, device=by_chain.device)
+        centered = by_chain - by_chain.mean(dim=1, keepdim=True)
+        autocorrelation_sum = torch.zeros_like(within)
+        active = torch.ones_like(within, dtype=torch.bool)
+        for lag in range(1, min(100, n_draws - 1) + 1):
+            autocovariance = (
+                centered[:, :-lag, :] * centered[:, lag:, :]
+            ).mean(dim=1).mean(dim=0)
+            correlation = autocovariance / torch.clamp(within, min=1e-12)
+            active &= correlation > 0
+            autocorrelation_sum += torch.where(active, correlation, torch.zeros_like(correlation))
+        return torch.clamp(
+            total / torch.clamp(1.0 + 2.0 * autocorrelation_sum, min=1.0),
+            min=1.0,
+            max=total,
         )
 
     def moments(
@@ -104,7 +136,7 @@ class GibbsSampler:
         clamp_index: int | None = None,
         clamp_value: float = 0.0,
         seed_offset: int = 0,
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, dict[str, float]]:
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, dict[str, Any]]:
         result = self.sample(
             h,
             J,

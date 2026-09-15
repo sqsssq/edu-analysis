@@ -74,6 +74,9 @@ def test_gibbs_sampler_matches_uniform_exact_moments():
     np.testing.assert_allclose(means.numpy(), 0.5, atol=0.08)
     np.testing.assert_allclose(pairwise.numpy()[np.triu_indices(3, 1)], 0.25, atol=0.1)
     assert diagnostics["draws"] == 1_200
+    assert diagnostics["max_rhat"] < 1.2
+    assert 1.0 <= diagnostics["min_effective_sample_size"] <= diagnostics["draws"]
+    assert len(diagnostics["rhat_by_node"]) == 3
 
 
 def test_gibbs_sampler_agrees_with_exact_moments_on_known_model():

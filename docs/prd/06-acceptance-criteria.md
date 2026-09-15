@@ -29,6 +29,7 @@
 - Exact KL/autodiff training is available as a cross-check for models within the exact-enumeration threshold.
 - Analysis results expose third- and fourth-order joint moments for reproducibility checks.
 - Fit results expose observed and model first- and second-order moments.
+- Sampling diagnostics include per-node R-hat and autocorrelation-based effective sample size estimates.
 - The public model can draw joint binary states with exact or Gibbs sampling according to model size.
 - Initial `tests/` coverage exists; exact parameter recovery and full numerical acceptance thresholds remain.
 - A PISA local-data guide, generic tabular preparation helper, and runnable synthetic workflow exist; PISA-specific mappings and reproduction notebooks remain.
