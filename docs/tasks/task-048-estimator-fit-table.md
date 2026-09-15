@@ -17,5 +17,5 @@ while retaining the same quality and interpretability contract as
 
 ## Verification
 
-`pytest`, `ruff`, mypy, wheel build, and
+`pytest`, `ruff`, mypy, wheel build/install smoke test, and
 `bash scripts/verify.sh --strict-instance`.
