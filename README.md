@@ -25,6 +25,17 @@ analysis = model.analyze()
 model.save("learning-model.pt")
 ```
 
+For estimator-style callers, the dependency-free `LearningEnergyClassifier` exposes `fit`, `predict_proba`, `predict`, and `analyze` while retaining the same interpretable model underneath:
+
+```python
+from learning_energy_model import LearningEnergyClassifier
+
+estimator = LearningEnergyClassifier(config=config, model_kwargs={"seed": 7})
+estimator.fit(X, y)
+probabilities = estimator.predict_proba(X_new)
+report = estimator.analyze()
+```
+
 For a runnable end-to-end example using generated data, run `python -m examples.fit_synthetic`.
 
 For an inspectable notebook version of the same workflow, open `examples/synthetic_workflow.ipynb`. It uses generated data only and does not require a PISA download.

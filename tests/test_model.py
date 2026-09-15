@@ -3,7 +3,7 @@ import json
 import numpy as np
 import pytest
 
-from learning_energy_model import DataConfig, LearningModel, __version__
+from learning_energy_model import DataConfig, LearningEnergyClassifier, LearningModel, __version__
 from learning_energy_model.sampler import GibbsSampler
 
 
@@ -59,6 +59,24 @@ def test_predict_matches_the_model_conditional_energy():
     np.testing.assert_allclose(result.probabilities, expected)
     assert result.diagnostics["target_name"] == "outcome"
     assert result.diagnostics["conditional_on"] == ["a", "b"]
+
+
+def test_sklearn_style_classifier_exposes_binary_probabilities_and_params():
+    X = np.array([[0.0], [1.0], [0.0], [1.0]])
+    y = np.array([0.0, 1.0, 0.0, 1.0])
+    estimator = LearningEnergyClassifier(
+        config=DataConfig(feature_names=("feature",)),
+        model_kwargs={"max_epochs": 30, "min_epochs": 5, "tolerance": 0.1},
+    )
+    assert estimator.set_params(model_kwargs={"max_epochs": 30}) is estimator
+    assert estimator.get_params()["model_kwargs"] == {"max_epochs": 30}
+    estimator.fit(X, y)
+    probabilities = estimator.predict_proba(X)
+    assert probabilities.shape == (4, 2)
+    np.testing.assert_allclose(probabilities.sum(axis=1), 1.0)
+    np.testing.assert_array_equal(estimator.predict(X), (probabilities[:, 1] >= 0.5).astype(float))
+    assert estimator.classes_.tolist() == [0.0, 1.0]
+    assert estimator.analyze().assumptions
 
 
 def test_analysis_can_export_one_row_dataframe_when_pandas_is_available():

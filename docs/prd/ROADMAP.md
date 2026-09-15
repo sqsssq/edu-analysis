@@ -33,7 +33,7 @@
 ## v0.3 - extensibility
 
 - Pluggable trainer, sampler, analyzer, and preprocessor components.
-- sklearn adapter.
+- sklearn adapter. **Implemented: dependency-free `LearningEnergyClassifier` provides the common estimator methods while preserving the structured analysis API.**
 - Multi-domain manager for independent target models.
 - Better CLI and reporting exports.
 

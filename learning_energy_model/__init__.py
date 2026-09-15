@@ -1,5 +1,6 @@
 """Interpretable pairwise maximum-entropy energy models."""
 
+from .adapters import LearningEnergyClassifier
 from .config import DataConfig
 from .data import PreparedData, prepare_tabular_data
 from .evaluation import MomentComparison, compare_moment_orders
@@ -12,6 +13,7 @@ __all__ = [
     "AnalysisResult",
     "DataConfig",
     "FitResult",
+    "LearningEnergyClassifier",
     "LearningModel",
     "MomentComparison",
     "PISAMapping",
