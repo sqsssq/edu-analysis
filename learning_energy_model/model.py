@@ -109,8 +109,73 @@ class LearningModel:
         )
         return means, pairwise, energies, diagnostics
 
-    def fit(self, X: Any, y: Any, sample_weight: Any | None = None) -> FitResult:
-        """Fit parameters by matching empirical first- and second-order moments."""
+    def _fit_kl(self, data: torch.Tensor, weights: torch.Tensor) -> FitResult:
+        """Fit the exact negative log-likelihood with PyTorch autodiff."""
+        if self._states is None:
+            raise ValueError("method='kl' requires exact enumeration; use moment matching for larger models")
+        assert self.h is not None and self.J is not None
+        data_means = self._weighted_mean(data, weights)
+        data_pairs = self._weighted_pairwise(data, weights)
+        optimizer = torch.optim.Adam([self.h, self.J], lr=self.learning_rate)
+        history: list[float] = []
+        converged = False
+        mean_error = float("inf")
+        correlation_error = float("inf")
+        for epoch in range(1, self.max_epochs + 1):
+            optimizer.zero_grad()
+            data_energy = self._energies(data)
+            state_energy = self._energies(self._states)
+            objective = (data_energy * weights).sum() / weights.sum() + torch.logsumexp(
+                -state_energy, dim=0
+            )
+            objective.backward()
+            optimizer.step()
+            with torch.no_grad():
+                self.J.fill_diagonal_(0.0)
+                self.J.copy_((self.J + self.J.T) / 2)
+                model_means, model_pairs, _, _ = self._model_moments()
+                mean_delta = model_means - data_means
+                pair_delta = model_pairs - data_pairs
+                pair_delta.fill_diagonal_(0.0)
+                mean_error = float(torch.max(torch.abs(mean_delta)))
+                correlation_error = float(torch.max(torch.abs(pair_delta)))
+            history.append(float(objective.detach()))
+            if epoch >= self.min_epochs and max(mean_error, correlation_error) <= self.tolerance:
+                converged = True
+                break
+        warnings = []
+        if not converged:
+            warnings.append("KL/autodiff training did not reach the requested tolerance")
+        self.h = self.h.detach()
+        self.J = self.J.detach()
+        self._fitted = True
+        self.fit_result = FitResult(
+            converged=converged,
+            epochs=epoch,
+            objective_history=history,
+            mean_error=mean_error,
+            correlation_error=correlation_error,
+            warnings=warnings,
+            diagnostics={
+                "n_samples": int(data.shape[0]),
+                "n_nodes": int(data.shape[1]),
+                "calculation": "exact",
+                "training_method": "kl",
+            },
+        )
+        return self.fit_result
+
+    def fit(
+        self,
+        X: Any,
+        y: Any,
+        sample_weight: Any | None = None,
+        *,
+        method: str = "moment_matching",
+    ) -> FitResult:
+        """Fit parameters by moment matching or exact KL/autodiff training."""
+        if method not in {"moment_matching", "kl"}:
+            raise ValueError("method must be 'moment_matching' or 'kl'")
         torch.manual_seed(self.seed)
         binary_X, binary_y = self.preprocessor.fit(X, y).transform(X, y)
         data_np = np.column_stack([binary_X, binary_y])
@@ -123,11 +188,20 @@ class LearningModel:
             if len(weights) != n_samples or torch.any(weights < 0) or float(weights.sum()) <= 0:
                 raise ValueError("sample_weight must be non-negative and match the number of rows")
 
-        self.h = torch.zeros(n_features, dtype=torch.float64, device=self.device)
-        self.J = torch.zeros((n_features, n_features), dtype=torch.float64, device=self.device)
+        self.h = torch.zeros(
+            n_features, dtype=torch.float64, device=self.device, requires_grad=method == "kl"
+        )
+        self.J = torch.zeros(
+            (n_features, n_features),
+            dtype=torch.float64,
+            device=self.device,
+            requires_grad=method == "kl",
+        )
         self._states = (
             self._enumerate_states(n_features) if n_features <= self.max_exact_nodes else None
         )
+        if method == "kl":
+            return self._fit_kl(data, weights)
         data_means = self._weighted_mean(data, weights)
         data_pairs = self._weighted_pairwise(data, weights)
         history = []
@@ -171,6 +245,7 @@ class LearningModel:
                 "n_samples": n_samples,
                 "n_nodes": n_features,
                 "calculation": "exact" if self._states is not None else "monte_carlo",
+                "training_method": "moment_matching",
                 **sampling_diagnostics,
             },
         )

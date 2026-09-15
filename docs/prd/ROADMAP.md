@@ -7,6 +7,7 @@
 - Implement binary pairwise energy model. **In progress: exact binary model is present.**
 - Implement exact state enumeration for 19 nodes. **In progress: exact enumeration is present.**
 - Implement weighted empirical moments and moment-matching trainer. **In progress: initial trainer is present.**
+- Implement exact KL/autodiff training as a cross-check path. **Implemented: `fit(..., method="kl")` is available for exact models.**
 - Implement conditional target probability and structured diagnostics. **In progress: initial API is present.**
 - Add synthetic recovery tests. **Implemented: small-model parameter recovery is covered; broader calibration remains.**
 - Add exact-vs-Monte-Carlo agreement tests on small systems.

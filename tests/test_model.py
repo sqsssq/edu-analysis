@@ -162,3 +162,26 @@ def test_moment_matching_recovers_a_small_known_model():
         true_J.numpy()[np.triu_indices(3, 1)],
         atol=0.4,
     )
+
+
+def test_kl_autodiff_path_is_available_for_exact_models():
+    X = np.array([[0.0], [1.0], [0.0], [1.0], [1.0], [0.0]])
+    y = np.array([0.0, 1.0, 0.0, 1.0, 1.0, 0.0])
+    model = LearningModel(
+        DataConfig(feature_names=("feature",), target_name="target"),
+        learning_rate=0.05,
+        max_epochs=120,
+        tolerance=0.08,
+        min_epochs=10,
+    )
+    result = model.fit(X, y, method="kl")
+    assert result.diagnostics["training_method"] == "kl"
+    assert model.predict(X).probabilities.shape == (6,)
+
+
+def test_kl_autodiff_path_rejects_large_models():
+    X = np.zeros((4, 3))
+    y = np.zeros(4)
+    model = LearningModel(DataConfig(feature_names=("a", "b", "c")), max_exact_nodes=2)
+    with pytest.raises(ValueError, match="requires exact enumeration"):
+        model.fit(X, y, method="kl")

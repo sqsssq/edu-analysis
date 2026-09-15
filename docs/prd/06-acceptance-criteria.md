@@ -26,6 +26,7 @@
 
 - `pyproject.toml` and an initial installable package now exist; dependency locking and release metadata remain.
 - Initial model source modules, public API, and Gibbs sampler exist; sampler calibration and plugin components remain.
+- Exact KL/autodiff training is available as a cross-check for models within the exact-enumeration threshold.
 - The public model can draw joint binary states with exact or Gibbs sampling according to model size.
 - Initial `tests/` coverage exists; exact parameter recovery and full numerical acceptance thresholds remain.
 - A PISA local-data guide, generic tabular preparation helper, and runnable synthetic workflow exist; PISA-specific mappings and reproduction notebooks remain.
