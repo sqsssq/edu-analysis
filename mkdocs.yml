@@ -5,13 +5,11 @@ repo_url: https://github.com/sqsssq/edu-analysis
 repo_name: sqsssq/edu-analysis
 docs_dir: docs
 exclude_docs: |
-  index.html
   domain/
   harness/
   meta/
   prd/
   tasks/
-  reproduction/PISA_2022_DATA_GUIDE.md
 
 theme:
   name: material
@@ -68,10 +66,15 @@ nav:
       - Save and reload: guide/save-and-reload.md
   - Reproduction:
       - PISA 2018: reproduction/PISA_2018_DATA_GUIDE.md
+      - PISA 2022: reproduction/PISA_2022_DATA_GUIDE.md
       - Benchmark contract: reproduction/PISA_BENCHMARK_CONTRACT.md
   - API Reference:
       - Overview: API.md
       - Python API: api-reference.md
+      - Core model: api/core.md
+      - Data and results: api/data-and-results.md
+      - Adapters and managers: api/adapters.md
+      - PISA and visualization: api/integrations.md
   - Research notes:
       - Design: design.md
       - Limitations: limitations.md
