@@ -1,13 +1,36 @@
 """Structured results returned by the public API."""
 
-from dataclasses import dataclass, field
-from typing import Any
+import json
+from dataclasses import asdict, dataclass, field
+from typing import Any, cast
 
 import numpy as np
 
 
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    if isinstance(value, np.generic):
+        return value.item()
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    return value
+
+
+class ResultExportMixin:
+    """Provide stable JSON-compatible export without requiring pandas."""
+
+    def to_dict(self) -> dict[str, Any]:
+        return _json_safe(asdict(cast(Any, self)))
+
+    def to_json(self, *, indent: int | None = 2) -> str:
+        return json.dumps(self.to_dict(), ensure_ascii=False, indent=indent, sort_keys=True)
+
+
 @dataclass
-class FitResult:
+class FitResult(ResultExportMixin):
     converged: bool
     epochs: int
     objective_history: list[float]
@@ -18,7 +41,7 @@ class FitResult:
 
 
 @dataclass
-class PredictionResult:
+class PredictionResult(ResultExportMixin):
     probabilities: np.ndarray
     uncertainty: np.ndarray
     labels: np.ndarray | None = None
@@ -26,7 +49,7 @@ class PredictionResult:
 
 
 @dataclass
-class AnalysisResult:
+class AnalysisResult(ResultExportMixin):
     h: np.ndarray
     J: np.ndarray
     means: np.ndarray

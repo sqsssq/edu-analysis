@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 
 from learning_energy_model import DataConfig, LearningModel
@@ -26,6 +28,9 @@ def test_fit_predict_and_analyze_on_binary_data():
     assert set(analysis.interventions) == {"home", "support"}
     samples = model.sample(25)
     assert samples.shape == (25, 3)
+    exported = json.loads(analysis.to_json())
+    assert len(exported["h"]) == 3
+    assert exported["assumptions"]
 
 
 def test_save_and_load_preserves_predictions(tmp_path):

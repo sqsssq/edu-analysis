@@ -22,7 +22,7 @@ The package is an exploratory research tool. It models a joint distribution over
 - Moment matching as the primary, interpretable trainer.
 - KL-divergence/autodiff training as a secondary implementation and validation path.
 - Optional sample weights.
-- Structured result objects and DataFrame export.
+- Structured result objects and dependency-light JSON/dict export (with optional DataFrame conversion by callers).
 - Model serialization including parameters, preprocessing, metadata, random state, sampler state, logs, and version information.
 - Synthetic recovery tests and PISA reproduction benchmarks.
 
@@ -53,4 +53,3 @@ Analysis reports include observed/model moments, pairwise and higher-order corre
 - Full replication of PISA's complex survey inference, replicate weights, or all plausible values.
 - Guaranteed fast training for arbitrary high-dimensional models.
 - Bundling restricted PISA raw data.
-
