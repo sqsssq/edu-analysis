@@ -3,12 +3,12 @@
 ## v0.1 - verified paper-scale core
 
 - Add GitHub Actions CI for strict harness verification and the supported Python matrix.
-- Define package layout and public API.
-- Implement binary pairwise energy model.
-- Implement exact state enumeration for 19 nodes.
-- Implement weighted empirical moments and moment-matching trainer.
-- Implement conditional target probability and structured diagnostics.
-- Add synthetic recovery tests.
+- Define package layout and public API. **In progress: initial package skeleton is present.**
+- Implement binary pairwise energy model. **In progress: exact binary model is present.**
+- Implement exact state enumeration for 19 nodes. **In progress: exact enumeration is present.**
+- Implement weighted empirical moments and moment-matching trainer. **In progress: initial trainer is present.**
+- Implement conditional target probability and structured diagnostics. **In progress: initial API is present.**
+- Add synthetic recovery tests. **In progress: initial API tests are present; parameter-recovery coverage remains.**
 - Add exact-vs-Monte-Carlo agreement tests on small systems.
 - Add PISA reproduction benchmark contracts and preparation instructions.
 

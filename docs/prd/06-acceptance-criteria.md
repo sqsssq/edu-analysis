@@ -24,8 +24,8 @@
 
 ## Current Gap Register
 
-- No `pyproject.toml` or installable package exists yet.
-- No model source modules or public API implementation exists yet.
-- No `tests/` directory exists yet.
+- `pyproject.toml` and an initial installable package now exist; dependency locking and release metadata remain.
+- Initial model source modules and public API exist; Monte Carlo and plugin components remain.
+- Initial `tests/` coverage exists; exact parameter recovery and full numerical acceptance thresholds remain.
 - No synthetic fixtures, PISA preparation scripts, or reproduction notebooks exist yet.
-- No PyTorch dependency policy or supported-version lock has been encoded in package metadata yet.
+- PyTorch dependency policy is encoded in `pyproject.toml`; lock files and CI installation verification remain.

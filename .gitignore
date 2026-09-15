@@ -4,3 +4,12 @@ init-project.env
 # Local environment and scratch files.
 .env
 .DS_Store
+
+# Python build and test artifacts.
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+__pycache__/
+.mypy_cache/
+.ruff_cache/

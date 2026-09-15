@@ -29,3 +29,9 @@ When the task list grows beyond a few files, add a task index to this README:
 | --- | --- | --- | --- |
 | `task-001-example.md` | Ready | `docs/prd/...` | planned: `bash scripts/verify.sh` |
 ```
+
+## Current Tasks
+
+| Task | Status | Source PRD | Verification Evidence |
+| --- | --- | --- | --- |
+| `task-001-core-package.md` | Review Ready | `docs/prd/00-product-brief.md`, `docs/prd/01-mvp-scope.md` | `pytest`, `ruff`, wheel build, and `bash scripts/verify.sh --strict-instance` |
