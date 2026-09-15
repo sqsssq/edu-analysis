@@ -49,6 +49,9 @@ learning-energy-model = "learning_energy_model.cli:main"
 [tool.setuptools.packages.find]
 include = ["learning_energy_model*"]
 
+[tool.setuptools.package-data]
+learning_energy_model = ["py.typed"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 

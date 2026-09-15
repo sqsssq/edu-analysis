@@ -74,3 +74,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-038-pisa-reproduction-notebook.md` | Review Ready | `docs/prd/ROADMAP.md`, `docs/prd/06-acceptance-criteria.md` | executed synthetic notebook, rendered HTML inspection, and `bash scripts/verify.sh --strict-instance` |
 | `task-039-pisa-extra-ci-smoke.md` | Review Ready | `docs/prd/06-acceptance-criteria.md`, `docs/prd/ROADMAP.md` | workflow inspection, optional dependency import smoke test, and `bash scripts/verify.sh --strict-instance` |
 | `task-040-pypi-metadata.md` | Review Ready | `docs/prd/06-acceptance-criteria.md`, `docs/prd/DECISION_LOG.md` | TOML parse, wheel metadata inspection, and `bash scripts/verify.sh --strict-instance` |
+| `task-041-typed-package-marker.md` | Review Ready | `docs/prd/04-content-model.md`, `docs/prd/06-acceptance-criteria.md` | wheel inspection, `pytest`, ruff, mypy, and `bash scripts/verify.sh --strict-instance` |
