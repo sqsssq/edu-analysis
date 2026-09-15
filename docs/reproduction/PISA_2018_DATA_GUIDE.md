@@ -36,8 +36,25 @@ The repository should contain only scripts, field mappings, synthetic fixtures, 
 3. Map each model node to a documented PISA variable; record recodes and response-value handling.
 4. Select one target and the feature columns. Keep plausible values and replicate-weight decisions explicit.
 5. Validate missing-value codes before applying `DataConfig` thresholds. PISA-specific nonresponse codes are not automatically ordinary numeric values.
-6. Pass the final table and optional student weight column through `prepare_tabular_data`.
+6. Pass the final table and optional student weight column through `PISAMapping` and `prepare_pisa_file` (or `prepare_tabular_data` for an already-loaded table).
 7. Fit locally and export only aggregate parameters, diagnostics, and reproducible mapping metadata.
+
+Example after installing the optional reader dependencies:
+
+```python
+from learning_energy_model import DataConfig, LearningModel, PISAMapping, prepare_pisa_file
+
+mapping = PISAMapping(
+    feature_names=("FEATURE_A", "FEATURE_B"),
+    target_name="TARGET",
+    weight_name="W_FSTUWT",
+    missing_values=(-9999.0, -999.0),  # confirm against the matching codebook
+)
+prepared = prepare_pisa_file("data/raw/pisa2018.sav", mapping)
+model = LearningModel(DataConfig(feature_names=prepared.feature_names, target_name=prepared.target_name, missing_strategy="median"))
+result = model.fit(prepared.X, prepared.y, sample_weight=prepared.sample_weight)
+model.save("data/prepared/local-model.pt")
+```
 
 ## Current project limitation
 

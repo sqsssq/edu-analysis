@@ -12,6 +12,7 @@
 - Add exact-vs-Monte-Carlo agreement tests on small systems.
 - Add PISA reproduction benchmark contracts and preparation instructions.
 - Add PISA source and local-data instructions. **Implemented: official source, access boundary, and preparation checklist are documented.**
+- Add an optional local PISA reader and explicit mapping adapter. **Implemented: `PISAMapping` and `prepare_pisa_file` are available; survey inference remains out of scope.**
 - Add a dependency-light named-column preparation helper. **Implemented: `PreparedData` and `prepare_tabular_data` are available.**
 
 ## v0.2 - robust computation
@@ -37,4 +38,4 @@
 
 ## Current status
 
-The repository is currently at Stage 2 for the paper-scale core. Package source, metadata, tests, CI, initial Gibbs sampling, and generic named-column preparation are present; PISA-specific mappings, reproduction notebooks, complete parameter-recovery benchmarks, and production release work remain.
+The repository is currently at Stage 2 for the paper-scale core. Package source, metadata, tests, CI, initial Gibbs sampling, generic named-column preparation, and an optional local PISA adapter are present; country-specific mappings, reproduction notebooks, complete parameter-recovery benchmarks, and production release work remain.

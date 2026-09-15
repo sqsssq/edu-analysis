@@ -37,3 +37,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-001-core-package.md` | Review Ready | `docs/prd/00-product-brief.md`, `docs/prd/01-mvp-scope.md` | `pytest`, `ruff`, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-002-sampling-validation.md` | Review Ready | `docs/prd/ROADMAP.md`, `docs/prd/06-acceptance-criteria.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-003-tabular-preparation.md` | Review Ready | `docs/prd/ROADMAP.md`, `docs/prd/04-content-model.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
+| `task-004-pisa-local-adapter.md` | Review Ready | `docs/prd/ROADMAP.md`, `docs/reproduction/PISA_2018_DATA_GUIDE.md` | `pytest`, `ruff`, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
