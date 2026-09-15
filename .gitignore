@@ -24,3 +24,6 @@ dist/
 __pycache__/
 .mypy_cache/
 .ruff_cache/
+
+# MkDocs build output.
+site/

@@ -45,6 +45,10 @@ pisa = [
 visualization = [
   "matplotlib>=3.7",
 ]
+docs = [
+  "mkdocs-material>=9.6",
+  "mkdocstrings[python]>=0.27",
+]
 
 [project.scripts]
 learning-energy-model = "learning_energy_model.cli:main"

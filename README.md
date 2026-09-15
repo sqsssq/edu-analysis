@@ -85,7 +85,7 @@ plot_correlations(analysis)
 
 For a local-only PISA reproduction template (synthetic smoke mode by default), open `examples/pisa_reproduction_workflow.ipynb`. Set `PISA_INPUT` and `PISA_MAPPING` to run against a reviewed local mapping contract.
 
-The package documentation landing page is available at [`docs/index.html`](docs/index.html) and can be served as a static GitHub Pages site.
+The package documentation source is available in [`docs/`](docs/) and is built with MkDocs Material. The standalone landing page is [`docs/index.html`](docs/index.html); use `mkdocs serve` for the full searchable documentation site.
 
 Before fitting a local table, callers can inspect input quality without changing the data:
 
