@@ -40,6 +40,21 @@ For a runnable end-to-end example using generated data, run `python -m examples.
 
 For an inspectable notebook version of the same workflow, open `examples/synthetic_workflow.ipynb`. It uses generated data only and does not require a PISA download.
 
+Before fitting a local table, callers can inspect input quality without changing the data:
+
+```python
+from learning_energy_model import validate_tabular_data
+
+quality = validate_tabular_data(
+    table,
+    feature_names=("feature_a", "feature_b"),
+    target_name="outcome",
+    weight_name="W_FSTUWT",
+)
+if not quality.passed:
+    raise ValueError(quality.issues)
+```
+
 The implementation uses exact enumeration up to the configured node threshold and automatically switches to multi-chain Gibbs sampling for larger models. Sampling diagnostics are returned with fit and analysis results and should be reviewed for large systems.
 
 ## Intended first release

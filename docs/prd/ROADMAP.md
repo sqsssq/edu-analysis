@@ -22,6 +22,7 @@
 - Add versioned artifact metadata and caller-supplied configuration metadata. **Implemented: saved artifacts include format/package metadata, random state, and `DataConfig.metadata`.**
 - Add aggregate moment-order comparison for reproduction checks. **Implemented: `compare_moment_orders` reports per-order errors and pass/fail status.**
 - Add a dependency-light named-column preparation helper. **Implemented: `PreparedData` and `prepare_tabular_data` are available.**
+- Add pre-training tabular quality evidence. **Implemented: `validate_tabular_data` reports required-column, shape, missingness, infinity, and weight issues without transforming data.**
 
 ## v0.2 - robust computation
 

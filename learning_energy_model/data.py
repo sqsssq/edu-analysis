@@ -6,6 +6,8 @@ from typing import Any
 
 import numpy as np
 
+from .results import ResultExportMixin
+
 
 @dataclass(frozen=True)
 class PreparedData:
@@ -21,6 +23,18 @@ class PreparedData:
     feature_names: tuple[str, ...]
     target_name: str
     sample_weight: np.ndarray | None = None
+
+
+@dataclass(frozen=True)
+class TabularQualityReport(ResultExportMixin):
+    """Aggregate input-quality evidence before binary preprocessing."""
+
+    row_count: int
+    column_names: tuple[str, ...]
+    missing_fraction: dict[str, float]
+    infinite_count: dict[str, int]
+    issues: tuple[str, ...]
+    passed: bool
 
 
 def _column(data: Any, name: str) -> Any:
@@ -87,4 +101,61 @@ def prepare_tabular_data(
         feature_names=names,
         target_name=target_name,
         sample_weight=weights,
+    )
+
+
+def validate_tabular_data(
+    table: Any,
+    *,
+    feature_names: tuple[str, ...] | list[str],
+    target_name: str,
+    weight_name: str | None = None,
+) -> TabularQualityReport:
+    """Profile required numeric columns without applying model transformations.
+
+    Missing values are reported rather than treated as failures because the
+    configured preprocessor may handle them. Infinite values, missing columns,
+    inconsistent row counts, and invalid weights are reported as issues.
+    """
+    names = tuple(feature_names) + (target_name,)
+    if weight_name is not None:
+        names += (weight_name,)
+    issues: list[str] = []
+    missing_fraction: dict[str, float] = {}
+    infinite_count: dict[str, int] = {}
+    row_count = 0
+    lengths: dict[str, int] = {}
+    arrays: dict[str, np.ndarray] = {}
+    for name in names:
+        try:
+            values = _column(table, name)
+            array = np.asarray(values.to_numpy() if hasattr(values, "to_numpy") else values, dtype=float).reshape(-1)
+        except (KeyError, IndexError, TypeError, ValueError) as exc:
+            issues.append(f"column {name!r} is missing or non-numeric: {exc}")
+            continue
+        arrays[name] = array
+        lengths[name] = len(array)
+        missing_fraction[name] = float(np.isnan(array).mean()) if len(array) else 1.0
+        infinite_count[name] = int(np.isinf(array).sum())
+        if not len(array):
+            issues.append(f"column {name!r} is empty")
+        if infinite_count[name]:
+            issues.append(f"column {name!r} contains infinite values")
+    if lengths:
+        row_count = max(lengths.values())
+        if len(set(lengths.values())) != 1:
+            issues.append("required columns have inconsistent row counts")
+    if weight_name is not None and weight_name in arrays:
+        weights = arrays[weight_name]
+        if np.isnan(weights).any() or np.isinf(weights).any() or (weights < 0).any():
+            issues.append("sample weights must be finite and non-negative")
+        elif float(weights.sum()) <= 0:
+            issues.append("sample weights must not be all zero")
+    return TabularQualityReport(
+        row_count=row_count,
+        column_names=names,
+        missing_fraction=missing_fraction,
+        infinite_count=infinite_count,
+        issues=tuple(issues),
+        passed=not issues,
     )
