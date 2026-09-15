@@ -164,6 +164,26 @@ def test_save_and_load_preserves_predictions(tmp_path):
     assert loaded.artifact_metadata["package_version"] == __version__
 
 
+def test_load_backfills_settings_added_after_legacy_artifact(tmp_path):
+    import torch
+
+    X = np.array([[0.0], [1.0], [0.2], [0.8]])
+    y = np.array([0.0, 1.0, 0.0, 1.0])
+    model = LearningModel(DataConfig(feature_names=("feature",)), max_epochs=2)
+    model.fit(X, y)
+    path = tmp_path / "legacy.pt"
+    model.save(path)
+    payload = torch.load(path, weights_only=False)
+    for key in ("calculation", "mc_max_rhat", "mc_min_effective_sample_size", "mc_max_mcse"):
+        payload["settings"].pop(key, None)
+    torch.save(payload, path)
+    loaded = LearningModel.load(path)
+    assert loaded.calculation == "auto"
+    assert loaded.mc_max_rhat == 1.1
+    assert loaded.mc_min_effective_sample_size == 100.0
+    assert loaded.mc_max_mcse == 0.05
+
+
 def test_gibbs_sampler_matches_uniform_exact_moments():
     import torch
 

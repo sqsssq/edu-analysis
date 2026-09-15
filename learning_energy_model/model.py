@@ -571,6 +571,9 @@ class LearningModel:
         config = DataConfig(**payload["config"])
         settings = dict(payload["settings"])
         settings.setdefault("calculation", "auto")
+        settings.setdefault("mc_max_rhat", 1.1)
+        settings.setdefault("mc_min_effective_sample_size", 100.0)
+        settings.setdefault("mc_max_mcse", 0.05)
         model = cls(config, **settings, device=map_location)
         model.artifact_metadata = payload.get(
             "artifact",

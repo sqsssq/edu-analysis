@@ -52,4 +52,4 @@
 
 ## Current status
 
-The repository is currently at Stage 2 for the paper-scale core. Package source, metadata, tests, CI, initial Gibbs sampling, generic named-column preparation, an optional local PISA adapter, and runnable synthetic workflows are present; real-data PISA reproduction notebooks and production release work remain.
+The repository is currently at Stage 2 for the paper-scale core. Package source, metadata, tests, CI, initial Gibbs sampling, generic named-column preparation, an optional local PISA adapter, and runnable synthetic workflows are present; real-data PISA reproduction runs and production release work remain.
