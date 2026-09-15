@@ -38,4 +38,5 @@
 - A PISA local-data guide, generic tabular preparation helper, runnable synthetic script, and executed synthetic workflow notebook exist; PISA-specific mappings and reproduction notebooks remain.
 - A dependency-free sklearn-style adapter exposes `fit`, `predict`, `predict_proba`, and parameter access without changing the core model contract.
 - A pre-training tabular quality report exposes aggregate missingness, shape, infinity, and sample-weight checks without retaining raw rows.
+- Monte Carlo diagnostics expose per-node and aggregate MC standard error estimates in addition to R-hat and ESS.
 - PyTorch dependency policy is encoded in `pyproject.toml`; lock files and CI installation verification remain.

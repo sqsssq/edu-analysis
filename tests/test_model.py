@@ -140,6 +140,8 @@ def test_gibbs_sampler_matches_uniform_exact_moments():
     assert diagnostics["draws"] == 1_200
     assert diagnostics["max_rhat"] < 1.2
     assert 1.0 <= diagnostics["min_effective_sample_size"] <= diagnostics["draws"]
+    assert 0.0 <= diagnostics["max_mcse"] < 0.1
+    assert len(diagnostics["mcse_by_node"]) == 3
     assert len(diagnostics["rhat_by_node"]) == 3
 
 

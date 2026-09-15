@@ -22,6 +22,7 @@ Users can identify nodes with poor mixing instead of interpreting the total numb
 
 - Standard multi-chain R-hat calculation with degenerate-node handling.
 - Initial-positive-sequence autocorrelation ESS estimate.
+- Monte Carlo standard error estimates derived from marginal variance and ESS.
 - Aggregate and per-node diagnostics in sampler, fit, and analysis results.
 
 ## Out of Scope
@@ -41,6 +42,7 @@ Adds feedback sensors for sampler mixing and replaces a known placeholder metric
 
 - ESS is not always equal to the raw draw count.
 - R-hat and ESS are available per node and in aggregate.
+- MC standard error is available per node and as an aggregate maximum.
 - Uniform and model-based sampler tests pass with standard verification.
 
 ## Verification Method

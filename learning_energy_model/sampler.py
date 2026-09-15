@@ -100,6 +100,8 @@ class GibbsSampler:
             torch.where(between <= 1e-12, torch.ones_like(within), torch.full_like(within, float("inf"))),
         )
         effective_size = self._effective_sample_size(by_chain, within)
+        marginal_variance = flat_samples.var(dim=0, unbiased=True)
+        mcse = torch.sqrt(marginal_variance / torch.clamp(effective_size, min=1.0))
         return SamplingResult(
             samples=flat_samples,
             energies=energies.reshape(-1),
@@ -108,6 +110,8 @@ class GibbsSampler:
                 "draws": float(flat_samples.shape[0]),
                 "max_rhat": float(rhat.max()),
                 "min_effective_sample_size": float(effective_size.min()),
+                "max_mcse": float(mcse.max()),
+                "mcse_by_node": mcse.detach().cpu().tolist(),
                 "rhat_by_node": rhat.detach().cpu().tolist(),
                 "effective_sample_size_by_node": effective_size.detach().cpu().tolist(),
             },
