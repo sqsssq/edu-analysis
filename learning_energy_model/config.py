@@ -1,6 +1,7 @@
 """Configuration and preprocessing contracts."""
 
 from dataclasses import dataclass, field, replace
+from math import isfinite
 from typing import Any
 
 
@@ -23,6 +24,12 @@ class DataConfig:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        if any(not isinstance(name, str) or not name for name in self.feature_names):
+            raise ValueError("feature_names must contain non-empty strings")
+        if not isinstance(self.target_name, str) or not self.target_name:
+            raise ValueError("target_name must be a non-empty string")
+        if self.target_name in self.feature_names:
+            raise ValueError("target_name must not also be a feature name")
         if self.threshold_method not in {"median", "quantile"}:
             raise ValueError("threshold_method must be 'median' or 'quantile'")
         if not 0 < self.quantile < 1:
@@ -31,6 +38,13 @@ class DataConfig:
             raise ValueError("missing_strategy must be 'error' or 'median'")
         if len(set(self.feature_names)) != len(self.feature_names):
             raise ValueError("feature_names must be unique")
+        if self.thresholds is not None and not all(
+            isinstance(name, str) and isfinite(float(value))
+            for name, value in self.thresholds.items()
+        ):
+            raise ValueError("thresholds must contain finite numeric values")
+        if self.target_threshold is not None and not isfinite(float(self.target_threshold)):
+            raise ValueError("target_threshold must be finite")
 
     def copy_with(self, **updates: Any) -> "DataConfig":
         return replace(self, **updates)
