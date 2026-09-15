@@ -12,6 +12,7 @@ Provide a repeatable command-line path for callers who want to train and use a m
 
 - Add `python -m learning_energy_model fit` for numeric CSV training.
 - Add `python -m learning_energy_model predict` for saved-model probability output.
+- Add `python -m learning_energy_model analyze` for aggregate interpretability output.
 - Register the `learning-energy-model` console script.
 - Emit aggregate fit/quality JSON only; never include raw rows in output.
 
@@ -24,6 +25,7 @@ Provide a repeatable command-line path for callers who want to train and use a m
 
 - A clean numeric CSV can be trained into a versioned model artifact.
 - Prediction output contains class probabilities and a binary cutoff prediction.
+- Analysis output contains parameters, correlations, higher-order moments, and diagnostics.
 - Invalid input produces an actionable error through the quality checks.
 - Standard package verification passes.
 

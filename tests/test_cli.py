@@ -34,3 +34,8 @@ def test_cli_fit_and_predict_round_trip(tmp_path, capsys):
     prediction_output = capsys.readouterr().out
     assert prediction_output.splitlines()[0] == "probability_0,probability_1,prediction"
     assert len(prediction_output.splitlines()) == 5
+
+    assert main(["analyze", "--model", str(artifact)]) == 0
+    analysis_output = json.loads(capsys.readouterr().out)
+    assert len(analysis_output["h"]) == 2
+    assert "higher_order_moments" in analysis_output

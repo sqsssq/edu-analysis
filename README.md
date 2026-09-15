@@ -54,6 +54,7 @@ python -m learning_energy_model fit \
   --input data.csv --features feature_a,feature_b --target outcome \
   --output model.pt --missing-strategy median
 python -m learning_energy_model predict --model model.pt --input data.csv --output predictions.csv
+python -m learning_energy_model analyze --model model.pt > analysis.json
 ```
 
 For a runnable end-to-end example using generated data, run `python -m examples.fit_synthetic`.

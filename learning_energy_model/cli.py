@@ -108,6 +108,12 @@ def _predict(args: argparse.Namespace) -> int:
     return 0
 
 
+def _analyze(args: argparse.Namespace) -> int:
+    model = LearningModel.load(args.model)
+    print(json.dumps(model.analyze().to_dict(), ensure_ascii=False, indent=2, sort_keys=True))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Train and call an interpretable learning energy model.")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -130,6 +136,9 @@ def build_parser() -> argparse.ArgumentParser:
     predict.add_argument("--input", required=True, help="input CSV with fitted feature columns")
     predict.add_argument("--output", default="-", help="prediction CSV path, or - for stdout")
     predict.set_defaults(handler=_predict)
+    analyze = commands.add_parser("analyze", help="export an aggregate interpretability report")
+    analyze.add_argument("--model", required=True, help="saved model artifact path")
+    analyze.set_defaults(handler=_analyze)
     return parser
 
 
