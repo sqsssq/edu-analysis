@@ -69,6 +69,20 @@ For a deterministic parameter-recovery check with an aggregate JSON report, run
 
 For an inspectable notebook version of the same workflow, open `examples/synthetic_workflow.ipynb`. It uses generated data only and does not require a PISA download.
 
+Optional Matplotlib visualizations are available for fitted results:
+
+```bash
+pip install 'interpretable-learning-energy-model[visualization]'
+```
+
+```python
+from learning_energy_model.visualization import plot_correlations, plot_interactions
+
+analysis = model.analyze()
+plot_interactions(analysis)
+plot_correlations(analysis)
+```
+
 For a local-only PISA reproduction template (synthetic smoke mode by default), open `examples/pisa_reproduction_workflow.ipynb`. Set `PISA_INPUT` and `PISA_MAPPING` to run against a reviewed local mapping contract.
 
 Before fitting a local table, callers can inspect input quality without changing the data:

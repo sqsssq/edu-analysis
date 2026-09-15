@@ -552,7 +552,11 @@ class LearningModel:
                 "PISA complex-survey inference is not implemented in v0.1.",
                 "Monte Carlo results require convergence diagnostics to be reviewed.",
             ],
-            diagnostics=sampling_diagnostics,
+            diagnostics={
+                **sampling_diagnostics,
+                "feature_names": list(self.preprocessor.feature_names),
+                "target_name": self.config.target_name,
+            },
             higher_order_moments=self._higher_order_moments(),
         )
 
