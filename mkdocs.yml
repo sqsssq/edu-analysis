@@ -1,4 +1,4 @@
-site_name: Interpretable Learning Energy Model
+site_name: Interpretable Learning Energy Framework
 site_description: Interpretable pairwise maximum-entropy energy models for structured data
 site_url: https://sqsssq.github.io/edu-analysis/
 repo_url: https://github.com/sqsssq/edu-analysis
@@ -61,6 +61,8 @@ nav:
   - Getting Started: getting-started.md
   - User Guide:
       - Core concepts: guide/core-concepts.md
+      - Methods: guide/methods.md
+      - Parameters: guide/parameters.md
       - Fit and inspect: guide/fit-and-inspect.md
       - Visualizations: guide/visualizations.md
       - Save and reload: guide/save-and-reload.md

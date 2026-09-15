@@ -1,8 +1,8 @@
-# Interpretable Learning Energy Model
+# Interpretable Learning Energy Framework
 
 **See the structure behind learning data.**
 
-Interpretable Learning Energy Model is a Python package for fitting binary
+Interpretable Learning Energy Framework is a Python package for fitting binary
 pairwise maximum-entropy energy models, inspecting interactions, and building
 auditable reproduction workflows.
 
@@ -46,6 +46,13 @@ analysis = model.analyze()
 ```
 
 Read [Getting Started](getting-started.md) for a complete example.
+
+## Start with the documentation
+
+- [Methods](guide/methods.md) — objective, normalization, exact enumeration, and Gibbs sampling.
+- [Parameters](guide/parameters.md) — data, training, and Monte Carlo settings.
+- [Fit and inspect](guide/fit-and-inspect.md) — the main package workflow and result objects.
+- [Python API](api-reference.md) — generated reference pages for public classes and functions.
 
 ## Model convention
 
