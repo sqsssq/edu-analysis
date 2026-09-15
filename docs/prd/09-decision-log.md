@@ -9,3 +9,7 @@ This project uses PRD-first planning, small task files, verification before hand
 ### 2026-09-15: Confirm package direction
 
 The first release targets a PyTorch binary pairwise maximum-entropy energy model with exact enumeration at paper scale and automatic Monte Carlo at larger scale. It prioritizes interpretable moment matching, supports fresh user data and saved-model inference, and does not make causal or individual-decision claims.
+
+### 2026-09-15: Add GitHub Actions CI
+
+GitHub Actions is the project's CI system. It runs strict HarnessWeaver verification on pushes and pull requests and tests Python 3.10-3.12. Package tests, linting, typing, and builds become active automatically once the corresponding project metadata and tooling are added.

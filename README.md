@@ -23,6 +23,8 @@ Run the project harness check from the repository root:
 bash scripts/verify.sh --instance
 ```
 
+GitHub Actions runs the strict harness check on pushes and pull requests. The Python matrix is ready for package tests and builds once package metadata and source code are added.
+
 ## Documentation map
 
 - `docs/prd/PRODUCT_BRIEF.md` - product scope and user-facing contract.
@@ -31,4 +33,3 @@ bash scripts/verify.sh --instance
 - `docs/domain/PROJECT_RULES.md` - scientific and safety guardrails.
 - `docs/harness/README.md` - HarnessWeaver workflow and verification contract.
 - `docs/meta/WORKFLOW.md` - contribution and task workflow.
-

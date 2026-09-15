@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  harness:
+    name: Harness verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Run strict project verification
+        run: bash scripts/verify.sh --strict-instance
+
+  python:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Check Python project when present
+        shell: bash
+        run: |
+          python --version
+          if [[ -f pyproject.toml || -f setup.py || -f setup.cfg ]]; then
+            python -m pip install --upgrade pip
+            if [[ -f pyproject.toml ]]; then
+              python -m pip install -e ".[dev]" || python -m pip install -e .
+            else
+              python -m pip install -e .
+            fi
+            if [[ -d tests ]]; then python -m pytest; fi
+            if command -v ruff >/dev/null 2>&1; then ruff check .; fi
+            if command -v mypy >/dev/null 2>&1; then mypy .; fi
+            if [[ -f pyproject.toml ]]; then python -m build; fi
+          else
+            echo "No Python package metadata yet; Stage 0 harness checks remain authoritative."
+          fi

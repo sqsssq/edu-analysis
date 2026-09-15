@@ -2,6 +2,7 @@
 
 ## v0.1 - verified paper-scale core
 
+- Add GitHub Actions CI for strict harness verification and the supported Python matrix.
 - Define package layout and public API.
 - Implement binary pairwise energy model.
 - Implement exact state enumeration for 19 nodes.
@@ -32,3 +33,6 @@
 - Complete user, theory, and reproduction documentation.
 - PyPI release under the finalized project name and license.
 
+## Current status
+
+The repository is currently at Stage 0. Harness documentation, project rules, and CI are present; package source code, package metadata, tests, notebooks, data preparation scripts, and reproduction benchmarks are not yet implemented.
