@@ -14,8 +14,8 @@
 
 ## v0.2 - robust computation
 
-- Automatic Monte Carlo selection for larger systems.
-- Multiple chains, convergence diagnostics, burn-in, effective sample size, and error estimates.
+- Automatic Monte Carlo selection for larger systems. **In progress: Gibbs sampling is present.**
+- Multiple chains, convergence diagnostics, burn-in, effective sample size, and error estimates. **In progress: initial diagnostics are present.**
 - More missing-value strategies and sample-weight handling.
 - Example pretrained model artifact only if its data and redistribution rights are clear.
 
@@ -35,4 +35,4 @@
 
 ## Current status
 
-The repository is currently at Stage 0. Harness documentation, project rules, and CI are present; package source code, package metadata, tests, notebooks, data preparation scripts, and reproduction benchmarks are not yet implemented.
+The repository is currently at Stage 2 for the paper-scale core. Package source, metadata, tests, CI, and initial Gibbs sampling are present; PISA preparation, reproduction notebooks, complete parameter-recovery benchmarks, and production release work remain.

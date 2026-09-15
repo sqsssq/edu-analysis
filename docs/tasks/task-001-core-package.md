@@ -30,7 +30,7 @@ Researchers and ML engineers can fit the paper-scale model to their own structur
 
 ## Out of Scope
 
-- Monte Carlo training or sampling for larger systems.
+- Full Monte Carlo convergence calibration and large-scale performance tuning.
 - Continuous energy nodes.
 - Causal inference or individual intervention recommendations.
 - PISA raw data distribution and complex-survey inference.

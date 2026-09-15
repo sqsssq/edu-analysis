@@ -35,4 +35,4 @@ class AnalysisResult:
     interventions: dict[str, dict[str, float]]
     assumptions: list[str]
     limitations: list[str]
-
+    diagnostics: dict[str, Any] = field(default_factory=dict)
