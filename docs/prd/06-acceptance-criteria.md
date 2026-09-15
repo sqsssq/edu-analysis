@@ -35,7 +35,7 @@
 - Saved artifacts expose format/package version, caller metadata, random state, and training logs without raw observations.
 - Training and tabular preparation reject non-finite sample weights before moment calculation.
 - The public model can draw joint binary states with exact or Gibbs sampling according to model size.
-- Initial `tests/` coverage includes deterministic exact-distribution parameter recovery; broader numerical acceptance thresholds remain.
+- Initial `tests/` coverage includes deterministic exact-distribution parameter recovery and a repeatable aggregate benchmark; domain-specific numerical calibration remains.
 - PISA 2018/2022 local-data guides, generic tabular preparation, reusable reviewed mappings, runnable local workflow, and executed synthetic notebook exist; real-data reproduction notebooks remain.
 - A dependency-free sklearn-style adapter exposes `fit`, `predict`, `predict_proba`, and parameter access without changing the core model contract.
 - A pre-training tabular quality report exposes aggregate missingness, shape, infinity, and sample-weight checks without retaining raw rows.

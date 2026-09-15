@@ -59,6 +59,9 @@ python -m learning_energy_model analyze --model model.pt > analysis.json
 
 For a runnable end-to-end example using generated data, run `python -m examples.fit_synthetic`.
 
+For a deterministic parameter-recovery check with an aggregate JSON report, run
+`python examples/parameter_recovery_benchmark.py --output recovery.json`.
+
 For an inspectable notebook version of the same workflow, open `examples/synthetic_workflow.ipynb`. It uses generated data only and does not require a PISA download.
 
 Before fitting a local table, callers can inspect input quality without changing the data:

@@ -9,7 +9,7 @@
 - Implement weighted empirical moments and moment-matching trainer. **Implemented: weighted moments, default moment matching, and deterministic recovery checks are present.**
 - Implement exact KL/autodiff training as a cross-check path. **Implemented: `fit(..., method="kl")` is available for exact models.**
 - Implement conditional target probability and structured diagnostics. **Implemented: `predict` exposes the energy-derived conditional probability and diagnostics; the formula is regression-tested.**
-- Add synthetic recovery tests. **Implemented: sampled and deterministic exact-distribution parameter recovery are covered; broader calibration remains.**
+- Add synthetic recovery tests. **Implemented: sampled and deterministic exact-distribution recovery plus a repeatable aggregate benchmark report are covered; domain-specific calibration remains.**
 - Add exact-vs-Monte-Carlo agreement tests on small systems. **Implemented: known-model moment agreement and computation-path switching are covered; deterministic exact-distribution recovery is also tested.**
 - Add PISA reproduction benchmark contracts and preparation instructions. **Implemented: the aggregate-only contract is documented in `docs/reproduction/PISA_BENCHMARK_CONTRACT.md`; reusable reviewed `PISAMapping` JSON contracts are supported, while local data and aligned mappings remain required.**
 - Add PISA source and local-data instructions. **Implemented: official source, access boundary, and preparation checklist are documented.**
@@ -52,4 +52,4 @@
 
 ## Current status
 
-The repository is currently at Stage 2 for the paper-scale core. Package source, metadata, tests, CI, initial Gibbs sampling, generic named-column preparation, an optional local PISA adapter, and a runnable synthetic notebook are present; country-specific mappings, PISA reproduction notebooks, complete parameter-recovery benchmarks, and production release work remain.
+The repository is currently at Stage 2 for the paper-scale core. Package source, metadata, tests, CI, initial Gibbs sampling, generic named-column preparation, an optional local PISA adapter, and runnable synthetic workflows are present; real-data PISA reproduction notebooks and production release work remain.
