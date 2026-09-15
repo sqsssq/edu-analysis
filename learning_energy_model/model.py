@@ -10,7 +10,7 @@ import torch
 
 from .components import AnalyzerProtocol, PreprocessorProtocol, SamplerProtocol, TrainerProtocol
 from .config import DataConfig
-from .data import prepare_tabular_data, validate_tabular_data
+from .data import TabularQualityReport, prepare_tabular_data, validate_tabular_data
 from .preprocessing import BinaryPreprocessor
 from .results import AnalysisResult, FitResult, PredictionResult
 from .sampler import GibbsSampler
@@ -81,6 +81,7 @@ class LearningModel:
         self._states: torch.Tensor | None = None
         self._fitted = False
         self.fit_result: FitResult | None = None
+        self.last_quality_report: TabularQualityReport | None = None
         self.artifact_metadata = {
             "format_version": 1,
             "package": "interpretable-learning-energy-model",
@@ -414,6 +415,7 @@ class LearningModel:
         )
         if not quality.passed:
             raise ValueError("input quality checks failed: " + "; ".join(quality.issues))
+        self.last_quality_report = quality
         prepared = prepare_tabular_data(
             table,
             feature_names=selected_features,
@@ -585,6 +587,7 @@ class LearningModel:
             "h": self.h.detach().cpu(),
             "J": self.J.detach().cpu(),
             "fit_result": asdict(self.fit_result) if self.fit_result else None,
+            "quality_report": self.last_quality_report.to_dict() if self.last_quality_report else None,
             "random_state": {
                 "torch": torch.get_rng_state(),
                 "numpy": np.random.get_state(),
@@ -649,4 +652,14 @@ class LearningModel:
         model._fitted = True
         if payload["fit_result"] is not None:
             model.fit_result = FitResult(**payload["fit_result"])
+        quality_payload = payload.get("quality_report")
+        if quality_payload is not None:
+            model.last_quality_report = TabularQualityReport(
+                row_count=quality_payload["row_count"],
+                column_names=tuple(quality_payload["column_names"]),
+                missing_fraction=dict(quality_payload["missing_fraction"]),
+                infinite_count=dict(quality_payload["infinite_count"]),
+                issues=tuple(quality_payload["issues"]),
+                passed=quality_payload["passed"],
+            )
         return model

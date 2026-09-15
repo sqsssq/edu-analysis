@@ -40,6 +40,26 @@ def test_model_fit_table_runs_quality_check_and_preserves_weight_provenance():
     assert result.diagnostics["n_samples"] == 4
     assert model.config.sample_weight_name == "weight"
     assert model.config.feature_names == ("support",)
+    assert model.last_quality_report is not None
+    assert model.last_quality_report.passed
+    assert model.last_quality_report.row_count == 4
+
+
+def test_model_fit_table_quality_report_round_trips_without_raw_rows(tmp_path):
+    model = LearningModel(DataConfig(target_name="outcome"), max_epochs=2)
+    model.fit_table(
+        {"support": [1.0, 2.0, 3.0, 4.0], "outcome": [0.0, 1.0, 1.0, 0.0]},
+        feature_names=("support",),
+    )
+    path = tmp_path / "model.pt"
+    model.save(path)
+    torch = __import__("torch")
+    payload = torch.load(path, weights_only=False)
+    assert "quality_report" in payload
+    assert payload["quality_report"]["row_count"] == 4
+    assert "support" not in payload["quality_report"]
+    reloaded = LearningModel.load(path)
+    assert reloaded.last_quality_report == model.last_quality_report
 
 
 def test_prepare_tabular_data_rejects_bad_weights():

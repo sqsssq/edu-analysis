@@ -51,6 +51,11 @@ fit = model.fit_table(
 )
 ```
 
+The aggregate validation evidence is available as `model.last_quality_report`
+and is retained in the saved artifact. It contains row count, required column
+names, missingness, infinite-value counts, and issues only; raw table rows are
+never stored.
+
 `calculation="auto"` uses exact enumeration through `max_exact_nodes` and
 Gibbs sampling above it. Use `"exact"` or `"monte_carlo"` to force a path.
 `method="kl"` is an exact-only autodiff cross-check.
