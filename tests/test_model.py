@@ -180,6 +180,37 @@ def test_moment_matching_recovers_a_small_known_model():
     )
 
 
+def test_exact_moment_matching_recovers_a_known_distribution():
+    """Use deterministic state counts to separate optimizer error from MC error."""
+    true_h = np.array([-0.35, 0.2, 0.45])
+    true_J = np.array(
+        [[0.0, -0.3, 0.15], [-0.3, 0.0, 0.25], [0.15, 0.25, 0.0]]
+    )
+    states = np.array([[(value >> shift) & 1 for shift in (2, 1, 0)] for value in range(8)])
+    energies = states @ true_h + 0.5 * ((states @ true_J) * states).sum(axis=1)
+    probabilities = np.exp(-energies)
+    probabilities /= probabilities.sum()
+    counts = np.floor(100_000 * probabilities).astype(int)
+    counts[0] += 100_000 - counts.sum()
+    observations = np.repeat(states, counts, axis=0)
+
+    model = LearningModel(
+        DataConfig(feature_names=("a", "b"), target_name="outcome"),
+        learning_rate=0.08,
+        max_epochs=1_000,
+        tolerance=0.001,
+        min_epochs=25,
+        seed=2,
+    )
+    result = model.fit(observations[:, :2], observations[:, 2])
+
+    assert result.converged
+    np.testing.assert_allclose(model.h.numpy(), true_h, atol=0.08)
+    np.testing.assert_allclose(
+        model.J.numpy()[np.triu_indices(3, 1)], true_J[np.triu_indices(3, 1)], atol=0.08
+    )
+
+
 def test_kl_autodiff_path_is_available_for_exact_models():
     X = np.array([[0.0], [1.0], [0.0], [1.0], [1.0], [0.0]])
     y = np.array([0.0, 1.0, 0.0, 1.0, 1.0, 0.0])

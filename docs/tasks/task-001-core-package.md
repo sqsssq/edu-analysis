@@ -42,7 +42,7 @@ Keep the energy convention and binary preprocessing explicit. Label node freezin
 
 ## Harness Impact
 
-Moves the project from Stage 0 toward Stage 2. Core behavior is covered by deterministic API tests; numerical recovery and exact-vs-Monte-Carlo checks remain follow-up tasks.
+Moves the project from Stage 0 toward Stage 2. Core behavior, deterministic exact-distribution recovery, and exact-vs-Monte-Carlo agreement are covered by tests; broader calibration remains a follow-up task.
 
 ## Acceptance Criteria
 
