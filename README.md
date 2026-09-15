@@ -119,6 +119,7 @@ GitHub Actions runs the strict harness check, package tests, lint, type checks, 
 ## Documentation map
 
 - `docs/prd/PRODUCT_BRIEF.md` - product scope and user-facing contract.
+- `docs/API.md` - public classes, methods, result contracts, and extension boundaries.
 - `docs/prd/DECISION_LOG.md` - decisions made during requirements grilling.
 - `docs/prd/ROADMAP.md` - staged implementation plan.
 - `docs/domain/PROJECT_RULES.md` - scientific and safety guardrails.
