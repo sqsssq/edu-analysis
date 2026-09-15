@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "interpretable-learning-energy-model"
+name = "learnenergy"
 version = "0.1.0a1"
 description = "Interpretable pairwise maximum-entropy energy models for structured data"
 readme = "README.md"
@@ -51,13 +51,15 @@ docs = [
 ]
 
 [project.scripts]
+learnenergy = "learning_energy_model.cli:main"
 learning-energy-model = "learning_energy_model.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["learning_energy_model*"]
+include = ["learning_energy_model*", "learnenergy*"]
 
 [tool.setuptools.package-data]
 learning_energy_model = ["py.typed"]
+learnenergy = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

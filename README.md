@@ -14,7 +14,7 @@ Python matrix and the optional PISA extra; ordinary users can continue to use
 the pip commands from the package metadata.
 
 ```python
-from learning_energy_model import DataConfig, LearningModel
+from learnenergy import DataConfig, LearningModel
 
 X = ...       # rows x feature values from your own dataset
 y = ...       # one target value per row
@@ -33,7 +33,7 @@ model.save("learning-model.pt")
 For estimator-style callers, the dependency-free `LearningEnergyClassifier` exposes `fit`, `predict_proba`, `predict`, and `analyze` while retaining the same interpretable model underneath:
 
 ```python
-from learning_energy_model import LearningEnergyClassifier
+from learnenergy import LearningEnergyClassifier
 
 estimator = LearningEnergyClassifier(config=config, model_kwargs={"seed": 7})
 estimator.fit(X, y)
@@ -44,7 +44,7 @@ report = estimator.analyze()
 For independent targets or domains, use `MultiDomainManager`; each domain keeps its own preprocessing rules and parameters:
 
 ```python
-from learning_energy_model import MultiDomainManager
+from learnenergy import MultiDomainManager
 
 manager = MultiDomainManager(model_kwargs={"seed": 7})
 manager.fit("math", X, y_math)
@@ -72,7 +72,7 @@ For an inspectable notebook version of the same workflow, open `examples/synthet
 Optional Matplotlib visualizations are available for fitted results:
 
 ```bash
-pip install 'interpretable-learning-energy-model[visualization]'
+pip install 'learnenergy[visualization]'
 ```
 
 ```python
@@ -90,7 +90,7 @@ The visual landing page is [`docs/landing.html`](docs/landing.html). The full se
 Before fitting a local table, callers can inspect input quality without changing the data:
 
 ```python
-from learning_energy_model import validate_tabular_data
+from learnenergy import validate_tabular_data
 
 quality = validate_tabular_data(
     table,

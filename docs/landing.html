@@ -37,8 +37,8 @@
       <div class="grid"><div class="card"><div class="number">01 / FIT</div><h3>Maximum entropy</h3><p>Match observed moments with an explicit pairwise energy distribution.</p></div><div class="card"><div class="number">02 / INSPECT</div><h3>Readable parameters</h3><p>Inspect signed interactions, correlations, energy statistics, and model-internal interventions.</p></div><div class="card"><div class="number">03 / REPRODUCE</div><h3>Auditable workflows</h3><p>Record thresholds, missingness, weights, calculation paths, and provenance.</p></div></div>
     </section>
     <section id="quickstart"><div class="eyebrow">Quickstart</div><h2>From table to model in minutes.</h2><p class="intro">The core package requires NumPy and PyTorch. Optional extras add PISA readers and Matplotlib visualizations.</p>
-      <div class="code-wrap"><pre><code>pip install interpretable-learning-energy-model
-pip install 'interpretable-learning-energy-model[visualization]'</code></pre><pre><code>from learning_energy_model import DataConfig, LearningModel
+      <div class="code-wrap"><pre><code>pip install learnenergy
+pip install 'learnenergy[visualization]'</code></pre><pre><code>from learnenergy import DataConfig, LearningModel
 
 config = DataConfig(
     feature_names=("support", "resources"),
@@ -57,7 +57,7 @@ analysis = model.analyze()</code></pre></div>
       </tbody></table>
     </section>
     <section><div class="eyebrow">Visual analysis</div><h2>Make interactions visible.</h2><p class="intro">Plotting helpers return Matplotlib figure/axes pairs, so they can be composed in notebooks and reports.</p>
-      <div class="code-wrap"><pre><code>from learning_energy_model.visualization import (
+      <div class="code-wrap"><pre><code>from learnenergy.visualization import (
     plot_interactions, plot_correlations,
     plot_training_history,
 )

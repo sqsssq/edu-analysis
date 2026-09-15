@@ -3,14 +3,14 @@
 Install the optional plotting dependency:
 
 ```bash
-pip install 'interpretable-learning-energy-model[visualization]'
+pip install 'learnenergy[visualization]'
 ```
 
 The helpers return `(figure, axes)` pairs and accept an existing Matplotlib axes
 object for composing reports.
 
 ```python
-from learning_energy_model.visualization import plot_correlations, plot_interactions, plot_training_history
+from learnenergy.visualization import plot_correlations, plot_interactions, plot_training_history
 
 analysis = model.analyze()
 plot_interactions(analysis, annotate=True)

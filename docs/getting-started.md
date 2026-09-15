@@ -3,7 +3,7 @@
 ## Install
 
 ```bash
-python -m pip install interpretable-learning-energy-model
+python -m pip install learnenergy
 ```
 
 For local development:
@@ -21,7 +21,7 @@ applies the configured binary thresholds, and fits the model.
 
 ```python
 import pandas as pd
-from learning_energy_model import DataConfig, LearningModel
+from learnenergy import DataConfig, LearningModel
 
 table = pd.DataFrame({"support": [0.1, 0.8, 0.4, 0.9], "resources": [0.2, 0.7, 0.3, 0.95], "outcome": [0, 1, 0, 1]})
 model = LearningModel(DataConfig(feature_names=("support", "resources"), target_name="outcome"), calculation="exact", seed=7)

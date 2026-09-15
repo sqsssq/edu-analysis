@@ -22,19 +22,19 @@ auditable reproduction workflows.
 ## Install
 
 ```bash
-pip install interpretable-learning-energy-model
+pip install learnenergy
 ```
 
 For PISA readers and plots:
 
 ```bash
-pip install 'interpretable-learning-energy-model[pisa,visualization]'
+pip install 'learnenergy[pisa,visualization]'
 ```
 
 ## A first model
 
 ```python
-from learning_energy_model import DataConfig, LearningModel
+from learnenergy import DataConfig, LearningModel
 
 config = DataConfig(
     feature_names=("home_resources", "teacher_support"),

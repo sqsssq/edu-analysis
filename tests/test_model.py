@@ -3,8 +3,14 @@ import json
 import numpy as np
 import pytest
 
+import learnenergy
 from learning_energy_model import DataConfig, LearningEnergyClassifier, LearningModel, __version__
 from learning_energy_model.sampler import GibbsSampler
+
+
+def test_short_public_import_name_is_compatible():
+    assert learnenergy.LearningModel is LearningModel
+    assert learnenergy.__version__ == __version__
 
 
 class DelegatingSampler:

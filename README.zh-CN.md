@@ -30,7 +30,7 @@ uv sync --locked --extra dev
 模型接受 `X`（行是样本、列是特征）和 `y`（每行一个目标值）。特征会按配置转换为二元节点；`h` 和对称的 `J` 参数可以直接检查和解释。
 
 ```python
-from learning_energy_model import DataConfig, LearningModel
+from learnenergy import DataConfig, LearningModel
 
 config = DataConfig(
     feature_names=("家庭资源", "教师支持"),
