@@ -27,6 +27,9 @@ pisa = [
   "pyreadstat>=1.2",
 ]
 
+[project.scripts]
+learning-energy-model = "learning_energy_model.cli:main"
+
 [tool.setuptools.packages.find]
 include = ["learning_energy_model*"]
 

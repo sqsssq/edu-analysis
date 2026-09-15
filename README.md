@@ -47,6 +47,15 @@ manager.fit("reading", X, y_reading)
 math_report = manager.analyze("math")
 ```
 
+For a numeric CSV, the same workflow is available from the command line:
+
+```bash
+python -m learning_energy_model fit \
+  --input data.csv --features feature_a,feature_b --target outcome \
+  --output model.pt --missing-strategy median
+python -m learning_energy_model predict --model model.pt --input data.csv --output predictions.csv
+```
+
 For a runnable end-to-end example using generated data, run `python -m examples.fit_synthetic`.
 
 For an inspectable notebook version of the same workflow, open `examples/synthetic_workflow.ipynb`. It uses generated data only and does not require a PISA download.
