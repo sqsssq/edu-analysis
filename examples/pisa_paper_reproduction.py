@@ -31,6 +31,12 @@ PAPER_OUTCOMES = ("PV1MATH", "PV1SCIE", "PV1READ")
 PAPER_ECONOMIES = ("TAP", "HKG", "DEU", "USA", "GBR")
 
 
+def _json_default(value: Any) -> Any:
+    if hasattr(value, "tolist"):
+        return value.tolist()
+    raise TypeError(f"unsupported JSON value: {type(value).__name__}")
+
+
 def _moments(fit: Any) -> tuple[dict[int, Any], dict[int, Any]]:
     observed: dict[int, Any] = {
         1: fit.observed_means,
@@ -292,7 +298,10 @@ def main() -> int:
         tolerance=args.tolerance,
         status_file=args.status_file,
     )
-    Path(args.output).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    Path(args.output).write_text(
+        json.dumps(report, ensure_ascii=False, indent=2, default=_json_default),
+        encoding="utf-8",
+    )
     return 0
 
 
