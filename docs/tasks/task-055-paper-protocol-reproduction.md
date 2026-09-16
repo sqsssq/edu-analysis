@@ -32,6 +32,11 @@ In Progress
 - Reports include provenance, thresholds/protocol, moment orders 1-4,
   pass/fail comparisons, convergence, repeated-parameter correlations, and
   `J` distribution statistics.
+- The public analysis surface exposes paper-style effective interactions,
+  mean±SD classifications, threshold sensitivity, and exact temperature
+  response diagnostics.
+- `examples/pisa_paper_figures.py` exports aggregate PNGs for effective
+  interactions, temperature response, and `Jij` distributions from a report.
 - Existing package defaults remain backward compatible.
 - `pytest`, lint/type checks when available, and strict harness verification
   are run before handoff.

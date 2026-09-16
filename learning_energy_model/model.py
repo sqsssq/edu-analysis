@@ -498,6 +498,84 @@ class LearningModel:
             return result
         return self._builtin_analyze()
 
+    def effective_interactions(self, *, target_index: int | None = None) -> dict[str, float]:
+        """Return paper-style effective interactions for each feature.
+
+        ``epsilon_i(k)`` is the change in the target node's effective field
+        after feature ``k`` is fixed to zero. This is a model-internal
+        structural quantity, not a causal effect. Exact models use the exact
+        conditional distribution; sampled models use the configured sampler.
+        """
+        self._require_fitted()
+        assert self.h is not None and self.J is not None
+        target = self.target_index if target_index is None else int(target_index)
+        if not 0 <= target < self.n_nodes:
+            raise ValueError("target_index is outside the model node range")
+        baseline_means, _, _, _ = self._model_moments()
+        baseline_field = float(self.h[target] + torch.dot(self.J[target], baseline_means))
+        values: dict[str, float] = {}
+        for index, name in enumerate(self.preprocessor.feature_names):
+            if index == target:
+                continue
+            if self._states is not None:
+                mask = self._states[:, index] == 0
+                states = self._states[mask]
+                energies = self._energies(states)
+                probabilities = torch.softmax(-energies, dim=0)
+                frozen_means = probabilities @ states
+            else:
+                frozen_means, _, _, _ = self.sampler.moments(
+                    self.h,
+                    self.J,
+                    clamp_index=index,
+                    clamp_value=0.0,
+                    seed_offset=index + 1,
+                )
+            frozen_field = float(self.h[target] + torch.dot(self.J[target], frozen_means))
+            values[name] = baseline_field - frozen_field
+        return values
+
+    def temperature_response(self, temperatures: Any) -> dict[str, Any]:
+        """Scan mean energy and magnetization over positive temperatures.
+
+        The paper's critical-state diagnostic uses the peaks of ``d<E>/dT``
+        and ``dm/dT``. This reference implementation requires exact states so
+        that the response curve is not confused with Monte Carlo noise.
+        """
+        self._require_fitted()
+        if self._states is None:
+            raise ValueError("temperature_response requires exact enumeration")
+        values = np.asarray(temperatures, dtype=float).reshape(-1)
+        if values.size < 2 or not np.isfinite(values).all() or np.any(values <= 0):
+            raise ValueError("temperatures must contain at least two finite positive values")
+        assert self.h is not None and self.J is not None
+        energies = self._energies(self._states)
+        energies_np = energies.detach().cpu().numpy()
+        magnetization = self._states.sum(dim=1)
+        mean_energy = []
+        mean_magnetization = []
+        for temperature in values:
+            probabilities = torch.softmax(-energies / float(temperature), dim=0)
+            mean_energy.append(float((probabilities * energies).sum()))
+            mean_magnetization.append(float((probabilities * magnetization).sum()))
+        energy_array = np.asarray(mean_energy)
+        magnetization_array = np.asarray(mean_magnetization)
+        d_energy_d_temperature = np.gradient(energy_array, values)
+        d_magnetization_d_temperature = np.gradient(magnetization_array, values)
+        return {
+            "temperature": values.tolist(),
+            "mean_energy": energy_array.tolist(),
+            "mean_magnetization": magnetization_array.tolist(),
+            "d_mean_energy_d_temperature": d_energy_d_temperature.tolist(),
+            "d_mean_magnetization_d_temperature": d_magnetization_d_temperature.tolist(),
+            "energy_response_peak_temperature": float(values[np.argmax(d_energy_d_temperature)]),
+            "magnetization_response_peak_temperature": float(
+                values[np.argmax(np.abs(d_magnetization_d_temperature))]
+            ),
+            "temperature_one_index": int(np.argmin(np.abs(values - 1.0))),
+            "energies_finite": bool(np.isfinite(energies_np).all()),
+        }
+
     def _builtin_analyze(self) -> AnalysisResult:
         """Run the built-in aggregate analysis implementation."""
         self._require_fitted()

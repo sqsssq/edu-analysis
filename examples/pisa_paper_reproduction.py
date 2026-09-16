@@ -12,7 +12,14 @@ from typing import Any
 
 import numpy as np
 
-from learning_energy_model import DataConfig, LearningModel, PISAMapping, read_pisa_file
+from learning_energy_model import (
+    DataConfig,
+    LearningModel,
+    PISAMapping,
+    classify_effective_interactions,
+    read_pisa_file,
+    threshold_sensitivity,
+)
 from learning_energy_model.evaluation import compare_moment_orders
 
 PAPER_FEATURES = (
@@ -84,6 +91,7 @@ def run(
         raise ValueError("sample_size and repeats must be positive")
     results: list[dict[str, Any]] = []
     parameter_vectors: dict[str, list[np.ndarray]] = {}
+    protocol_diagnostics: dict[str, Any] = {}
     for economy_index, economy in enumerate(economies):
         subset = table[table[economy_column] == economy]
         for outcome_index, outcome in enumerate(outcomes):
@@ -95,6 +103,13 @@ def run(
             prepared = mapping.prepare(subset)
             if len(prepared.X) < sample_size:
                 raise ValueError(f"{economy}/{outcome} has fewer than {sample_size} complete rows")
+            protocol_diagnostics[f"{economy}/{outcome}"] = {
+                "complete_rows": len(prepared.X),
+                "threshold_sensitivity": threshold_sensitivity(
+                    np.column_stack([prepared.X, prepared.y]),
+                    np.linspace(-0.5, 0.5, 1_000),
+                ),
+            }
             for repeat in range(1, repeats + 1):
                 repeat_seed = seed + economy_index * 10_000 + outcome_index * 100 + repeat
                 indices = np.random.default_rng(repeat_seed).choice(
@@ -129,6 +144,8 @@ def run(
                     modeled,
                     tolerances={order: tolerance for order in range(1, 5)},
                 )
+                effective = model.effective_interactions()
+                temperature_response = model.temperature_response(np.linspace(0.5, 1.5, 101))
                 results.append({
                     "economy": economy,
                     "outcome": outcome,
@@ -149,6 +166,8 @@ def run(
                     "observed_moments": {str(order): observed[order] for order in range(1, 5)},
                     "modeled_moments": {str(order): modeled[order] for order in range(1, 5)},
                     "moment_comparison": comparison.to_dict(),
+                    "effective_interactions": classify_effective_interactions(effective),
+                    "temperature_response": temperature_response,
                     "h": model.h.detach().cpu().numpy().tolist(),
                     "J": model.J.detach().cpu().numpy().tolist(),
                     "J_statistics": _j_statistics(model.J.detach().cpu().numpy()),
@@ -194,6 +213,7 @@ def run(
             "tolerance": tolerance,
         },
         "results": results,
+        "protocol_diagnostics": protocol_diagnostics,
         "repeat_parameter_correlations": repeat_correlations,
     }
 

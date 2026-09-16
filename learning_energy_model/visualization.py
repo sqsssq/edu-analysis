@@ -104,4 +104,53 @@ def plot_training_history(
     return _finish(ax.figure, ax, title)
 
 
-__all__ = ["plot_correlations", "plot_interactions", "plot_training_history"]
+def plot_effective_interactions(
+    values: dict[str, float],
+    *,
+    ax: Any | None = None,
+    title: str | None = "Effective interactions",
+) -> tuple[Any, Any]:
+    """Plot paper-style ``epsilon_i(k)`` values with mean ± SD benchmarks."""
+    plt = _pyplot()
+    names = list(values)
+    data = np.asarray([values[name] for name in names], dtype=float)
+    if ax is None:
+        _, ax = plt.subplots(figsize=(max(7, len(names) * 0.45), 4))
+    mean, std = float(data.mean()), float(data.std())
+    ax.bar(np.arange(len(names)), data, color="#176b87")
+    ax.axhline(mean, color="#102b3a", linewidth=1, label="mean")
+    ax.axhline(mean + std, color="#e47945", linestyle="--", label="mean ± SD")
+    ax.axhline(mean - std, color="#e47945", linestyle="--")
+    ax.set_xticks(np.arange(len(names)), names, rotation=90)
+    ax.set_ylabel("epsilon")
+    ax.legend()
+    return _finish(ax.figure, ax, title)
+
+
+def plot_temperature_response(
+    response: dict[str, Any],
+    *,
+    ax: Any | None = None,
+    title: str | None = "Temperature response",
+) -> tuple[Any, Any]:
+    """Plot the paper's ``d<E>/dT`` and ``dm/dT`` critical-state curves."""
+    plt = _pyplot()
+    temperatures = np.asarray(response["temperature"], dtype=float)
+    if ax is None:
+        _, ax = plt.subplots(figsize=(7, 4))
+    ax.plot(temperatures, response["d_mean_energy_d_temperature"], label="d<E>/dT")
+    ax.plot(temperatures, response["d_mean_magnetization_d_temperature"], label="dm/dT")
+    ax.axvline(1.0, color="#62717e", linestyle=":", label="T=1")
+    ax.set_xlabel("temperature")
+    ax.set_ylabel("response")
+    ax.legend()
+    return _finish(ax.figure, ax, title)
+
+
+__all__ = [
+    "plot_correlations",
+    "plot_effective_interactions",
+    "plot_interactions",
+    "plot_temperature_response",
+    "plot_training_history",
+]

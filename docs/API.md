@@ -70,6 +70,14 @@ target node being one. `AnalysisResult` contains `h`, symmetric `J`, moments,
 binary Pearson correlations, higher-order model moments, and model-internal
 node-freezing comparisons. A node-freezing comparison is not a causal effect.
 
+For paper-aligned analysis, fitted exact models also expose
+`effective_interactions()`, returning the change in the target effective field
+when each feature is fixed to zero, and `temperature_response()`, returning
+mean energy, magnetization, and their temperature derivatives. The helpers
+`classify_effective_interactions()` and `threshold_sensitivity()` implement the
+paper's mean±SD factor classification and Appendix A threshold scan. These are
+model-internal diagnostics, not causal effects or official PISA estimates.
+
 ## Estimator and multi-domain interfaces
 
 `LearningEnergyClassifier` provides `fit`, `predict`, `predict_proba`,
