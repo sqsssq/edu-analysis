@@ -2,7 +2,7 @@
 
 This example intentionally keeps the raw PISA file local. It samples 1,200
 complete rows 16 times per economy and outcome, uses the paper's standard-
-deviation binarization, and fits with the exact KL/autodiff path.
+deviation binarization, and fits with explicit KL-gradient descent.
 """
 
 import argparse
