@@ -93,12 +93,21 @@ def run(
     learning_rate: float = 0.05,
     max_epochs: int = 10_000,
     tolerance: float = 1e-3,
+    status_file: str | Path | None = None,
 ) -> dict[str, Any]:
     if sample_size <= 0 or repeats <= 0:
         raise ValueError("sample_size and repeats must be positive")
     results: list[dict[str, Any]] = []
     parameter_vectors: dict[str, list[np.ndarray]] = {}
     protocol_diagnostics: dict[str, Any] = {}
+    total_runs = len(economies) * len(outcomes) * repeats
+    status_path = Path(status_file) if status_file is not None else None
+    if status_path is not None:
+        status_path.parent.mkdir(parents=True, exist_ok=True)
+        status_path.write_text(
+            json.dumps({"done": 0, "total": total_runs, "current": "starting"}, indent=2) + "\n",
+            encoding="utf-8",
+        )
     for economy_index, economy in enumerate(economies):
         subset = table[table[economy_column] == economy]
         for outcome_index, outcome in enumerate(outcomes):
@@ -190,6 +199,20 @@ def run(
                         model.J.detach().cpu().numpy()[np.triu_indices(len(features) + 1, k=1)],
                     ])
                 )
+                if status_path is not None:
+                    status_path.write_text(
+                        json.dumps(
+                            {
+                                "done": len(results),
+                                "total": total_runs,
+                                "current": f"{economy}/{outcome}/repeat-{repeat}",
+                                "converged": fit.converged,
+                            },
+                            indent=2,
+                        )
+                        + "\n",
+                        encoding="utf-8",
+                    )
 
     repeat_correlations: dict[str, float | None] = {}
     for economy in economies:
@@ -203,6 +226,12 @@ def run(
             repeat_correlations[f"{economy}/{outcome}"] = (
                 float(np.mean(correlations)) if correlations else None
             )
+    if status_path is not None:
+        status_path.write_text(
+            json.dumps({"done": total_runs, "total": total_runs, "current": "finished"}, indent=2)
+            + "\n",
+            encoding="utf-8",
+        )
     return {
         "provenance": {
             "assessment_cycle": "PISA 2018",
@@ -245,6 +274,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--learning-rate", type=float, default=0.05)
     parser.add_argument("--max-epochs", type=int, default=10_000)
     parser.add_argument("--tolerance", type=float, default=1e-3)
+    parser.add_argument("--status-file", help="write aggregate progress JSON while running")
     return parser
 
 
@@ -260,6 +290,7 @@ def main() -> int:
         learning_rate=args.learning_rate,
         max_epochs=args.max_epochs,
         tolerance=args.tolerance,
+        status_file=args.status_file,
     )
     Path(args.output).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     return 0
