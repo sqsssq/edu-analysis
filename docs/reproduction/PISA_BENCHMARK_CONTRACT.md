@@ -30,6 +30,7 @@ The bundled paper's protocol is available through
 
 - 18 WLE features plus one outcome, for 19 binary nodes;
 - `f > population standard deviation` for every binary threshold;
+- thresholds are computed independently within each sampled 1,200-row repeat;
 - first plausible values `PV1MATH`, `PV1SCIE`, and `PV1READ`;
 - 1,200 rows sampled without replacement, repeated 16 times per economy/outcome;
 - exact enumeration and explicit KL-gradient training;

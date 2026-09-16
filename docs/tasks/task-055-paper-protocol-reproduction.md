@@ -29,6 +29,8 @@ In Progress
   `f > population standard deviation` rule.
 - The paper runner defaults to 1,200 samples, 16 repeats, exact calculation,
   and `method="kl"`.
+- Each repeat computes its own population-standard-deviation thresholds before
+  binarization; this scope is recorded as `per_sample_repeat`.
 - Reports include provenance, thresholds/protocol, moment orders 1-4,
   pass/fail comparisons, convergence, repeated-parameter correlations, and
   `J` distribution statistics.
