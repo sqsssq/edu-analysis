@@ -72,6 +72,9 @@ print(model.last_quality_report.to_dict())
 - critical-state 使用 exact covariance 导数。
 
 复现脚本只输出聚合参数、矩、收敛信息、采样诊断和 provenance，不会把 PISA 原始行数据写入仓库。完整边界见 `docs/reproduction/PISA_BENCHMARK_CONTRACT.md`。
+默认还会在 `data/prepared/pisa2018-paper-reproduction-models/` 保存 15 个
+按经济体/学科选出的 PyTorch `.pt` 模型文件；每个文件都可以用
+`LearningModel.load()` 重新加载。16 次重复结果仍会全部保留用于 validation。
 
 无需 PISA 数据即可运行完整示例：
 

@@ -34,6 +34,8 @@ In Progress
 - Reports include provenance, thresholds/protocol, moment orders 1-4,
   pass/fail comparisons, convergence, repeated-parameter correlations, and
   `J` distribution statistics.
+- The runner saves one selected PyTorch `.pt` model per economy/outcome after
+  retaining all repeats for validation.
 - The public analysis surface exposes paper-style effective interactions,
   mean±SD classifications, threshold sensitivity, and exact temperature
   response diagnostics; the reproduction runner forces Monte Carlo for the

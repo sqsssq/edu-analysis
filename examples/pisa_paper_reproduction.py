@@ -111,11 +111,13 @@ def run(
     max_epochs: int = 10_000,
     tolerance: float = 1e-3,
     status_file: str | Path | None = None,
+    model_dir: str | Path | None = None,
 ) -> dict[str, Any]:
     if sample_size <= 0 or repeats <= 0:
         raise ValueError("sample_size and repeats must be positive")
     results: list[dict[str, Any]] = []
     parameter_vectors: dict[str, list[np.ndarray]] = {}
+    best_models: dict[str, tuple[LearningModel, tuple[int, float]]] = {}
     protocol_diagnostics: dict[str, Any] = {}
     total_runs = len(economies) * len(outcomes) * repeats
     status_path = Path(status_file) if status_file is not None else None
@@ -219,6 +221,15 @@ def run(
                     "J_statistics": _j_statistics(model.J.detach().cpu().numpy()),
                     "warnings": fit.warnings,
                 })
+                group_key = f"{economy}/{outcome}"
+                kl_score = float(fit.diagnostics.get("kl_divergence", float("inf")))
+                candidate_score = (
+                    0 if fit.converged else 1,
+                    kl_score if fit.converged else fit.mean_error + fit.correlation_error,
+                )
+                previous = best_models.get(group_key)
+                if previous is None or candidate_score < previous[1]:
+                    best_models[group_key] = (model, candidate_score)
                 parameter_vectors.setdefault(f"{economy}/{outcome}", []).append(
                     np.concatenate([
                         model.h.detach().cpu().numpy(),
@@ -238,9 +249,31 @@ def run(
                             indent=2,
                         )
                         + "\n",
-                        encoding="utf-8",
-                    )
+                            encoding="utf-8",
+                        )
 
+
+            if model_dir is not None:
+                group_key = f"{economy}/{outcome}"
+                selected_model, selected_score = best_models[group_key]
+                selected_repeat = next(
+                    row["repeat"]
+                    for row in reversed(results)
+                    if row["economy"] == economy
+                    and row["outcome"] == outcome
+                    and row["seed"] == selected_model.seed
+                )
+                selected_model.artifact_metadata["reproduction_selection"] = {
+                    "strategy": "converged_then_minimum_kl_else_minimum_moment_error",
+                    "economy": economy,
+                    "outcome": outcome,
+                    "repeat": selected_repeat,
+                    "score": list(selected_score),
+                    "total_repeats": repeats,
+                }
+                destination = Path(model_dir)
+                destination.mkdir(parents=True, exist_ok=True)
+                selected_model.save(destination / f"{economy}-{outcome}.pt")
     repeat_correlations: dict[str, float | None] = {}
     for economy in economies:
         for outcome in outcomes:
@@ -281,6 +314,16 @@ def run(
             "calculation": "exact",
             "effective_interaction_calculation": "monte_carlo",
             "temperature_response_derivative": "exact_covariance",
+            "model_artifacts": (
+                {
+                    "directory": str(model_dir),
+                    "count": len(best_models),
+                    "selection": "converged_then_minimum_kl_else_minimum_moment_error",
+                    "format": "PyTorch .pt via LearningModel.save",
+                }
+                if model_dir is not None
+                else None
+            ),
             "learning_rate": learning_rate,
             "max_epochs": max_epochs,
             "tolerance": tolerance,
@@ -308,6 +351,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-epochs", type=int, default=10_000)
     parser.add_argument("--tolerance", type=float, default=1e-3)
     parser.add_argument("--status-file", help="write aggregate progress JSON while running")
+    parser.add_argument(
+        "--model-dir",
+        default="data/prepared/pisa2018-paper-reproduction-models",
+        help="directory for one selected PyTorch .pt model per economy/outcome",
+    )
     return parser
 
 
@@ -327,6 +375,7 @@ def main() -> int:
             max_epochs=args.max_epochs,
             tolerance=args.tolerance,
             status_file=args.status_file,
+            model_dir=args.model_dir,
         )
     except Exception as exc:
         if args.status_file:

@@ -42,6 +42,11 @@ nodes. The report records chain count, draws, R-hat, ESS, and MCSE for the
 baseline and every frozen-node conditional sample. Critical-state derivatives
 use the exact covariance identities for `d<E>/dT` and `dm/dT`.
 
+The 16 repeats are retained for validation. The runner also saves one selected
+PyTorch `.pt` artifact per economy/outcome (15 total) using the rule
+"converged, then minimum KL; otherwise minimum moment error". These artifacts
+contain model parameters and aggregate fit metadata, not raw PISA rows.
+
 This mode is separate from the package default median threshold and ordinary
 row-weight behavior. It still requires a locally obtained, codebook-reviewed
 PISA file and does not implement official complex-survey inference.

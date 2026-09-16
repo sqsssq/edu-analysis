@@ -107,6 +107,9 @@ The runner writes only aggregate parameters, moments, convergence information,
 Monte Carlo diagnostics, and provenance. It never writes raw PISA rows to the
 repository. See `docs/reproduction/PISA_BENCHMARK_CONTRACT.md` for the complete
 interpretation boundary and known differences from official PISA inference.
+By default it also writes 15 selected PyTorch `.pt` model artifacts under
+`data/prepared/pisa2018-paper-reproduction-models/`; each is reloadable with
+`LearningModel.load()` and is selected from the 16 validation repeats.
 
 The visual landing page is [`docs/landing.html`](docs/landing.html). The full searchable documentation is built from [`docs/`](docs/) with MkDocs Material and is available under `/docs/` on GitHub Pages.
 
