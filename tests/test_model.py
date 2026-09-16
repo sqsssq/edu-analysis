@@ -468,6 +468,8 @@ def test_kl_autodiff_path_is_available_for_exact_models():
     )
     result = model.fit(X, y, method="kl")
     assert result.diagnostics["training_method"] == "kl"
+    assert result.diagnostics["optimizer"] == "explicit_gradient_descent"
+    assert np.isfinite(result.diagnostics["gradient_norm"])
     assert model.predict(X).probabilities.shape == (6,)
 
 

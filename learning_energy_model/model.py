@@ -205,36 +205,45 @@ class LearningModel:
         return moments
 
     def _fit_kl(self, data: torch.Tensor, weights: torch.Tensor) -> FitResult:
-        """Fit the exact negative log-likelihood with PyTorch autodiff."""
+        """Fit KL divergence with the paper's explicit moment gradients.
+
+        For ``p(s) ∝ exp(-E(s))``, the KL gradients are ``m_data - m_model``
+        and ``C_data - C_model``. The paper updates the fields and symmetric
+        interactions directly along the negative gradient; an adaptive
+        optimizer is intentionally not used in this reproduction path.
+        """
         if self._states is None:
             raise ValueError("method='kl' requires exact enumeration; use moment matching for larger models")
         assert self.h is not None and self.J is not None
         data_means = self._weighted_mean(data, weights)
         data_pairs = self._weighted_pairwise(data, weights)
-        optimizer = torch.optim.Adam([self.h, self.J], lr=self.learning_rate)
         history: list[float] = []
         converged = False
         mean_error = float("inf")
         correlation_error = float("inf")
+        gradient_norm = float("inf")
         for epoch in range(1, self.max_epochs + 1):
-            optimizer.zero_grad()
-            data_energy = self._energies(data)
-            state_energy = self._energies(self._states)
-            objective = (data_energy * weights).sum() / weights.sum() + torch.logsumexp(
-                -state_energy, dim=0
-            )
-            objective.backward()
-            optimizer.step()
             with torch.no_grad():
+                model_means, model_pairs, energies, _ = self._model_moments()
+                mean_gradient = data_means - model_means
+                pair_gradient = data_pairs - model_pairs
+                pair_gradient.fill_diagonal_(0.0)
+                gradient_norm = float(
+                    torch.maximum(
+                        torch.max(torch.abs(mean_gradient)),
+                        torch.max(torch.abs(pair_gradient)),
+                    )
+                )
+                self.h -= self.learning_rate * mean_gradient
+                self.J -= self.learning_rate * pair_gradient
                 self.J.fill_diagonal_(0.0)
                 self.J.copy_((self.J + self.J.T) / 2)
-                model_means, model_pairs, _, _ = self._model_moments()
                 mean_delta = model_means - data_means
                 pair_delta = model_pairs - data_pairs
                 pair_delta.fill_diagonal_(0.0)
                 mean_error = float(torch.max(torch.abs(mean_delta)))
                 correlation_error = float(torch.max(torch.abs(pair_delta)))
-            history.append(float(objective.detach()))
+            history.append(float(energies.mean()))
             if epoch >= self.min_epochs and max(mean_error, correlation_error) <= self.tolerance:
                 converged = True
                 break
@@ -259,6 +268,8 @@ class LearningModel:
                 "n_nodes": int(data.shape[1]),
                 "calculation": "exact",
                 "training_method": "kl",
+                "optimizer": "explicit_gradient_descent",
+                "gradient_norm": gradient_norm,
             },
             observed_means=data_means.detach().cpu().numpy(),
             model_means=model_means.detach().cpu().numpy(),

@@ -2,7 +2,7 @@
 
 ## Status
 
-Review Ready
+In Progress
 
 ## Scope
 
@@ -12,6 +12,8 @@ Review Ready
 - Use exact 19-node KL/autodiff training and export first- through fourth-order
   moment comparisons, convergence, parameter stability, and `J` distribution
   statistics.
+- Use the paper's explicit KL gradients for the paper runner; adaptive Adam is
+  not used in that reproduction path.
 - Record the complete reproduction protocol and provenance without exporting
   raw PISA rows.
 
