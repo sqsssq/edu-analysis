@@ -10,6 +10,9 @@ init-project.env
 data/raw/
 data/prepared/
 
+# Unpublished source papers (keep local; never publish to GitHub).
+A_Neural_Network_Model_for_Learning.pdf
+
 # Locally generated model artifacts.
 *.pt
 *.pth
