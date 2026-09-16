@@ -24,9 +24,9 @@ def export_figures(report: dict[str, Any], output_dir: str | Path) -> list[Path]
     for key, row in first_by_group.items():
         effective = row["effective_interactions"]
         names = list(effective["values"])
-        values = np.asarray(list(effective["values"].values()), dtype=float)
+        effective_values = np.asarray(list(effective["values"].values()), dtype=float)
         fig, ax = plt.subplots(figsize=(max(7, len(names) * 0.45), 4))
-        ax.bar(np.arange(len(names)), values, color="#176b87")
+        ax.bar(np.arange(len(names)), effective_values, color="#176b87")
         ax.axhline(effective["mean"], color="#102b3a", label="mean")
         ax.axhline(effective["lower_benchmark"], color="#e47945", linestyle="--")
         ax.axhline(effective["upper_benchmark"], color="#e47945", linestyle="--", label="mean ± SD")
@@ -57,13 +57,13 @@ def export_figures(report: dict[str, Any], output_dir: str | Path) -> list[Path]
         outputs.append(path)
 
     for outcome in sorted({row["outcome"] for row in results}):
-        values = []
+        interaction_values: list[float] = []
         for row in results:
             if row["outcome"] == outcome:
                 matrix = np.asarray(row["J"], dtype=float)
-                values.extend(matrix[np.triu_indices_from(matrix, k=1)])
+                interaction_values.extend(matrix[np.triu_indices_from(matrix, k=1)].tolist())
         fig, ax = plt.subplots(figsize=(7, 4))
-        ax.hist(values, bins=40, color="#176b87", alpha=0.85)
+        ax.hist(interaction_values, bins=40, color="#176b87", alpha=0.85)
         ax.set_xlabel("Jij")
         ax.set_ylabel("count")
         ax.set_title(f"Jij distribution: {outcome}")

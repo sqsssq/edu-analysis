@@ -37,6 +37,17 @@ def _json_default(value: Any) -> Any:
     raise TypeError(f"unsupported JSON value: {type(value).__name__}")
 
 
+def _economy_subset(table: Any, economy_column: str, economy: str) -> Any:
+    """Select an economy across SAS readers that return strings or bytes."""
+    values = table[economy_column]
+    normalized = values.map(
+        lambda value: value.decode(errors="replace").strip()
+        if isinstance(value, bytes)
+        else str(value).strip()
+    )
+    return table[normalized == economy]
+
+
 def _moments(fit: Any) -> tuple[dict[int, Any], dict[int, Any]]:
     observed: dict[int, Any] = {
         1: fit.observed_means,
@@ -111,11 +122,17 @@ def run(
     if status_path is not None:
         status_path.parent.mkdir(parents=True, exist_ok=True)
         status_path.write_text(
-            json.dumps({"done": 0, "total": total_runs, "current": "starting"}, indent=2) + "\n",
+            json.dumps(
+                {"done": 0, "total": total_runs, "current": "starting", "status": "running"},
+                indent=2,
+            )
+            + "\n",
             encoding="utf-8",
         )
     for economy_index, economy in enumerate(economies):
-        subset = table[table[economy_column] == economy]
+        subset = _economy_subset(table, economy_column, economy)
+        if len(subset) == 0:
+            raise ValueError(f"no rows found for economy {economy!r} in {economy_column!r}")
         for outcome_index, outcome in enumerate(outcomes):
             mapping = PISAMapping(
                 feature_names=features,
@@ -132,7 +149,7 @@ def run(
                 "complete_rows": len(X_complete),
                 "threshold_sensitivity": threshold_sensitivity(
                     np.column_stack([X_complete, y_complete]),
-                    np.linspace(-0.5, 0.5, 1_000),
+                    np.linspace(-0.5, 0.5, 1_000).tolist(),
                 ),
             }
             for repeat in range(1, repeats + 1):
@@ -213,6 +230,7 @@ def run(
                                 "total": total_runs,
                                 "current": f"{economy}/{outcome}/repeat-{repeat}",
                                 "converged": fit.converged,
+                                "status": "running",
                             },
                             indent=2,
                         )
@@ -234,7 +252,10 @@ def run(
             )
     if status_path is not None:
         status_path.write_text(
-            json.dumps({"done": total_runs, "total": total_runs, "current": "finished"}, indent=2)
+            json.dumps(
+                {"done": total_runs, "total": total_runs, "current": "finished", "status": "finished"},
+                indent=2,
+            )
             + "\n",
             encoding="utf-8",
         )
@@ -286,18 +307,38 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     args = build_parser().parse_args()
-    report = run(
-        read_pisa_file(args.input),
-        economy_column=args.economy_column,
-        sample_size=args.sample_size,
-        repeats=args.repeats,
-        missing_values=tuple(float(item) for item in args.missing_values.split(",") if item.strip()),
-        seed=args.seed,
-        learning_rate=args.learning_rate,
-        max_epochs=args.max_epochs,
-        tolerance=args.tolerance,
-        status_file=args.status_file,
-    )
+    try:
+        report = run(
+            read_pisa_file(args.input),
+            economy_column=args.economy_column,
+            sample_size=args.sample_size,
+            repeats=args.repeats,
+            missing_values=tuple(
+                float(item) for item in args.missing_values.split(",") if item.strip()
+            ),
+            seed=args.seed,
+            learning_rate=args.learning_rate,
+            max_epochs=args.max_epochs,
+            tolerance=args.tolerance,
+            status_file=args.status_file,
+        )
+    except Exception as exc:
+        if args.status_file:
+            Path(args.status_file).write_text(
+                json.dumps(
+                    {
+                        "done": 0,
+                        "total": 240,
+                        "current": "failed",
+                        "status": "failed",
+                        "message": str(exc),
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+        raise
     Path(args.output).write_text(
         json.dumps(report, ensure_ascii=False, indent=2, default=_json_default),
         encoding="utf-8",
