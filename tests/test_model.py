@@ -470,6 +470,8 @@ def test_kl_autodiff_path_is_available_for_exact_models():
     assert result.diagnostics["training_method"] == "kl"
     assert result.diagnostics["optimizer"] == "explicit_gradient_descent"
     assert np.isfinite(result.diagnostics["gradient_norm"])
+    assert result.diagnostics["kl_divergence"] >= 0.0
+    assert all(value >= -1e-10 for value in result.objective_history)
     assert model.predict(X).probabilities.shape == (6,)
 
 

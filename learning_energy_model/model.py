@@ -217,6 +217,10 @@ class LearningModel:
         assert self.h is not None and self.J is not None
         data_means = self._weighted_mean(data, weights)
         data_pairs = self._weighted_pairwise(data, weights)
+        unique_data, inverse = torch.unique(data, dim=0, return_inverse=True)
+        masses = torch.zeros(unique_data.shape[0], dtype=torch.float64, device=data.device)
+        masses.scatter_add_(0, inverse, weights)
+        masses = masses / weights.sum()
         history: list[float] = []
         converged = False
         mean_error = float("inf")
@@ -225,6 +229,11 @@ class LearningModel:
         for epoch in range(1, self.max_epochs + 1):
             with torch.no_grad():
                 model_means, model_pairs, energies, _ = self._model_moments()
+                unique_energies = self._energies(unique_data)
+                log_partition = torch.logsumexp(-energies, dim=0)
+                kl_divergence = torch.sum(
+                    masses * (torch.log(masses) + unique_energies + log_partition)
+                )
                 mean_gradient = data_means - model_means
                 pair_gradient = data_pairs - model_pairs
                 pair_gradient.fill_diagonal_(0.0)
@@ -243,7 +252,7 @@ class LearningModel:
                 pair_delta.fill_diagonal_(0.0)
                 mean_error = float(torch.max(torch.abs(mean_delta)))
                 correlation_error = float(torch.max(torch.abs(pair_delta)))
-            history.append(float(energies.mean()))
+            history.append(float(kl_divergence))
             if epoch >= self.min_epochs and max(mean_error, correlation_error) <= self.tolerance:
                 converged = True
                 break
@@ -251,6 +260,14 @@ class LearningModel:
         if not converged:
             warnings.append("KL/autodiff training did not reach the requested tolerance")
         model_means, model_pairs, _, _ = self._model_moments()
+        final_unique_energies = self._energies(unique_data)
+        final_log_partition = torch.logsumexp(-final_unique_energies, dim=0)
+        final_kl_divergence = float(
+            torch.sum(
+                masses
+                * (torch.log(masses) + final_unique_energies + final_log_partition)
+            ).detach()
+        )
         self.h = self.h.detach()
         self.J = self.J.detach()
         self._fitted = True
@@ -270,6 +287,7 @@ class LearningModel:
                 "training_method": "kl",
                 "optimizer": "explicit_gradient_descent",
                 "gradient_norm": gradient_norm,
+                "kl_divergence": final_kl_divergence,
             },
             observed_means=data_means.detach().cpu().numpy(),
             model_means=model_means.detach().cpu().numpy(),
