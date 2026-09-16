@@ -32,22 +32,28 @@ PAPER_ECONOMIES = ("TAP", "HKG", "DEU", "USA", "GBR")
 
 
 def _moments(fit: Any) -> tuple[dict[int, Any], dict[int, Any]]:
-    observed = {
+    observed: dict[int, Any] = {
         1: fit.observed_means,
         2: fit.observed_pairwise_moments,
-        3: {key: value for key, value in fit.observed_higher_order_moments.items()
-            if key.count("×") == 2},
-        4: {key: value for key, value in fit.observed_higher_order_moments.items()
-            if key.count("×") == 3},
     }
-    modeled = {
+    modeled: dict[int, Any] = {
         1: fit.model_means,
         2: fit.model_pairwise_moments,
-        3: {key: value for key, value in fit.model_higher_order_moments.items()
-            if key.count("×") == 2},
-        4: {key: value for key, value in fit.model_higher_order_moments.items()
-            if key.count("×") == 3},
     }
+    for order, separator_count in ((3, 2), (4, 3)):
+        observed_values = {
+            key: value
+            for key, value in fit.observed_higher_order_moments.items()
+            if key.count("×") == separator_count
+        }
+        modeled_values = {
+            key: value
+            for key, value in fit.model_higher_order_moments.items()
+            if key.count("×") == separator_count
+        }
+        if observed_values or modeled_values:
+            observed[order] = observed_values
+            modeled[order] = modeled_values
     return observed, modeled
 
 
@@ -82,6 +88,7 @@ def run(
     outcomes: tuple[str, ...] = PAPER_OUTCOMES,
     sample_size: int = 1200,
     repeats: int = 16,
+    missing_values: tuple[float, ...] = (),
     seed: int = 0,
     learning_rate: float = 0.05,
     max_epochs: int = 10_000,
@@ -98,22 +105,25 @@ def run(
             mapping = PISAMapping(
                 feature_names=features,
                 target_name=outcome,
+                missing_values=missing_values,
                 metadata={"protocol": "paper", "economy": economy},
             )
             prepared = mapping.prepare(subset)
-            if len(prepared.X) < sample_size:
+            complete = np.isfinite(prepared.X).all(axis=1) & np.isfinite(prepared.y)
+            X_complete, y_complete = prepared.X[complete], prepared.y[complete]
+            if len(X_complete) < sample_size:
                 raise ValueError(f"{economy}/{outcome} has fewer than {sample_size} complete rows")
             protocol_diagnostics[f"{economy}/{outcome}"] = {
-                "complete_rows": len(prepared.X),
+                "complete_rows": len(X_complete),
                 "threshold_sensitivity": threshold_sensitivity(
-                    np.column_stack([prepared.X, prepared.y]),
+                    np.column_stack([X_complete, y_complete]),
                     np.linspace(-0.5, 0.5, 1_000),
                 ),
             }
             for repeat in range(1, repeats + 1):
                 repeat_seed = seed + economy_index * 10_000 + outcome_index * 100 + repeat
                 indices = np.random.default_rng(repeat_seed).choice(
-                    len(prepared.X), size=sample_size, replace=False
+                    len(X_complete), size=sample_size, replace=False
                 )
                 model = LearningModel(
                     DataConfig(
@@ -136,13 +146,14 @@ def run(
                     tolerance=tolerance,
                     seed=repeat_seed,
                 )
-                fit = model.fit(prepared.X[indices], prepared.y[indices], method="kl")
+                fit = model.fit(X_complete[indices], y_complete[indices], method="kl")
                 assert model.h is not None and model.J is not None
                 observed, modeled = _moments(fit)
+                moment_orders = sorted(observed)
                 comparison = compare_moment_orders(
                     observed,
                     modeled,
-                    tolerances={order: tolerance for order in range(1, 5)},
+                    tolerances={order: tolerance for order in moment_orders},
                 )
                 effective = model.effective_interactions()
                 temperature_response = model.temperature_response(np.linspace(0.5, 1.5, 101))
@@ -161,10 +172,10 @@ def run(
                     "pairwise_error": fit.correlation_error,
                     "moment_pearson_r": {
                         str(order): _pearson(observed[order], modeled[order])
-                        for order in range(1, 5)
+                        for order in moment_orders
                     },
-                    "observed_moments": {str(order): observed[order] for order in range(1, 5)},
-                    "modeled_moments": {str(order): modeled[order] for order in range(1, 5)},
+                    "observed_moments": {str(order): observed[order] for order in moment_orders},
+                    "modeled_moments": {str(order): modeled[order] for order in moment_orders},
                     "moment_comparison": comparison.to_dict(),
                     "effective_interactions": classify_effective_interactions(effective),
                     "temperature_response": temperature_response,
@@ -225,6 +236,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output", required=True)
     parser.add_argument("--sample-size", type=int, default=1200)
     parser.add_argument("--repeats", type=int, default=16)
+    parser.add_argument(
+        "--missing-values",
+        default="",
+        help="comma-separated source missing codes reviewed against the OECD codebook",
+    )
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--learning-rate", type=float, default=0.05)
     parser.add_argument("--max-epochs", type=int, default=10_000)
@@ -239,6 +255,7 @@ def main() -> int:
         economy_column=args.economy_column,
         sample_size=args.sample_size,
         repeats=args.repeats,
+        missing_values=tuple(float(item) for item in args.missing_values.split(",") if item.strip()),
         seed=args.seed,
         learning_rate=args.learning_rate,
         max_epochs=args.max_epochs,
