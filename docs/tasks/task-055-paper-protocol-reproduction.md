@@ -34,7 +34,8 @@ In Progress
   `J` distribution statistics.
 - The public analysis surface exposes paper-style effective interactions,
   mean±SD classifications, threshold sensitivity, and exact temperature
-  response diagnostics.
+  response diagnostics; the reproduction runner forces Monte Carlo for the
+  effective interaction calculation and records its chain diagnostics.
 - `examples/pisa_paper_figures.py` exports aggregate PNGs for effective
   interactions, temperature response, and `Jij` distributions from a report.
 - Existing package defaults remain backward compatible.

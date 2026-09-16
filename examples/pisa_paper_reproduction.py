@@ -187,7 +187,8 @@ def run(
                     modeled,
                     tolerances={order: tolerance for order in moment_orders},
                 )
-                effective = model.effective_interactions()
+                effective_report = model.effective_interaction_report(calculation="monte_carlo")
+                effective = effective_report["values"]
                 temperature_response = model.temperature_response(np.linspace(0.5, 1.5, 101))
                 results.append({
                     "economy": economy,
@@ -210,6 +211,7 @@ def run(
                     "modeled_moments": {str(order): modeled[order] for order in moment_orders},
                     "moment_comparison": comparison.to_dict(),
                     "effective_interactions": classify_effective_interactions(effective),
+                    "effective_interaction_diagnostics": effective_report,
                     "temperature_response": temperature_response,
                     "h": model.h.detach().cpu().numpy().tolist(),
                     "J": model.J.detach().cpu().numpy().tolist(),
@@ -275,7 +277,7 @@ def run(
             "strict_threshold": "f > population standard deviation",
             "training_method": "kl",
             "calculation": "exact",
-            "effective_interaction_calculation": "exact_conditional_enumeration",
+            "effective_interaction_calculation": "monte_carlo",
             "temperature_response_derivative": "exact_covariance",
             "learning_rate": learning_rate,
             "max_epochs": max_epochs,

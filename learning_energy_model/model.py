@@ -515,7 +515,12 @@ class LearningModel:
             return result
         return self._builtin_analyze()
 
-    def effective_interactions(self, *, target_index: int | None = None) -> dict[str, float]:
+    def _effective_interaction_report(
+        self,
+        *,
+        target_index: int | None = None,
+        calculation: str = "auto",
+    ) -> dict[str, Any]:
         """Return paper-style effective interactions for each feature.
 
         ``epsilon_i(k)`` is the change in the target node's effective field
@@ -523,34 +528,85 @@ class LearningModel:
         structural quantity, not a causal effect. Exact models use the exact
         conditional distribution; sampled models use the configured sampler.
         """
+        if calculation not in {"auto", "exact", "monte_carlo"}:
+            raise ValueError("calculation must be 'auto', 'exact', or 'monte_carlo'")
         self._require_fitted()
         assert self.h is not None and self.J is not None
         target = self.target_index if target_index is None else int(target_index)
         if not 0 <= target < self.n_nodes:
             raise ValueError("target_index is outside the model node range")
-        baseline_means, _, _, _ = self._model_moments()
+        use_exact = calculation == "exact" or (calculation == "auto" and self._states is not None)
+        if use_exact and self._states is None:
+            raise ValueError("exact effective interactions require exact enumeration")
+        if use_exact:
+            baseline_means, _, _, _ = self._model_moments()
+            baseline_diagnostics: dict[str, Any] = {"calculation": "exact"}
+        else:
+            baseline_means, _, _, baseline_diagnostics = self.sampler.moments(
+                self.h,
+                self.J,
+                seed_offset=0,
+            )
         baseline_field = float(self.h[target] + torch.dot(self.J[target], baseline_means))
         values: dict[str, float] = {}
+        clamp_diagnostics: dict[str, Any] = {}
         for index, name in enumerate(self.preprocessor.feature_names):
             if index == target:
                 continue
-            if self._states is not None:
+            if use_exact:
+                assert self._states is not None
                 mask = self._states[:, index] == 0
                 states = self._states[mask]
                 energies = self._energies(states)
                 probabilities = torch.softmax(-energies, dim=0)
                 frozen_means = probabilities @ states
+                clamp_diagnostics[name] = {"calculation": "exact"}
             else:
-                frozen_means, _, _, _ = self.sampler.moments(
+                frozen_means, _, _, diagnostics = self.sampler.moments(
                     self.h,
                     self.J,
                     clamp_index=index,
                     clamp_value=0.0,
                     seed_offset=index + 1,
                 )
+                clamp_diagnostics[name] = diagnostics
             frozen_field = float(self.h[target] + torch.dot(self.J[target], frozen_means))
             values[name] = baseline_field - frozen_field
-        return values
+        return {
+            "values": values,
+            "calculation": "exact" if use_exact else "monte_carlo",
+            "baseline_diagnostics": baseline_diagnostics,
+            "clamp_diagnostics": clamp_diagnostics,
+        }
+
+    def effective_interactions(
+        self,
+        *,
+        target_index: int | None = None,
+        calculation: str = "auto",
+    ) -> dict[str, float]:
+        """Return paper-style effective interactions for each feature.
+
+        ``calculation="monte_carlo"`` forces the paper's sampling path, even
+        when the fitted model also has exact states available.
+        """
+        report = self._effective_interaction_report(
+            target_index=target_index,
+            calculation=calculation,
+        )
+        return report["values"]
+
+    def effective_interaction_report(
+        self,
+        *,
+        target_index: int | None = None,
+        calculation: str = "auto",
+    ) -> dict[str, Any]:
+        """Return effective interactions together with calculation diagnostics."""
+        return self._effective_interaction_report(
+            target_index=target_index,
+            calculation=calculation,
+        )
 
     def temperature_response(self, temperatures: Any) -> dict[str, Any]:
         """Scan mean energy and magnetization over positive temperatures.

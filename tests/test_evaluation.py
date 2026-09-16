@@ -41,6 +41,9 @@ def test_effective_interaction_and_temperature_response_are_exact():
         DataConfig(feature_names=("a", "b"), target_name="outcome"),
         calculation="exact",
         max_epochs=10,
+        mc_samples=20,
+        mc_burn_in=5,
+        mc_chains=2,
     )
     model.fit(X, y)
     values = model.effective_interactions()
@@ -51,6 +54,11 @@ def test_effective_interaction_and_temperature_response_are_exact():
     assert len(response["mean_energy"]) == 3
     assert response["energies_finite"] is True
     assert response["response_derivative_method"] == "exact_covariance"
+
+    report = model.effective_interaction_report(calculation="monte_carlo")
+    assert report["calculation"] == "monte_carlo"
+    assert report["baseline_diagnostics"]["chains"] == 2.0
+    assert set(report["clamp_diagnostics"]) == {"a", "b"}
 
 
 def test_threshold_sensitivity_returns_appendix_style_summary():

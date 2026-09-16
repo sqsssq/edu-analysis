@@ -77,6 +77,9 @@ mean energy, magnetization, and their temperature derivatives. The helpers
 `classify_effective_interactions()` and `threshold_sensitivity()` implement the
 paper's mean±SD factor classification and Appendix A threshold scan. These are
 model-internal diagnostics, not causal effects or official PISA estimates.
+Pass `calculation="monte_carlo"` to `effective_interactions()` or use
+`effective_interaction_report()` to force and audit the paper's Monte Carlo
+node-freezing calculation, including chain diagnostics.
 
 ## Estimator and multi-domain interfaces
 
