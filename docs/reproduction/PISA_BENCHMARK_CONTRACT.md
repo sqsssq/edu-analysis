@@ -23,6 +23,22 @@ required arguments and stores them in `DataConfig.metadata`:
 Raw files, row-level extracts, and artifacts containing raw observations must stay
 outside Git and must not be included in a benchmark report.
 
+## Paper-aligned protocol
+
+The bundled paper's protocol is available through
+`examples/pisa_paper_reproduction.py`. It uses the following explicit settings:
+
+- 18 WLE features plus one outcome, for 19 binary nodes;
+- `f > population standard deviation` for every binary threshold;
+- first plausible values `PV1MATH`, `PV1SCIE`, and `PV1READ`;
+- 1,200 rows sampled without replacement, repeated 16 times per economy/outcome;
+- exact enumeration and KL/autodiff training;
+- aggregate comparison at moment orders 1, 2, 3, and 4.
+
+This mode is separate from the package default median threshold and ordinary
+row-weight behavior. It still requires a locally obtained, codebook-reviewed
+PISA file and does not implement official complex-survey inference.
+
 The explicit `PISAMapping` contract can be saved as a small JSON file containing
 only selected column names, missing codes, and provenance metadata. Review that
 file against the matching OECD codebook before using it, and keep it separate

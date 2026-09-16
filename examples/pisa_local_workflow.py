@@ -69,6 +69,7 @@ def run(args: argparse.Namespace) -> None:
             feature_names=prepared.feature_names,
             target_name=prepared.target_name,
             sample_weight_name=weight,
+            threshold_method=args.threshold_method,
             missing_strategy=args.missing_strategy,
             metadata={
                 "interface": "pisa-local-workflow",
@@ -88,11 +89,29 @@ def run(args: argparse.Namespace) -> None:
         mc_max_mcse=args.mc_max_mcse,
         seed=args.seed,
     )
-    fit = model.fit(prepared.X, prepared.y, sample_weight=prepared.sample_weight)
+    fit = model.fit(
+        prepared.X,
+        prepared.y,
+        sample_weight=prepared.sample_weight,
+        method=args.training_method,
+    )
     analysis = model.analyze()
     model.save(args.output_model)
     report = {
         "quality": quality.to_dict(),
+        "provenance": {
+            "assessment_cycle": cycle,
+            "scope": scope,
+            "codebook_reference": codebook,
+            "mapping": mapping.to_dict(),
+        },
+        "reproduction_protocol": {
+            "threshold_method": args.threshold_method,
+            "training_method": args.training_method,
+            "calculation": args.calculation,
+            "sample_size": prepared.X.shape[0],
+            "seed": args.seed,
+        },
         "fit": fit.to_dict(),
         "analysis": analysis.to_dict(),
     }
@@ -115,6 +134,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-model", required=True, help="local model artifact path")
     parser.add_argument("--output-report", required=True, help="aggregate JSON report path")
     parser.add_argument("--missing-strategy", choices=("error", "median", "mean", "zero"), default="median")
+    parser.add_argument(
+        "--threshold-method",
+        choices=("median", "quantile", "paper_std"),
+        default="median",
+        help="binary threshold rule; paper_std reproduces the paper's f > std rule",
+    )
+    parser.add_argument(
+        "--training-method",
+        choices=("moment_matching", "kl"),
+        default="moment_matching",
+        help="training objective; kl reproduces the paper's KL/autodiff path",
+    )
     parser.add_argument("--max-epochs", type=int, default=2_000)
     parser.add_argument("--min-epochs", type=int, default=25)
     parser.add_argument("--max-exact-nodes", type=int, default=20)

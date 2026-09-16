@@ -82,11 +82,20 @@ class BinaryPreprocessor:
         return np.nanmedian(array, axis=0)
 
     @staticmethod
-    def _binarize(values: np.ndarray, threshold: float) -> np.ndarray:
-        """Preserve native 0/1 columns instead of thresholding at a zero median."""
+    def _binarize(
+        values: np.ndarray, threshold: float, *, strict: bool = False
+    ) -> np.ndarray:
+        """Binarize values while preserving native binary columns.
+
+        ``strict=True`` reproduces the paper convention ``f > theta``;
+        package-native thresholding retains its historical ``f >= theta``
+        behavior.
+        """
         observed = values[~np.isnan(values)]
         if observed.size and np.isin(observed, (0.0, 1.0)).all():
             return values.astype(np.float64, copy=True)
+        if strict:
+            return (values > threshold).astype(np.float64)
         return (values >= threshold).astype(np.float64)
 
     def fit(self, X: Any, y: Any) -> "BinaryPreprocessor":
@@ -109,13 +118,20 @@ class BinaryPreprocessor:
             if missing:
                 raise ValueError(f"thresholds missing feature names: {sorted(missing)}")
             self.thresholds = {name: float(self.config.thresholds[name]) for name in self.feature_names}
+        elif self.config.threshold_method == "paper_std":
+            self.thresholds = {
+                name: float(np.std(features[:, i], ddof=0))
+                for i, name in enumerate(self.feature_names)
+            }
         else:
             quantile = self.config.quantile if self.config.threshold_method == "quantile" else 0.5
             self.thresholds = {
                 name: float(np.quantile(features[:, i], quantile))
                 for i, name in enumerate(self.feature_names)
             }
-        if self.target_threshold is None:
+        if self.target_threshold is None and self.config.threshold_method == "paper_std":
+            self.target_threshold = float(np.std(target_values, ddof=0))
+        elif self.target_threshold is None:
             quantile = self.config.quantile if self.config.threshold_method == "quantile" else 0.5
             self.target_threshold = float(np.quantile(target_values, quantile))
         self._fitted = True
@@ -129,8 +145,12 @@ class BinaryPreprocessor:
             raise ValueError("X has a different number of columns from the fitted data")
         features = self._fill_missing(features, self.feature_medians)
         threshold_array = np.array([self.thresholds[name] for name in self.feature_names])
+        strict = self.config.threshold_method == "paper_std"
         return np.column_stack(
-            [self._binarize(features[:, i], threshold_array[i]) for i in range(features.shape[1])]
+            [
+                self._binarize(features[:, i], threshold_array[i], strict=strict)
+                for i in range(features.shape[1])
+            ]
         )
 
     def transform_target(self, y: Any) -> np.ndarray:
@@ -140,7 +160,11 @@ class BinaryPreprocessor:
         target_values = self._fill_missing(
             target_matrix, np.array([self.target_median])
         ).reshape(-1)
-        return self._binarize(target_values, self.target_threshold)
+        return self._binarize(
+            target_values,
+            self.target_threshold,
+            strict=self.config.threshold_method == "paper_std",
+        )
 
     def transform(self, X: Any, y: Any) -> tuple[np.ndarray, np.ndarray]:
         return self.transform_features(X), self.transform_target(y)

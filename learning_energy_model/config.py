@@ -36,8 +36,8 @@ class DataConfig:
             or self.sample_weight_name in (*self.feature_names, self.target_name)
         ):
             raise ValueError("sample_weight_name must identify a separate non-empty column")
-        if self.threshold_method not in {"median", "quantile"}:
-            raise ValueError("threshold_method must be 'median' or 'quantile'")
+        if self.threshold_method not in {"median", "quantile", "paper_std"}:
+            raise ValueError("threshold_method must be 'median', 'quantile', or 'paper_std'")
         if not 0 < self.quantile < 1:
             raise ValueError("quantile must be between 0 and 1")
         if self.missing_strategy not in {"error", "median", "mean", "zero"}:

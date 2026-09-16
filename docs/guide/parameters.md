@@ -22,6 +22,10 @@
 | `max_epochs` | Maximum training iterations | `2000` |
 | `min_epochs` | Minimum iterations before convergence | `25` |
 | `tolerance` | Maximum accepted moment error | `1e-3` |
+
+For strict reproduction of the bundled PISA paper, use
+`threshold_method="paper_std"`. This applies the paper's `f > sigma` rule;
+the normal package defaults (`median` or `quantile`) remain unchanged.
 | `calculation` | `auto`, `exact`, or `monte_carlo` | `auto` |
 | `max_exact_nodes` | Largest exact model in automatic mode | `20` |
 | `seed` | Reproducibility seed | `0` |

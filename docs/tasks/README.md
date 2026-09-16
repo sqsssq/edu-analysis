@@ -88,3 +88,4 @@ When the task list grows beyond a few files, add a task index to this README:
 | `task-052-ignore-generated-artifacts.md` | Review Ready | `.gitignore`, `README.md` | synthetic example, `pytest`, ruff, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-053-dependency-lock.md` | Review Ready | `uv.lock`, `.github/workflows/ci.yml`, `docs/prd/ROADMAP.md` | `uv lock --check`, locked dependency export, `pytest`, ruff, mypy, wheel build, and `bash scripts/verify.sh --strict-instance` |
 | `task-054-locked-environment-docs.md` | Review Ready | `README.md`, `README.zh-CN.md`, `uv.lock` | `uv lock --check`, locked sync dry-run, `pytest`, ruff, mypy, and `bash scripts/verify.sh --strict-instance` |
+| `task-055-paper-protocol-reproduction.md` | In Progress | `docs/reproduction/PISA_BENCHMARK_CONTRACT.md`, `docs/prd/ROADMAP.md` | paper-protocol unit tests, local synthetic runner smoke test, and `bash scripts/verify.sh --strict-instance` |

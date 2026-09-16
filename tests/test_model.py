@@ -368,6 +368,24 @@ def test_binary_inputs_are_not_collapsed_by_median_threshold():
     np.testing.assert_array_equal(binary_y, y)
 
 
+def test_paper_std_threshold_uses_strict_greater_than():
+    X = np.array([[0.0], [1.0], [2.0], [3.0]])
+    y = np.array([0.0, 1.0, 2.0, 3.0])
+    model = LearningModel(
+        DataConfig(
+            feature_names=("feature",),
+            target_name="target",
+            threshold_method="paper_std",
+        ),
+        max_epochs=1,
+    )
+    model.preprocessor.fit(X, y)
+    binary_X, binary_y = model.preprocessor.transform(X, y)
+    assert model.preprocessor.thresholds["feature"] == np.std(X[:, 0])
+    np.testing.assert_array_equal(binary_X[:, 0], [0.0, 0.0, 1.0, 1.0])
+    np.testing.assert_array_equal(binary_y, [0.0, 0.0, 1.0, 1.0])
+
+
 def test_moment_matching_recovers_a_small_known_model():
     import torch
 
