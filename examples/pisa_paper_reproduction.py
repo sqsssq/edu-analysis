@@ -275,6 +275,8 @@ def run(
             "strict_threshold": "f > population standard deviation",
             "training_method": "kl",
             "calculation": "exact",
+            "effective_interaction_calculation": "exact_conditional_enumeration",
+            "temperature_response_derivative": "exact_covariance",
             "learning_rate": learning_rate,
             "max_epochs": max_epochs,
             "tolerance": tolerance,

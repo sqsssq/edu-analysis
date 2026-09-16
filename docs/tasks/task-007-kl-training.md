@@ -1,4 +1,4 @@
-# Task 007: Add exact KL/autodiff training
+# Task 007: Add exact explicit KL-gradient training
 
 ## Status
 
@@ -16,7 +16,7 @@ Provide an exact negative-log-likelihood training path as a numerical cross-chec
 
 ## User Value
 
-Advanced users can compare the interpretable default optimizer against a standard autodiff likelihood objective on paper-scale models.
+Advanced users can compare the interpretable default optimizer against the paper's explicit KL-gradient objective on paper-scale models.
 
 ## Scope
 

@@ -50,6 +50,7 @@ def test_effective_interaction_and_temperature_response_are_exact():
     response = model.temperature_response([0.5, 1.0, 1.5])
     assert len(response["mean_energy"]) == 3
     assert response["energies_finite"] is True
+    assert response["response_derivative_method"] == "exact_covariance"
 
 
 def test_threshold_sensitivity_returns_appendix_style_summary():

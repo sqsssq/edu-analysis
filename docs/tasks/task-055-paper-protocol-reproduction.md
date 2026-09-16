@@ -9,7 +9,7 @@ In Progress
 - Add the paper's strict standard-deviation binary threshold (`f > sigma`).
 - Provide a local-only reproduction runner using 1,200 rows sampled 16 times
   per economy and outcome.
-- Use exact 19-node KL/autodiff training and export first- through fourth-order
+- Use exact 19-node explicit KL-gradient training and export first- through fourth-order
   moment comparisons, convergence, parameter stability, and `J` distribution
   statistics.
 - Use the paper's explicit KL gradients for the paper runner; adaptive Adam is

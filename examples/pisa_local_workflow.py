@@ -144,7 +144,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--training-method",
         choices=("moment_matching", "kl"),
         default="moment_matching",
-        help="training objective; kl reproduces the paper's KL/autodiff path",
+        help="training objective; kl reproduces the paper's explicit KL-gradient path",
     )
     parser.add_argument("--max-epochs", type=int, default=2_000)
     parser.add_argument("--min-epochs", type=int, default=25)

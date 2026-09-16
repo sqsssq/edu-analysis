@@ -27,7 +27,7 @@
 - `pyproject.toml` and an initial installable package now exist; dependency locking is recorded in `uv.lock`, while final release publication remains.
 - Initial model source modules, public API, Gibbs sampler, and injectable lifecycle components exist.
 - Configured missing-value strategies include fail-fast, median, mean, and zero imputation; PISA-specific missing codes remain an explicit preparation responsibility.
-- Exact KL/autodiff training is available as a cross-check for models within the exact-enumeration threshold.
+- Exact explicit KL-gradient training is available as a cross-check for models within the exact-enumeration threshold.
 - Analysis results expose third- and fourth-order joint moments for reproducibility checks.
 - Analysis results expose a stable binary-node correlation matrix.
 - Fit results expose observed and model moments through fourth order.

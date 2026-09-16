@@ -24,7 +24,7 @@ Researchers and ML engineers can fit the paper-scale model to their own structur
 - `DataConfig` and binary preprocessing with thresholds and median missing-value handling.
 - Exact pairwise energy model with `h` and symmetric `J`.
 - Weighted empirical moments and moment-matching training.
-- Exact KL/autodiff training as a secondary cross-check path.
+- Exact explicit KL-gradient training as a secondary cross-check path.
 - Conditional target prediction and model-internal node-freezing analysis.
 - Structured result objects and save/load support.
 - Initial API tests and package build metadata.

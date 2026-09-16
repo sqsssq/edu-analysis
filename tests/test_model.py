@@ -456,7 +456,7 @@ def test_exact_moment_matching_recovers_a_known_distribution():
     )
 
 
-def test_kl_autodiff_path_is_available_for_exact_models():
+def test_explicit_kl_gradient_path_is_available_for_exact_models():
     X = np.array([[0.0], [1.0], [0.0], [1.0], [1.0], [0.0]])
     y = np.array([0.0, 1.0, 0.0, 1.0, 1.0, 0.0])
     model = LearningModel(
@@ -475,7 +475,7 @@ def test_kl_autodiff_path_is_available_for_exact_models():
     assert model.predict(X).probabilities.shape == (6,)
 
 
-def test_kl_autodiff_path_rejects_large_models():
+def test_explicit_kl_gradient_path_rejects_large_models():
     X = np.zeros((4, 3))
     y = np.zeros(4)
     model = LearningModel(DataConfig(feature_names=("a", "b", "c")), max_exact_nodes=2)

@@ -3,7 +3,7 @@
 ## In Scope
 
 - `PyTorch binary pairwise energy model with exact enumeration for small systems.`
-- `Moment matching, KL/autodiff cross-checks, conditional prediction, and model-internal intervention analysis.`
+- `Moment matching, explicit KL-gradient cross-checks, conditional prediction, and model-internal intervention analysis.`
 - `Versioned serialization, sample weights, diagnostics, examples, and PyPI-ready documentation.`
 
 ## Out of Scope

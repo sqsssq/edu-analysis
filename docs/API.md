@@ -58,7 +58,7 @@ never stored.
 
 `calculation="auto"` uses exact enumeration through `max_exact_nodes` and
 Gibbs sampling above it. Use `"exact"` or `"monte_carlo"` to force a path.
-`method="kl"` is an exact-only autodiff cross-check.
+`method="kl"` is an exact-only explicit KL-gradient path.
 
 `FitResult` contains convergence information, sampler quality checks, observed
 and modeled moments through fourth order, and warnings. For sampled fits,

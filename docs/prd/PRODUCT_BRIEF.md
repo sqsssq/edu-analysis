@@ -20,7 +20,7 @@ The package is an exploratory research tool. It models a joint distribution over
 - Exact enumeration for the paper-sized model (19 nodes).
 - Automatic sampler selection with Monte Carlo above the exact-enumeration threshold.
 - Moment matching as the primary, interpretable trainer.
-- KL-divergence/autodiff training as a secondary implementation and validation path.
+- Explicit KL-gradient training as a secondary implementation and validation path.
 - Optional sample weights.
 - Structured result objects and dependency-light JSON/dict export, with optional DataFrame conversion.
 - Model serialization including parameters, preprocessing, metadata, random state, sampler state, logs, and version information.

@@ -258,7 +258,7 @@ class LearningModel:
                 break
         warnings = []
         if not converged:
-            warnings.append("KL/autodiff training did not reach the requested tolerance")
+            warnings.append("Explicit KL-gradient training did not reach the requested tolerance")
         model_means, model_pairs, _, _ = self._model_moments()
         final_unique_energies = self._energies(unique_data)
         final_log_partition = torch.logsumexp(-final_unique_energies, dim=0)
@@ -306,7 +306,7 @@ class LearningModel:
         *,
         method: str = "moment_matching",
     ) -> FitResult:
-        """Fit parameters by moment matching or exact KL/autodiff training."""
+        """Fit parameters by moment matching or exact explicit KL-gradient descent."""
         if self.trainer is not None:
             result = self.trainer.fit(self, X, y, sample_weight=sample_weight, method=method)
             if not isinstance(result, FitResult):
@@ -334,13 +334,12 @@ class LearningModel:
                 )
 
         self.h = torch.zeros(
-            n_features, dtype=torch.float64, device=self.device, requires_grad=method == "kl"
+            n_features, dtype=torch.float64, device=self.device
         )
         self.J = torch.zeros(
             (n_features, n_features),
             dtype=torch.float64,
             device=self.device,
-            requires_grad=method == "kl",
         )
         if self.calculation == "exact":
             if n_features > self.max_exact_nodes:
@@ -572,20 +571,33 @@ class LearningModel:
         magnetization = self._states.sum(dim=1)
         mean_energy = []
         mean_magnetization = []
+        energy_response = []
+        magnetization_response = []
         for temperature in values:
             probabilities = torch.softmax(-energies / float(temperature), dim=0)
-            mean_energy.append(float((probabilities * energies).sum()))
-            mean_magnetization.append(float((probabilities * magnetization).sum()))
+            mean_e = (probabilities * energies).sum()
+            mean_m = (probabilities * magnetization).sum()
+            mean_energy.append(float(mean_e))
+            mean_magnetization.append(float(mean_m))
+            energy_centered = energies - mean_e
+            magnetization_centered = magnetization - mean_m
+            temperature_squared = float(temperature) ** 2
+            energy_response.append(float((probabilities * energy_centered.square()).sum()) / temperature_squared)
+            magnetization_response.append(
+                float((probabilities * magnetization_centered * energy_centered).sum())
+                / temperature_squared
+            )
         energy_array = np.asarray(mean_energy)
         magnetization_array = np.asarray(mean_magnetization)
-        d_energy_d_temperature = np.gradient(energy_array, values)
-        d_magnetization_d_temperature = np.gradient(magnetization_array, values)
+        d_energy_d_temperature = np.asarray(energy_response)
+        d_magnetization_d_temperature = np.asarray(magnetization_response)
         return {
             "temperature": values.tolist(),
             "mean_energy": energy_array.tolist(),
             "mean_magnetization": magnetization_array.tolist(),
             "d_mean_energy_d_temperature": d_energy_d_temperature.tolist(),
             "d_mean_magnetization_d_temperature": d_magnetization_d_temperature.tolist(),
+            "response_derivative_method": "exact_covariance",
             "energy_response_peak_temperature": float(values[np.argmax(d_energy_d_temperature)]),
             "magnetization_response_peak_temperature": float(
                 values[np.argmax(np.abs(d_magnetization_d_temperature))]

@@ -32,8 +32,14 @@ The bundled paper's protocol is available through
 - `f > population standard deviation` for every binary threshold;
 - first plausible values `PV1MATH`, `PV1SCIE`, and `PV1READ`;
 - 1,200 rows sampled without replacement, repeated 16 times per economy/outcome;
-- exact enumeration and KL/autodiff training;
+- exact enumeration and explicit KL-gradient training;
 - aggregate comparison at moment orders 1, 2, 3, and 4.
+
+For this project-level reproduction, effective interactions use exact conditional
+enumeration at 19 nodes, following the confirmed exact-statistics decision. The
+paper describes Monte Carlo for this diagnostic; the report records this
+calculation-path difference explicitly. Critical-state derivatives use the
+exact covariance identities for `d<E>/dT` and `dm/dT`.
 
 This mode is separate from the package default median threshold and ordinary
 row-weight behavior. It still requires a locally obtained, codebook-reviewed

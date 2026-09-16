@@ -18,7 +18,7 @@ recomputing internal statistics.
 ## Scope
 
 - Add serializable observed/model higher-order moment mappings to `FitResult`.
-- Populate them for exact KL/autodiff and moment-matching training paths.
+- Populate them for exact explicit KL-gradient and moment-matching training paths.
 - Preserve the mappings through save/load and dict/JSON export.
 - Document their use with `compare_moment_orders`.
 

@@ -21,7 +21,7 @@ Researchers can inspect whether a training run matched the data without rerunnin
 ## Scope
 
 - Add observed/model moment arrays to `FitResult` for first through fourth order.
-- Populate them for moment matching and exact KL/autodiff training.
+- Populate them for moment matching and exact explicit KL-gradient training.
 - Preserve them through dict/JSON export and saved model metadata.
 
 ## Out of Scope

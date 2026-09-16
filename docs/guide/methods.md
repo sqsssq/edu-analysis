@@ -44,6 +44,6 @@ configured quality thresholds.
 | Method | Use |
 | --- | --- |
 | `moment_matching` | Iteratively match first- and second-order moments |
-| `kl` | Exact autodiff KL optimization cross-check |
+| `kl` | Exact explicit KL-gradient descent |
 | `exact` calculation | Enumerate all states |
 | `monte_carlo` calculation | Estimate moments with Gibbs sampling |
