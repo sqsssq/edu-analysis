@@ -254,4 +254,31 @@ if [[ "$path_failed" -ne 0 ]]; then
 fi
 
 echo "Markdown path references are valid."
+
+if [[ "$mode" != "template" ]]; then
+  semantic_doc_failed=0
+  required_readme_terms=(
+    "paper_std"
+    "per_sample_repeat"
+    "explicit KL-gradient"
+    "effective_interaction_report"
+    "Monte Carlo effective interactions"
+  )
+  for term in "${required_readme_terms[@]}"; do
+    if ! grep -Fq "$term" README.md; then
+      echo "README is missing the current reproduction contract term: $term"
+      semantic_doc_failed=1
+    fi
+  done
+  if scan_text 'KL[/ -]?autodiff|autodiff.*KL|KL.*autodiff' README.md README.zh-CN.md docs learning_energy_model examples tests; then
+    echo "Found stale autodiff terminology in the project reproduction contract."
+    semantic_doc_failed=1
+  fi
+  if [[ "$semantic_doc_failed" -ne 0 ]]; then
+    echo "Project documentation consistency check failed."
+    exit 1
+  fi
+  echo "Project documentation reproduction contract is synchronized."
+fi
+
 echo "HarnessWeaver $mode verification passed."

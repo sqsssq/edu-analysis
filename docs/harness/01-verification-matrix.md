@@ -6,6 +6,7 @@
 | --- | --- |
 | Required files exist | `bash scripts/verify.sh` |
 | Paths are internally consistent | Markdown path reference check in `scripts/verify.sh` |
+| Project reproduction contract is synchronized | README semantic contract check in `scripts/verify.sh` |
 | Project agent entry point exists | root `AGENTS.md` |
 | Open-source license exists | `LICENSE` is required by `bash scripts/verify.sh` |
 | No source-project-specific terms remain | source-term search |

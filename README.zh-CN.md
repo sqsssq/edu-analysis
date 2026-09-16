@@ -60,6 +60,19 @@ print(model.last_quality_report.to_dict())
 
 `calculation="auto"` 会在小模型上使用精确状态枚举，在较大模型上切换到多链 Gibbs 采样；也可以显式指定 `"exact"` 或 `"monte_carlo"`。采样结果应检查 R-hat、ESS、MCSE 和质量阈值。
 
+## 论文复现协议
+
+`examples/pisa_paper_reproduction.py` 固定了论文复现所需的实验口径：
+
+- 每个经济体/学科组合无放回抽取 1,200 条，重复 16 次；
+- 使用 `paper_std`，即严格按照 `f > population standard deviation` 二值化；
+- 每个 1,200 条 repeat 独立计算标准差，范围记录为 `per_sample_repeat`；
+- 19 节点使用 exact enumeration 和显式 KL-gradient，不使用 Adam；
+- effective interaction 强制使用 Monte Carlo，并记录 chains、draws、R-hat、ESS、MCSE；
+- critical-state 使用 exact covariance 导数。
+
+复现脚本只输出聚合参数、矩、收敛信息、采样诊断和 provenance，不会把 PISA 原始行数据写入仓库。完整边界见 `docs/reproduction/PISA_BENCHMARK_CONTRACT.md`。
+
 无需 PISA 数据即可运行完整示例：
 
 ```bash

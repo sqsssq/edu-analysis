@@ -4,7 +4,10 @@ This repository will turn the paper *A Neural Network Model for Learning - Appli
 
 ## Current status
 
-The initial package core, automatic Gibbs-sampling path, and runnable synthetic workflows are implemented. PISA preparation and a local-only reproduction notebook template are available; real-data reproduction and final numerical calibration remain caller-run work.
+The package core, automatic Gibbs-sampling path, and runnable synthetic workflows
+are implemented. The paper-specific PISA reproduction runner is also available
+for a locally obtained, codebook-reviewed file; the full 240-run numerical
+calibration remains an explicit local experiment and is not bundled in Git.
 
 ## Quick start
 
@@ -85,6 +88,26 @@ plot_correlations(analysis)
 
 For a local-only PISA reproduction template (synthetic smoke mode by default), open `examples/pisa_reproduction_workflow.ipynb`. Set `PISA_INPUT` and `PISA_MAPPING` to run against a reviewed local mapping contract.
 
+### Paper reproduction protocol
+
+The paper runner in `examples/pisa_paper_reproduction.py` uses the explicit
+protocol below:
+
+- 1,200 rows sampled without replacement and repeated 16 times per economy/outcome;
+- `paper_std` binarization with `f > population standard deviation`;
+- thresholds computed independently for each sampled repeat (`per_sample_repeat`);
+- 19-node exact enumeration with explicit KL-gradient descent and no Adam;
+- Monte Carlo effective interactions with chain diagnostics;
+- exact covariance critical-state response derivatives.
+
+Python callers can use `effective_interaction_report(calculation="monte_carlo")`
+to retrieve the effective interactions together with their sampling diagnostics.
+
+The runner writes only aggregate parameters, moments, convergence information,
+Monte Carlo diagnostics, and provenance. It never writes raw PISA rows to the
+repository. See `docs/reproduction/PISA_BENCHMARK_CONTRACT.md` for the complete
+interpretation boundary and known differences from official PISA inference.
+
 The visual landing page is [`docs/landing.html`](docs/landing.html). The full searchable documentation is built from [`docs/`](docs/) with MkDocs Material and is available under `/docs/` on GitHub Pages.
 
 Before fitting a local table, callers can inspect input quality without changing the data:
@@ -123,7 +146,7 @@ When passing a named mapping or DataFrame to `predict`, the fitted feature names
 - PyTorch implementation of a pairwise maximum-entropy energy model.
 - Binary nodes by default, with recorded preprocessing and threshold rules.
 - Exact enumeration for small models, automatic Monte Carlo for larger models.
-- Interpretable moment matching as the default training path, with a KL/autodiff path for cross-checking.
+- Interpretable moment matching as the default training path, with an explicit KL-gradient path for cross-checking.
 - Structured fit, prediction, intervention-analysis, save, and load results.
 - PISA reproduction benchmarks without bundling restricted raw PISA data.
 
