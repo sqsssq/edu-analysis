@@ -762,6 +762,10 @@ class LearningModel:
                 "target_threshold": self.preprocessor.target_threshold,
                 "feature_medians": self.preprocessor.feature_medians,
                 "target_median": self.preprocessor.target_median,
+                "feature_means": self.preprocessor.feature_means,
+                "feature_scales": self.preprocessor.feature_scales,
+                "target_mean": self.preprocessor.target_mean,
+                "target_scale": self.preprocessor.target_scale,
             },
             "h": self.h.detach().cpu(),
             "J": self.J.detach().cpu(),
@@ -815,6 +819,14 @@ class LearningModel:
         model.preprocessor.target_threshold = state["target_threshold"]
         model.preprocessor.feature_medians = state["feature_medians"]
         model.preprocessor.target_median = state["target_median"]
+        model.preprocessor.feature_means = state.get(
+            "feature_means", np.zeros(len(model.preprocessor.feature_names), dtype=float)
+        )
+        model.preprocessor.feature_scales = state.get(
+            "feature_scales", np.ones(len(model.preprocessor.feature_names), dtype=float)
+        )
+        model.preprocessor.target_mean = float(state.get("target_mean", 0.0))
+        model.preprocessor.target_scale = float(state.get("target_scale", 1.0))
         model.preprocessor._fitted = True
         model.h = payload["h"].to(model.device)
         model.J = payload["J"].to(model.device)

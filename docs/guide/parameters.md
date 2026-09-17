@@ -7,6 +7,7 @@
 | `feature_names` | Ordered names of input nodes | `()` |
 | `target_name` | Name of the target node | `"target"` |
 | `threshold_method` | `"median"`, `"quantile"`, or `"paper_std"` | `"median"` |
+| `normalization` | `"none"` or `"zscore"` | `"none"` |
 | `quantile` | Quantile used with the quantile method | `0.5` |
 | `thresholds` | Explicit feature thresholds | `None` |
 | `target_threshold` | Explicit target threshold | `None` |

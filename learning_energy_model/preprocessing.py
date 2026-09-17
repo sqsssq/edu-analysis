@@ -44,6 +44,10 @@ class BinaryPreprocessor:
         self.target_threshold: float | None = config.target_threshold
         self.feature_medians: np.ndarray | None = None
         self.target_median: float | None = None
+        self.feature_means: np.ndarray | None = None
+        self.feature_scales: np.ndarray | None = None
+        self.target_mean: float = 0.0
+        self.target_scale: float = 1.0
         self._fitted = False
 
     def _names_for_features(self, n_features: int) -> tuple[str, ...]:
@@ -113,6 +117,15 @@ class BinaryPreprocessor:
             target_values.reshape(-1, 1), np.array([self.target_median])
         ).reshape(-1)
 
+        self.feature_means, self.feature_scales = self._normalization_parameters(features)
+        features = self._normalize(features, self.feature_means, self.feature_scales)
+        target_mean, target_scale = self._normalization_parameters(target_values.reshape(-1, 1))
+        self.target_mean = float(target_mean[0])
+        self.target_scale = float(target_scale[0])
+        target_values = self._normalize(
+            target_values.reshape(-1, 1), target_mean, target_scale
+        ).reshape(-1)
+
         if self.config.thresholds is not None:
             missing = set(self.feature_names) - set(self.config.thresholds)
             if missing:
@@ -137,6 +150,28 @@ class BinaryPreprocessor:
         self._fitted = True
         return self
 
+    def _normalization_parameters(self, array: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        if self.config.normalization == "none":
+            return np.zeros(array.shape[1], dtype=float), np.ones(array.shape[1], dtype=float)
+        means = np.zeros(array.shape[1], dtype=float)
+        scales = np.ones(array.shape[1], dtype=float)
+        for index in range(array.shape[1]):
+            values = array[:, index]
+            if np.isin(values, (0.0, 1.0)).all():
+                continue
+            means[index] = float(np.mean(values))
+            scale = float(np.std(values, ddof=0))
+            if not np.isfinite(scale) or scale == 0:
+                raise ValueError("zscore normalization requires non-constant columns")
+            scales[index] = scale
+        return means, scales
+
+    @staticmethod
+    def _normalize(
+        array: np.ndarray, means: np.ndarray, scales: np.ndarray
+    ) -> np.ndarray:
+        return (array - means) / scales
+
     def transform_features(self, X: Any) -> np.ndarray:
         if not self._fitted:
             raise RuntimeError("preprocessor must be fitted before transform")
@@ -144,6 +179,9 @@ class BinaryPreprocessor:
         if features.shape[1] != len(self.feature_names):
             raise ValueError("X has a different number of columns from the fitted data")
         features = self._fill_missing(features, self.feature_medians)
+        if self.feature_means is None or self.feature_scales is None:
+            raise RuntimeError("normalization parameters are unavailable")
+        features = self._normalize(features, self.feature_means, self.feature_scales)
         threshold_array = np.array([self.thresholds[name] for name in self.feature_names])
         strict = self.config.threshold_method == "paper_std"
         return np.column_stack(
@@ -159,6 +197,11 @@ class BinaryPreprocessor:
         target_matrix = _as_array(y).reshape(-1, 1)
         target_values = self._fill_missing(
             target_matrix, np.array([self.target_median])
+        ).reshape(-1)
+        target_values = self._normalize(
+            target_values.reshape(-1, 1),
+            np.array([self.target_mean]),
+            np.array([self.target_scale]),
         ).reshape(-1)
         return self._binarize(
             target_values,

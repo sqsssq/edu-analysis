@@ -2,11 +2,13 @@
 
 ## Status
 
-Review Ready
+In Progress
 
 ## Scope
 
 - Add the paper's strict standard-deviation binary threshold (`f > sigma`).
+- Standardize continuous variables within each sampled repeat before applying
+  the paper threshold; persist the fitted normalization statistics.
 - Provide a local-only reproduction runner using 1,200 rows sampled 16 times
   per economy and outcome.
 - Use exact 19-node explicit KL-gradient training and export first- through fourth-order
@@ -25,8 +27,8 @@ Review Ready
 
 ## Acceptance criteria
 
-- `DataConfig(threshold_method="paper_std")` implements the paper's strict
-  `f > population standard deviation` rule.
+- The paper runner uses `DataConfig(threshold_method="paper_std",
+  normalization="zscore")`, applying strict `z > 1` to continuous variables.
 - The paper runner defaults to 1,200 samples, 16 repeats, exact calculation,
   and `method="kl"`.
 - Each repeat computes its own population-standard-deviation thresholds before

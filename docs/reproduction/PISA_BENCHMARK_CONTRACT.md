@@ -16,6 +16,7 @@ required arguments and stores them in `DataConfig.metadata`:
 - recodes, valid response ranges, and source-specific missing-value codes;
 - whether the data are SAS or SPSS and the reader version;
 - the target definition, feature order, threshold method, missing-value strategy,
+  normalization policy,
   and ordinary row-weight field;
 - package version, model configuration, random seed, calculation path, and sampler
   diagnostics when Monte Carlo is used.
@@ -29,7 +30,8 @@ The bundled paper's protocol is available through
 `examples/pisa_paper_reproduction.py`. It uses the following explicit settings:
 
 - 18 WLE features plus one outcome, for 19 binary nodes;
-- `f > population standard deviation` for every binary threshold;
+- z-score each continuous variable within the sampled repeat, then apply the
+  strict `f > population standard deviation` rule (equivalent to `z > 1`);
 - thresholds are computed independently within each sampled 1,200-row repeat;
 - first plausible values `PV1MATH`, `PV1SCIE`, and `PV1READ`;
 - 1,200 rows sampled without replacement, repeated 16 times per economy/outcome;

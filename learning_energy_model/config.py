@@ -19,6 +19,7 @@ class DataConfig:
     thresholds: dict[str, float] | None = None
     target_threshold: float | None = None
     threshold_method: str = "median"
+    normalization: str = "none"
     quantile: float = 0.5
     missing_strategy: str = "error"
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -38,6 +39,8 @@ class DataConfig:
             raise ValueError("sample_weight_name must identify a separate non-empty column")
         if self.threshold_method not in {"median", "quantile", "paper_std"}:
             raise ValueError("threshold_method must be 'median', 'quantile', or 'paper_std'")
+        if self.normalization not in {"none", "zscore"}:
+            raise ValueError("normalization must be 'none' or 'zscore'")
         if not 0 < self.quantile < 1:
             raise ValueError("quantile must be between 0 and 1")
         if self.missing_strategy not in {"error", "median", "mean", "zero"}:

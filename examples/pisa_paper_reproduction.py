@@ -164,6 +164,7 @@ def run(
                         feature_names=features,
                         target_name=outcome,
                         threshold_method="paper_std",
+                        normalization="zscore",
                         missing_strategy="error",
                         metadata={
                             "assessment_cycle": "PISA 2018",
@@ -308,6 +309,7 @@ def run(
             "sample_size": sample_size,
             "repeats": repeats,
             "threshold_method": "paper_std",
+            "normalization": "zscore",
             "strict_threshold": "f > population standard deviation",
             "threshold_scope": "per_sample_repeat",
             "training_method": "kl",

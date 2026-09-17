@@ -386,6 +386,25 @@ def test_paper_std_threshold_uses_strict_greater_than():
     np.testing.assert_array_equal(binary_y, [0.0, 0.0, 1.0, 1.0])
 
 
+def test_zscore_normalization_is_persisted_for_paper_style_inputs(tmp_path):
+    X = np.array([[10.0], [20.0], [30.0], [40.0]])
+    y = np.array([100.0, 200.0, 300.0, 400.0])
+    model = LearningModel(
+        DataConfig(
+            feature_names=("feature",),
+            target_name="target",
+            threshold_method="paper_std",
+            normalization="zscore",
+        ),
+        max_epochs=1,
+    )
+    binary_X, binary_y = model.preprocessor.fit(X, y).transform(X, y)
+    np.testing.assert_array_equal(binary_X[:, 0], [0.0, 0.0, 0.0, 1.0])
+    np.testing.assert_array_equal(binary_y, [0.0, 0.0, 0.0, 1.0])
+    assert model.preprocessor.target_mean == 250.0
+    assert model.preprocessor.target_scale == np.std(y)
+
+
 def test_moment_matching_recovers_a_small_known_model():
     import torch
 

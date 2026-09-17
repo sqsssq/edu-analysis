@@ -22,9 +22,11 @@ thresholds. The default threshold is the median. Quantile thresholds and
 explicit caller-supplied thresholds are also supported. Missing values are
 handled according to `missing_strategy`.
 
-For paper reproduction, record the exact threshold rule and apply it before
-comparing parameters. The current PISA experiment uses the paper's
-standard-deviation threshold rule through explicit thresholds.
+For paper reproduction, the continuous inputs are first standardized within
+the fitted sample (population mean and standard deviation), then the paper's
+strict standard-deviation rule is applied. In standardized units this is
+`z > 1`. The fitted normalization statistics are stored with the model so that
+reload and inference use the same transformation.
 
 ## Exact enumeration
 
