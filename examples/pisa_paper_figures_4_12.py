@@ -1,0 +1,163 @@
+"""Recreate the paper-style Figures 4--12 from a local reproduction report.
+
+The script consumes only the aggregate JSON report. It does not read raw PISA
+rows and writes figures to a caller-selected local directory.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+from collections import defaultdict
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+
+ECONOMIES = ("TAP", "HKG", "DEU", "USA", "GBR")
+OUTCOMES = ("PV1MATH", "PV1SCIE", "PV1READ")
+ECONOMY_LABELS = {"TAP": "tw", "HKG": "hk", "DEU": "gm", "USA": "usa", "GBR": "uk"}
+OUTCOME_LABELS = {"PV1MATH": "Math", "PV1SCIE": "Science", "PV1READ": "Reading"}
+
+
+def _pearson(x: list[float], y: list[float]) -> float:
+    left = np.asarray(x, dtype=float)
+    right = np.asarray(y, dtype=float)
+    if left.size < 2 or np.std(left) == 0 or np.std(right) == 0:
+        return float("nan")
+    return float(np.corrcoef(left, right)[0, 1])
+
+
+def _group_rows(report: dict[str, Any]) -> dict[tuple[str, str], list[dict[str, Any]]]:
+    groups: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for row in report["results"]:
+        groups[(row["economy"], row["outcome"])].append(row)
+    return groups
+
+
+def _save(fig: Any, output_dir: Path, number: int, title: str) -> Path:
+    import matplotlib.pyplot as plt
+
+    path = output_dir / f"figure-{number:02d}-{title}.png"
+    fig.tight_layout()
+    fig.savefig(path, dpi=200)
+    plt.close(fig)
+    return path
+
+
+def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list[Path]:
+    """Export Figures 4--12 from a completed reproduction report."""
+    import matplotlib.pyplot as plt
+
+    destination = Path(output_dir)
+    destination.mkdir(parents=True, exist_ok=True)
+    groups = _group_rows(report)
+    outputs: list[Path] = []
+
+    # Figure 4: pooled triple and quadruplet correlations.
+    fig, axes = plt.subplots(1, 2, figsize=(11, 5))
+    for axis, order, label in zip(axes, ("3", "4"), ("Triple", "Quadruplet")):
+        observed: list[float] = []
+        modeled: list[float] = []
+        for row in report["results"]:
+            observed.extend(row["observed_moments"][order].values() if order in ("3", "4") else [])
+            modeled.extend(row["modeled_moments"][order].values() if order in ("3", "4") else [])
+        axis.scatter(observed, modeled, s=5, alpha=0.25, color="#176b87", edgecolors="none")
+        limits = [0.0, max(observed + modeled) * 1.02]
+        axis.plot(limits, limits, color="#394b59", linewidth=1.2)
+        axis.set(xlabel="Observed correlation", ylabel="Model correlation", title=label)
+        axis.text(0.04, 0.92, f"r = {_pearson(observed, modeled):.3f}", transform=axis.transAxes)
+        axis.set_xlim(limits)
+        axis.set_ylim(limits)
+    fig.suptitle("Figure 4: Observed versus model triple and quadruplet correlations")
+    outputs.append(_save(fig, destination, 4, "higher-order-correlations"))
+
+    # Figure 5: one panel per outcome, overlaying the five economies.
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4.5), sharey=True)
+    colors = {"TAP": "#2f80c0", "HKG": "#f2994a", "DEU": "#43a047", "USA": "#e53935", "GBR": "#8e6bbf"}
+    for axis, outcome in zip(axes, OUTCOMES):
+        for economy in ECONOMIES:
+            values: list[float] = []
+            for row in groups[(economy, outcome)]:
+                matrix = np.asarray(row["J"], dtype=float)
+                values.extend(matrix[np.triu_indices_from(matrix, k=1)].tolist())
+            axis.hist(values, bins=35, density=True, histtype="step", linewidth=1.4,
+                      color=colors[economy], label=ECONOMY_LABELS[economy])
+        axis.set_title(OUTCOME_LABELS[outcome])
+        axis.set_xlabel("Jij")
+        axis.legend(frameon=False, fontsize=8)
+    axes[0].set_ylabel("Density")
+    fig.suptitle("Figure 5: Jij distributions across five economies")
+    outputs.append(_save(fig, destination, 5, "Jij-distributions"))
+
+    # Figures 6--10: one economy per figure, three outcome curves.
+    for number, economy in zip(range(6, 11), ECONOMIES):
+        fig, axis = plt.subplots(figsize=(9, 4.8))
+        for outcome in OUTCOMES:
+            rows = groups[(economy, outcome)]
+            names = list(rows[0]["effective_interactions"]["values"])
+            effective_matrix = np.asarray(
+                [[r["effective_interactions"]["values"][name] for name in names] for r in rows]
+            )
+            axis.plot(np.arange(len(names)), effective_matrix.mean(axis=0), marker="o", markersize=2.5,
+                      linewidth=1.3, label=OUTCOME_LABELS[outcome])
+        all_values = np.asarray([
+            value
+            for outcome in OUTCOMES
+            for row in groups[(economy, outcome)]
+            for value in row["effective_interactions"]["values"].values()
+        ])
+        mean = float(all_values.mean())
+        std = float(all_values.std(ddof=0))
+        axis.axhline(mean, color="#394b59", linewidth=1.0)
+        axis.axhline(mean - std, color="#e47945", linestyle="--", linewidth=1.0)
+        axis.axhline(mean + std, color="#e47945", linestyle="--", linewidth=1.0)
+        axis.set_xticks(np.arange(len(names)), [str(i) for i in range(len(names))])
+        axis.set(xlabel="Frozen node i", ylabel="epsilon_outcome", title=f"Figure {number}: {economy}")
+        axis.legend(frameon=False)
+        outputs.append(_save(fig, destination, number, f"effective-interactions-{economy}"))
+
+    # Figure 11: average response over outcomes for each economy.
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), sharex=True)
+    for economy in ECONOMIES:
+        curves = [row["temperature_response"] for outcome in OUTCOMES for row in groups[(economy, outcome)]]
+        temperatures = np.asarray(curves[0]["temperature"], dtype=float)
+        energy = np.asarray([c["d_mean_energy_d_temperature"] for c in curves]).mean(axis=0)
+        magnetization = np.asarray([c["d_mean_magnetization_d_temperature"] for c in curves]).mean(axis=0)
+        label = ECONOMY_LABELS[economy]
+        axes[0].plot(temperatures, energy, linewidth=1.4, label=label)
+        axes[1].plot(temperatures, magnetization, linewidth=1.4, label=label)
+    for axis, title, ylabel in zip(axes, ("Specific heat", "Magnetization response"), ("d<E>/dT", "dm/dT")):
+        axis.axvline(1.0, color="#394b59", linestyle=":", linewidth=1.0)
+        axis.set(xlabel="Temperature T", ylabel=ylabel, title=title)
+        axis.legend(frameon=False, fontsize=8)
+    fig.suptitle("Figure 11: Critical-state responses across five economies")
+    outputs.append(_save(fig, destination, 11, "critical-state-responses"))
+
+    # Figure 12: threshold sensitivity, averaged over the three outcomes.
+    fig, axis = plt.subplots(figsize=(7.5, 5))
+    for economy in ECONOMIES:
+        curves = [report["protocol_diagnostics"][f"{economy}/{outcome}"]["threshold_sensitivity"] for outcome in OUTCOMES]
+        thresholds = np.asarray(curves[0]["thresholds"], dtype=float)
+        correlations = np.asarray([c["correlations"] for c in curves]).mean(axis=0)
+        axis.plot(thresholds, correlations, linewidth=1.4, label=ECONOMY_LABELS[economy])
+    axis.set(xlabel="Threshold theta", ylabel="Pearson correlation rho", title="Figure A.12: Threshold sensitivity")
+    axis.legend(frameon=False)
+    axis.set_ylim(0.15, 1.03)
+    outputs.append(_save(fig, destination, 12, "threshold-sensitivity"))
+    return outputs
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Export paper-style Figures 4--12.")
+    parser.add_argument("--report", required=True)
+    parser.add_argument("--output-dir", required=True)
+    args = parser.parse_args()
+    report = json.loads(Path(args.report).read_text(encoding="utf-8"))
+    paths = export_paper_figures(report, args.output_dir)
+    print(f"exported {len(paths)} figures to {args.output_dir}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
