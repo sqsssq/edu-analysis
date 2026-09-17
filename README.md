@@ -103,7 +103,7 @@ protocol below:
 Python callers can use `effective_interaction_report(calculation="monte_carlo")`
 to retrieve the effective interactions together with their sampling diagnostics.
 
-To export the paper-style Figures 3–12 from a completed aggregate report, run:
+To export the paper-style Figures 3–11 from a completed aggregate report, run:
 
 ```bash
 python examples/pisa_paper_figures_4_12.py \
@@ -111,13 +111,11 @@ python examples/pisa_paper_figures_4_12.py \
   --output-dir data/prepared/pisa2018-paper-figures-4-12
 ```
 
-This produces ten PNGs: Figures 3–5, 6–10, 11, and Appendix Figure A.12.
+This produces nine PNGs: Figures 3–5, 6–10, and 11.
 Figures 3 and 4 use the same economy color mapping for their scatter points.
 Figure 5 uses the full observed `Jij` range with Matplotlib's automatic x-axis.
 Figure 11 displays the requested temperature axis from 0 to 4 and recomputes
 the exact-covariance curves over `T=0.05–4.0` from the selected `.pt` artifacts.
-Figure A.12 plots threshold `theta` against Pearson correlation between the
-original and binarized data, using only aggregate report fields.
 
 The runner writes only aggregate parameters, moments, convergence information,
 Monte Carlo diagnostics, and provenance. It never writes raw PISA rows to the

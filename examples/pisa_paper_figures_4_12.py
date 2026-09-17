@@ -1,4 +1,4 @@
-"""Recreate the paper-style Figures 3--12 from a local reproduction report.
+"""Recreate the paper-style Figures 3--11 from a local reproduction report.
 
 The script consumes only the aggregate JSON report. It does not read raw PISA
 rows and writes figures to a caller-selected local directory.
@@ -67,7 +67,7 @@ def _save(fig: Any, output_dir: Path, number: int, title: str) -> Path:
 
 
 def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list[Path]:
-    """Export Figures 3--12 from a completed reproduction report."""
+    """Export Figures 3--11 from a completed reproduction report."""
     import matplotlib.pyplot as plt
 
     destination = Path(output_dir)
@@ -241,22 +241,11 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
     fig.suptitle("Figure 11: Critical-state responses across five economies")
     outputs.append(_save(fig, destination, 11, "critical-state-responses"))
 
-    # Figure 12: threshold sensitivity, averaged over the three outcomes.
-    fig, axis = plt.subplots(figsize=(7.5, 5))
-    for economy in ECONOMIES:
-        curves = [report["protocol_diagnostics"][f"{economy}/{outcome}"]["threshold_sensitivity"] for outcome in OUTCOMES]
-        thresholds = np.asarray(curves[0]["thresholds"], dtype=float)
-        correlations = np.asarray([c["correlations"] for c in curves]).mean(axis=0)
-        axis.plot(thresholds, correlations, linewidth=1.4, label=ECONOMY_LABELS[economy])
-    axis.set(xlabel="Threshold theta", ylabel="Pearson correlation rho", title="Figure A.12: Threshold sensitivity")
-    axis.legend(frameon=False)
-    axis.set_ylim(0.15, 1.03)
-    outputs.append(_save(fig, destination, 12, "threshold-sensitivity"))
     return outputs
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Export paper-style Figures 3--12.")
+    parser = argparse.ArgumentParser(description="Export paper-style Figures 3--11.")
     parser.add_argument("--report", required=True)
     parser.add_argument("--output-dir", required=True)
     args = parser.parse_args()
