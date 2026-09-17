@@ -113,6 +113,9 @@ python examples/pisa_paper_figures_4_12.py \
 
 This produces ten PNGs: Figures 3–5, 6–10, 11, and Appendix Figure A.12.
 Figures 3 and 4 use the same economy color mapping for their scatter points.
+Figure 11 displays the requested temperature axis from 0 to 4; the current
+aggregate report stores response values only for `T=0.5–1.5`, so the plotted
+curves occupy that interval until a wider temperature scan is recomputed.
 Figure A.12 plots threshold `theta` against Pearson correlation between the
 original and binarized data, using only aggregate report fields.
 

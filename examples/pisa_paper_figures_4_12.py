@@ -196,6 +196,7 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
         axes[1].plot(temperatures, magnetization, linewidth=1.4, label=label)
     for axis, title, ylabel in zip(axes, ("Specific heat", "Magnetization response"), ("d<E>/dT", "dm/dT")):
         axis.axvline(1.0, color="#394b59", linestyle=":", linewidth=1.0)
+        axis.set_xlim(0.0, 4.0)
         axis.set(xlabel="Temperature T", ylabel=ylabel, title=title)
         axis.legend(frameon=False, fontsize=8)
     fig.suptitle("Figure 11: Critical-state responses across five economies")
