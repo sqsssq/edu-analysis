@@ -113,6 +113,7 @@ python examples/pisa_paper_figures_4_12.py \
 
 This produces ten PNGs: Figures 3–5, 6–10, 11, and Appendix Figure A.12.
 Figures 3 and 4 use the same economy color mapping for their scatter points.
+Figure 5 uses the full observed `Jij` range with Matplotlib's automatic x-axis.
 Figure 11 displays the requested temperature axis from 0 to 4 and recomputes
 the exact-covariance curves over `T=0.05–4.0` from the selected `.pt` artifacts.
 Figure A.12 plots threshold `theta` against Pearson correlation between the

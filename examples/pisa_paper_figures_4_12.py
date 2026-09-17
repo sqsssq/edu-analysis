@@ -152,7 +152,6 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
                 values.extend(matrix[np.triu_indices_from(matrix, k=1)].tolist())
             axis.hist(values, bins=35, density=True, histtype="step", linewidth=1.4,
                       color=ECONOMY_COLORS[economy], label=ECONOMY_LABELS[economy])
-        axis.set_xlim(-0.4, 1.0)
         axis.set_title(OUTCOME_LABELS[outcome])
         axis.set_xlabel("Jij")
         axis.legend(frameon=False, fontsize=8)

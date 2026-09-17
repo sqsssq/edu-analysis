@@ -82,6 +82,7 @@ python examples/pisa_paper_figures_4_12.py \
 
 脚本生成 10 张 PNG：Figure 3、4、5、6–10、11，以及 Appendix Figure A.12。
 Figure 3 和 Figure 4 的散点使用一致的经济体颜色编码。
+Figure 5 恢复使用全部观测到的 `Jij` 范围，并由 Matplotlib 自动确定横轴。
 Figure 11 的温度横轴显示范围已调整为 0–4，并使用选出的 `.pt` 模型文件在
 `T=0.05–4.0` 上重新计算 exact covariance 响应。
 A.12 绘制阈值 `theta` 与原始/二值化数据 Pearson 相关系数的关系，只读取
