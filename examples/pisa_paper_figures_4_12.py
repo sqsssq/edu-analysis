@@ -66,6 +66,19 @@ def _save(fig: Any, output_dir: Path, number: int, title: str) -> Path:
     return path
 
 
+def _model_directory(report: dict[str, Any], output_dir: Path) -> Path:
+    configured = report.get("model_artifact_directory")
+    if configured is None:
+        configured = report.get("protocol", {}).get("model_artifacts", {}).get("directory")
+    if configured is None:
+        return output_dir.parent / "pisa2018-paper-reproduction-models"
+    path = Path(configured)
+    if path.is_absolute():
+        return path
+    project_relative = Path.cwd() / path
+    return project_relative if project_relative.exists() else output_dir.parent.parent / path
+
+
 def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list[Path]:
     """Export Figures 3--11 from a completed reproduction report."""
     import matplotlib.pyplot as plt
@@ -77,7 +90,7 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
 
     # Figures 3 and 4 use the paper's selected fit per economy/outcome and
     # display a separate correlation coefficient for each economy.
-    model_dir = Path(report.get("model_artifact_directory", destination.parent / "pisa2018-paper-reproduction-models"))
+    model_dir = _model_directory(report, destination)
 
     # Figure 3: magnetization and pairwise products.
     fig, axes = plt.subplots(1, 2, figsize=(11, 5))
@@ -188,7 +201,7 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
     # Figures 6--10: one economy per figure, one paper-style panel per outcome.
     # The paper uses one selected fitted model per economy/outcome and computes
     # the mean +/- SD benchmark separately within each outcome.
-    model_dir = Path(report.get("model_artifact_directory", destination.parent / "pisa2018-paper-reproduction-models"))
+    model_dir = _model_directory(report, destination)
     for number, economy in zip(range(6, 11), ECONOMIES):
         fig, axes = plt.subplots(1, 3, figsize=(12, 4.2), sharey=False)
         for axis, outcome in zip(axes, OUTCOMES):
