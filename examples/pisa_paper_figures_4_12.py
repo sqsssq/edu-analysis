@@ -1,4 +1,4 @@
-"""Recreate the paper-style Figures 4--12 from a local reproduction report.
+"""Recreate the paper-style Figures 3--12 from a local reproduction report.
 
 The script consumes only the aggregate JSON report. It does not read raw PISA
 rows and writes figures to a caller-selected local directory.
@@ -18,6 +18,13 @@ ECONOMIES = ("TAP", "HKG", "DEU", "USA", "GBR")
 OUTCOMES = ("PV1MATH", "PV1SCIE", "PV1READ")
 ECONOMY_LABELS = {"TAP": "tw", "HKG": "hk", "DEU": "gm", "USA": "usa", "GBR": "uk"}
 OUTCOME_LABELS = {"PV1MATH": "Math", "PV1SCIE": "Science", "PV1READ": "Reading"}
+ECONOMY_COLORS = {
+    "TAP": "#2f80c0",
+    "HKG": "#f2994a",
+    "DEU": "#43a047",
+    "USA": "#e53935",
+    "GBR": "#8e6bbf",
+}
 
 
 def _pearson(x: list[float], y: list[float]) -> float:
@@ -46,7 +53,7 @@ def _save(fig: Any, output_dir: Path, number: int, title: str) -> Path:
 
 
 def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list[Path]:
-    """Export Figures 4--12 from a completed reproduction report."""
+    """Export Figures 3--12 from a completed reproduction report."""
     import matplotlib.pyplot as plt
 
     destination = Path(output_dir)
@@ -54,27 +61,87 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
     groups = _group_rows(report)
     outputs: list[Path] = []
 
-    # Figure 4: pooled triple and quadruplet correlations.
+    # Figure 3: first- and second-order observed-versus-model moments.
     fig, axes = plt.subplots(1, 2, figsize=(11, 5))
-    for axis, order, label in zip(axes, ("3", "4"), ("Triple", "Quadruplet")):
-        observed: list[float] = []
-        modeled: list[float] = []
-        for row in report["results"]:
-            observed.extend(row["observed_moments"][order].values() if order in ("3", "4") else [])
-            modeled.extend(row["modeled_moments"][order].values() if order in ("3", "4") else [])
-        axis.scatter(observed, modeled, s=5, alpha=0.25, color="#176b87", edgecolors="none")
-        limits = [0.0, max(observed + modeled) * 1.02]
+    for axis, order, label in zip(axes, ("1", "2"), ("Single node", "Pairwise")):
+        all_values: list[float] = []
+        for economy in ECONOMIES:
+            observed: list[float] = []
+            modeled: list[float] = []
+            for outcome in OUTCOMES:
+                for row in groups[(economy, outcome)]:
+                    observed_moments = np.asarray(row["observed_moments"][order], dtype=float)
+                    modeled_moments = np.asarray(row["modeled_moments"][order], dtype=float)
+                    if order == "2":
+                        indices = np.triu_indices_from(observed_moments, k=1)
+                        observed.extend(observed_moments[indices].tolist())
+                        modeled.extend(modeled_moments[indices].tolist())
+                    else:
+                        observed.extend(observed_moments.tolist())
+                        modeled.extend(modeled_moments.tolist())
+            all_values.extend(observed)
+            all_values.extend(modeled)
+            axis.scatter(
+                observed,
+                modeled,
+                s=5,
+                alpha=0.28,
+                color=ECONOMY_COLORS[economy],
+                edgecolors="none",
+                label=ECONOMY_LABELS[economy],
+            )
+            axis.text(
+                0.04,
+                0.92 - 0.06 * ECONOMIES.index(economy),
+                f"{ECONOMY_LABELS[economy]} r={_pearson(observed, modeled):.3f}",
+                color=ECONOMY_COLORS[economy],
+                transform=axis.transAxes,
+                fontsize=8,
+            )
+        limits = [0.0, max(all_values) * 1.02]
         axis.plot(limits, limits, color="#394b59", linewidth=1.2)
-        axis.set(xlabel="Observed correlation", ylabel="Model correlation", title=label)
-        axis.text(0.04, 0.92, f"r = {_pearson(observed, modeled):.3f}", transform=axis.transAxes)
+        axis.set(xlabel="Observed moment", ylabel="Model moment", title=label)
         axis.set_xlim(limits)
         axis.set_ylim(limits)
+        axis.legend(frameon=False, fontsize=8)
+    fig.suptitle("Figure 3: Observed versus model first- and second-order moments")
+    outputs.append(_save(fig, destination, 3, "lower-order-correlations"))
+
+    # Figure 4: pooled triple and quadruplet correlations, colored by economy.
+    fig, axes = plt.subplots(1, 2, figsize=(11, 5))
+    for axis, order, label in zip(axes, ("3", "4"), ("Triple", "Quadruplet")):
+        all_observed: list[float] = []
+        all_modeled: list[float] = []
+        for economy in ECONOMIES:
+            observed_higher: list[float] = []
+            modeled_higher: list[float] = []
+            for outcome in OUTCOMES:
+                for row in groups[(economy, outcome)]:
+                    observed_higher.extend(row["observed_moments"][order].values())
+                    modeled_higher.extend(row["modeled_moments"][order].values())
+            all_observed.extend(observed_higher)
+            all_modeled.extend(modeled_higher)
+            axis.scatter(
+                observed_higher,
+                modeled_higher,
+                s=5,
+                alpha=0.28,
+                color=ECONOMY_COLORS[economy],
+                edgecolors="none",
+                label=ECONOMY_LABELS[economy],
+            )
+        limits = [0.0, max(all_observed + all_modeled) * 1.02]
+        axis.plot(limits, limits, color="#394b59", linewidth=1.2)
+        axis.set(xlabel="Observed correlation", ylabel="Model correlation", title=label)
+        axis.text(0.04, 0.92, f"r = {_pearson(all_observed, all_modeled):.3f}", transform=axis.transAxes)
+        axis.set_xlim(limits)
+        axis.set_ylim(limits)
+        axis.legend(frameon=False, fontsize=8)
     fig.suptitle("Figure 4: Observed versus model triple and quadruplet correlations")
     outputs.append(_save(fig, destination, 4, "higher-order-correlations"))
 
     # Figure 5: one panel per outcome, overlaying the five economies.
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.5), sharey=True)
-    colors = {"TAP": "#2f80c0", "HKG": "#f2994a", "DEU": "#43a047", "USA": "#e53935", "GBR": "#8e6bbf"}
     for axis, outcome in zip(axes, OUTCOMES):
         for economy in ECONOMIES:
             values: list[float] = []
@@ -82,7 +149,7 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
                 matrix = np.asarray(row["J"], dtype=float)
                 values.extend(matrix[np.triu_indices_from(matrix, k=1)].tolist())
             axis.hist(values, bins=35, density=True, histtype="step", linewidth=1.4,
-                      color=colors[economy], label=ECONOMY_LABELS[economy])
+                      color=ECONOMY_COLORS[economy], label=ECONOMY_LABELS[economy])
         axis.set_title(OUTCOME_LABELS[outcome])
         axis.set_xlabel("Jij")
         axis.legend(frameon=False, fontsize=8)
@@ -101,14 +168,14 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
             )
             axis.plot(np.arange(len(names)), effective_matrix.mean(axis=0), marker="o", markersize=2.5,
                       linewidth=1.3, label=OUTCOME_LABELS[outcome])
-        all_values = np.asarray([
+        all_effective_values = np.asarray([
             value
             for outcome in OUTCOMES
             for row in groups[(economy, outcome)]
             for value in row["effective_interactions"]["values"].values()
         ])
-        mean = float(all_values.mean())
-        std = float(all_values.std(ddof=0))
+        mean = float(all_effective_values.mean())
+        std = float(all_effective_values.std(ddof=0))
         axis.axhline(mean, color="#394b59", linewidth=1.0)
         axis.axhline(mean - std, color="#e47945", linestyle="--", linewidth=1.0)
         axis.axhline(mean + std, color="#e47945", linestyle="--", linewidth=1.0)
@@ -149,7 +216,7 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Export paper-style Figures 4--12.")
+    parser = argparse.ArgumentParser(description="Export paper-style Figures 3--12.")
     parser.add_argument("--report", required=True)
     parser.add_argument("--output-dir", required=True)
     args = parser.parse_args()

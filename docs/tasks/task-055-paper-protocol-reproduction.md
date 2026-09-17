@@ -42,9 +42,9 @@ Review Ready
   effective interaction calculation and records its chain diagnostics.
 - `examples/pisa_paper_figures.py` exports aggregate PNGs for effective
   interactions, temperature response, and `Jij` distributions from a report.
-- `examples/pisa_paper_figures_4_12.py` exports paper-style Figures 4, 5,
+- `examples/pisa_paper_figures_4_12.py` exports paper-style Figures 3, 4, 5,
   6–11, and Appendix Figure A.12 from aggregate report fields without reading
-  raw PISA rows.
+  raw PISA rows; Figures 3 and 4 use consistent economy-specific point colors.
 - Existing package defaults remain backward compatible.
 - `pytest`, lint/type checks when available, and strict harness verification
   are run before handoff.

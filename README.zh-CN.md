@@ -71,7 +71,7 @@ print(model.last_quality_report.to_dict())
 - effective interaction 强制使用 Monte Carlo，并记录 chains、draws、R-hat、ESS、MCSE；
 - critical-state 使用 exact covariance 导数。
 
-从已经完成的聚合报告导出论文风格的 Figures 4–12（包括你提供的附录
+从已经完成的聚合报告导出论文风格的 Figures 3–12（包括你提供的附录
 Figure A.12）可以运行：
 
 ```bash
@@ -80,7 +80,8 @@ python examples/pisa_paper_figures_4_12.py \
   --output-dir data/prepared/pisa2018-paper-figures-4-12
 ```
 
-脚本生成 9 张 PNG：Figure 4、5、6–10、11，以及 Appendix Figure A.12。
+脚本生成 10 张 PNG：Figure 3、4、5、6–10、11，以及 Appendix Figure A.12。
+Figure 3 和 Figure 4 的散点使用一致的经济体颜色编码。
 A.12 绘制阈值 `theta` 与原始/二值化数据 Pearson 相关系数的关系，只读取
 聚合报告，不读取或导出 PISA 原始行数据。
 
