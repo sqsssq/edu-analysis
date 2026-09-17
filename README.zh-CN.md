@@ -82,8 +82,8 @@ python examples/pisa_paper_figures_4_12.py \
 
 脚本生成 10 张 PNG：Figure 3、4、5、6–10、11，以及 Appendix Figure A.12。
 Figure 3 和 Figure 4 的散点使用一致的经济体颜色编码。
-Figure 11 的温度横轴显示范围已调整为 0–4；当前聚合报告只保存了
-`T=0.5–1.5` 的响应值，因此在重新计算更宽温度扫描前，曲线只会出现在这个区间。
+Figure 11 的温度横轴显示范围已调整为 0–4，并使用选出的 `.pt` 模型文件在
+`T=0.05–4.0` 上重新计算 exact covariance 响应。
 A.12 绘制阈值 `theta` 与原始/二值化数据 Pearson 相关系数的关系，只读取
 聚合报告，不读取或导出 PISA 原始行数据。
 

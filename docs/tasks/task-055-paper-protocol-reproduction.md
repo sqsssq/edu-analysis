@@ -44,7 +44,9 @@ Review Ready
   interactions, temperature response, and `Jij` distributions from a report.
 - `examples/pisa_paper_figures_4_12.py` exports paper-style Figures 3, 4, 5,
   6–11, and Appendix Figure A.12 from aggregate report fields without reading
-  raw PISA rows; Figures 3 and 4 use consistent economy-specific point colors.
+  raw PISA rows; Figures 3 and 4 use consistent economy-specific point colors,
+  Figure 5 uses `Jij ∈ [-0.4, 1.0]`, and Figure 11 recomputes exact-covariance
+  responses over `T=0.05–4.0` from selected `.pt` artifacts.
 - Existing package defaults remain backward compatible.
 - `pytest`, lint/type checks when available, and strict harness verification
   are run before handoff.

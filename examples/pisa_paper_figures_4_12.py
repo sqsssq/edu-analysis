@@ -14,6 +14,8 @@ from typing import Any
 
 import numpy as np
 
+from learning_energy_model import LearningModel
+
 ECONOMIES = ("TAP", "HKG", "DEU", "USA", "GBR")
 OUTCOMES = ("PV1MATH", "PV1SCIE", "PV1READ")
 ECONOMY_LABELS = {"TAP": "tw", "HKG": "hk", "DEU": "gm", "USA": "usa", "GBR": "uk"}
@@ -150,6 +152,7 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
                 values.extend(matrix[np.triu_indices_from(matrix, k=1)].tolist())
             axis.hist(values, bins=35, density=True, histtype="step", linewidth=1.4,
                       color=ECONOMY_COLORS[economy], label=ECONOMY_LABELS[economy])
+        axis.set_xlim(-0.4, 1.0)
         axis.set_title(OUTCOME_LABELS[outcome])
         axis.set_xlabel("Jij")
         axis.legend(frameon=False, fontsize=8)
@@ -184,14 +187,23 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
         axis.legend(frameon=False)
         outputs.append(_save(fig, destination, number, f"effective-interactions-{economy}"))
 
-    # Figure 11: average response over outcomes for each economy.
+    # Figure 11: response from the selected model artifact for each group.
+    # Recompute over the full temperature range; the aggregate report only
+    # stores the original narrow scan used by the first reproduction run.
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), sharex=True)
+    model_dir = Path(report.get("model_artifact_directory", destination.parent / "pisa2018-paper-reproduction-models"))
+    temperatures = np.linspace(0.05, 4.0, 161)
     for economy in ECONOMIES:
-        curves = [row["temperature_response"] for outcome in OUTCOMES for row in groups[(economy, outcome)]]
-        temperatures = np.asarray(curves[0]["temperature"], dtype=float)
-        energy = np.asarray([c["d_mean_energy_d_temperature"] for c in curves]).mean(axis=0)
-        magnetization = np.asarray([c["d_mean_magnetization_d_temperature"] for c in curves]).mean(axis=0)
         label = ECONOMY_LABELS[economy]
+        responses = []
+        for outcome in OUTCOMES:
+            model_path = model_dir / f"{economy}-{outcome}.pt"
+            model = LearningModel.load(model_path)
+            responses.append(model.temperature_response(temperatures))
+        energy = np.asarray([response["d_mean_energy_d_temperature"] for response in responses]).mean(axis=0)
+        magnetization = np.asarray(
+            [response["d_mean_magnetization_d_temperature"] for response in responses]
+        ).mean(axis=0)
         axes[0].plot(temperatures, energy, linewidth=1.4, label=label)
         axes[1].plot(temperatures, magnetization, linewidth=1.4, label=label)
     for axis, title, ylabel in zip(axes, ("Specific heat", "Magnetization response"), ("d<E>/dT", "dm/dT")):
