@@ -44,6 +44,18 @@ def _group_rows(report: dict[str, Any]) -> dict[tuple[str, str], list[dict[str, 
     return groups
 
 
+def _selected_row(
+    groups: dict[tuple[str, str], list[dict[str, Any]]],
+    model_dir: Path,
+    economy: str,
+    outcome: str,
+) -> dict[str, Any]:
+    model = LearningModel.load(model_dir / f"{economy}-{outcome}.pt")
+    selection = cast(dict[str, Any], model.artifact_metadata["reproduction_selection"])
+    repeat = int(selection["repeat"])
+    return next(row for row in groups[(economy, outcome)] if row["repeat"] == repeat)
+
+
 def _save(fig: Any, output_dir: Path, number: int, title: str) -> Path:
     import matplotlib.pyplot as plt
 
@@ -63,24 +75,29 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
     groups = _group_rows(report)
     outputs: list[Path] = []
 
-    # Figure 3: first- and second-order observed-versus-model moments.
+    # Figures 3 and 4 use the paper's selected fit per economy/outcome and
+    # display a separate correlation coefficient for each economy.
+    model_dir = Path(report.get("model_artifact_directory", destination.parent / "pisa2018-paper-reproduction-models"))
+
+    # Figure 3: magnetization and pairwise products.
     fig, axes = plt.subplots(1, 2, figsize=(11, 5))
-    for axis, order, label in zip(axes, ("1", "2"), ("Single node", "Pairwise")):
+    for axis, order, title in zip(axes, ("1", "2"), ("A  magnetization", "B  pair product")):
         all_values: list[float] = []
+        economy_correlations: list[float] = []
         for economy in ECONOMIES:
             observed: list[float] = []
             modeled: list[float] = []
             for outcome in OUTCOMES:
-                for row in groups[(economy, outcome)]:
-                    observed_moments = np.asarray(row["observed_moments"][order], dtype=float)
-                    modeled_moments = np.asarray(row["modeled_moments"][order], dtype=float)
-                    if order == "2":
-                        indices = np.triu_indices_from(observed_moments, k=1)
-                        observed.extend(observed_moments[indices].tolist())
-                        modeled.extend(modeled_moments[indices].tolist())
-                    else:
-                        observed.extend(observed_moments.tolist())
-                        modeled.extend(modeled_moments.tolist())
+                row = _selected_row(groups, model_dir, economy, outcome)
+                observed_moments = np.asarray(row["observed_moments"][order], dtype=float)
+                modeled_moments = np.asarray(row["modeled_moments"][order], dtype=float)
+                if order == "2":
+                    indices = np.triu_indices_from(observed_moments, k=1)
+                    observed.extend(observed_moments[indices].tolist())
+                    modeled.extend(modeled_moments[indices].tolist())
+                else:
+                    observed.extend(observed_moments.tolist())
+                    modeled.extend(modeled_moments.tolist())
             all_values.extend(observed)
             all_values.extend(modeled)
             axis.scatter(
@@ -92,37 +109,32 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
                 edgecolors="none",
                 label=ECONOMY_LABELS[economy],
             )
-            axis.text(
-                0.04,
-                0.92 - 0.06 * ECONOMIES.index(economy),
-                f"{ECONOMY_LABELS[economy]} r={_pearson(observed, modeled):.3f}",
-                color=ECONOMY_COLORS[economy],
-                transform=axis.transAxes,
-                fontsize=8,
-            )
+            economy_correlations.append(_pearson(observed, modeled))
         limits = [0.0, max(all_values) * 1.02]
         axis.plot(limits, limits, color="#394b59", linewidth=1.2)
-        axis.set(xlabel="Observed moment", ylabel="Model moment", title=label)
+        axis.set(xlabel="data", ylabel="model", title=title)
         axis.set_xlim(limits)
         axis.set_ylim(limits)
-        axis.legend(frameon=False, fontsize=8)
-    fig.suptitle("Figure 3: Observed versus model first- and second-order moments")
+        handles, labels = axis.get_legend_handles_labels()
+        axis.legend(
+            handles,
+            [f"{label}   r={correlation:.4f}" for label, correlation in zip(labels, economy_correlations)],
+            frameon=False,
+            fontsize=8,
+        )
+    fig.suptitle("Figure 3: Comparison of observed and model-predicted moments")
     outputs.append(_save(fig, destination, 3, "lower-order-correlations"))
 
-    # Figure 4: pooled triple and quadruplet correlations, colored by economy.
+    # Figure 4: triple and quadruplet products, colored by economy.
     fig, axes = plt.subplots(1, 2, figsize=(11, 5))
     for axis, order, label in zip(axes, ("3", "4"), ("Triple", "Quadruplet")):
-        all_observed: list[float] = []
-        all_modeled: list[float] = []
         for economy in ECONOMIES:
             observed_higher: list[float] = []
             modeled_higher: list[float] = []
             for outcome in OUTCOMES:
-                for row in groups[(economy, outcome)]:
-                    observed_higher.extend(row["observed_moments"][order].values())
-                    modeled_higher.extend(row["modeled_moments"][order].values())
-            all_observed.extend(observed_higher)
-            all_modeled.extend(modeled_higher)
+                row = _selected_row(groups, model_dir, economy, outcome)
+                observed_higher.extend(row["observed_moments"][order].values())
+                modeled_higher.extend(row["modeled_moments"][order].values())
             axis.scatter(
                 observed_higher,
                 modeled_higher,
@@ -132,26 +144,40 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
                 edgecolors="none",
                 label=ECONOMY_LABELS[economy],
             )
-        limits = [0.0, max(all_observed + all_modeled) * 1.02]
+        all_observed = [point.get_offsets().data[:, 0] for point in axis.collections]
+        all_modeled = [point.get_offsets().data[:, 1] for point in axis.collections]
+        observed_flat = np.concatenate(all_observed).tolist()
+        modeled_flat = np.concatenate(all_modeled).tolist()
+        limits = [0.0, max(observed_flat + modeled_flat) * 1.02]
         axis.plot(limits, limits, color="#394b59", linewidth=1.2)
-        axis.set(xlabel="Observed correlation", ylabel="Model correlation", title=label)
-        axis.text(0.04, 0.92, f"r = {_pearson(all_observed, all_modeled):.3f}", transform=axis.transAxes)
+        axis.set(xlabel="data", ylabel="model", title=f"{label} product")
         axis.set_xlim(limits)
         axis.set_ylim(limits)
         axis.legend(frameon=False, fontsize=8)
-    fig.suptitle("Figure 4: Observed versus model triple and quadruplet correlations")
+    fig.suptitle("Figure 4: Comparison of triple and quadruplet correlations")
     outputs.append(_save(fig, destination, 4, "higher-order-correlations"))
 
-    # Figure 5: one panel per outcome, overlaying the five economies.
+    # Figure 5: the paper's order is Math, Reading, Science, with distribution
+    # statistics included in each economy legend entry.
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.5), sharey=True)
-    for axis, outcome in zip(axes, OUTCOMES):
+    for axis, outcome in zip(axes, ("PV1MATH", "PV1READ", "PV1SCIE")):
         for economy in ECONOMIES:
             values: list[float] = []
-            for row in groups[(economy, outcome)]:
-                matrix = np.asarray(row["J"], dtype=float)
-                values.extend(matrix[np.triu_indices_from(matrix, k=1)].tolist())
+            row = _selected_row(groups, model_dir, economy, outcome)
+            matrix = np.asarray(row["J"], dtype=float)
+            values.extend(matrix[np.triu_indices_from(matrix, k=1)].tolist())
+            values_array = np.asarray(values, dtype=float)
+            centered = values_array - values_array.mean()
+            scale = float(values_array.std())
+            skew = float((centered**3).mean() / scale**3) if scale else 0.0
+            kurtosis = float((centered**4).mean() / scale**4 - 3.0) if scale else 0.0
+            legend_label = (
+                f"{ECONOMY_LABELS[economy]} "
+                f"μ={values_array.mean():.3f} ({scale:.2f})\n"
+                f"skw={skew:.2f}, kur={kurtosis:.2f}"
+            )
             axis.hist(values, bins=35, density=True, histtype="step", linewidth=1.4,
-                      color=ECONOMY_COLORS[economy], label=ECONOMY_LABELS[economy])
+                      color=ECONOMY_COLORS[economy], label=legend_label)
         axis.set_title(OUTCOME_LABELS[outcome])
         axis.set_xlabel("Jij")
         axis.legend(frameon=False, fontsize=8)
