@@ -10,7 +10,7 @@ import argparse
 import json
 from collections import defaultdict
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -159,38 +159,40 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
     fig.suptitle("Figure 5: Jij distributions across five economies")
     outputs.append(_save(fig, destination, 5, "Jij-distributions"))
 
-    # Figures 6--10: one economy per figure, three outcome curves.
+    # Figures 6--10: one economy per figure, one paper-style panel per outcome.
+    # The paper uses one selected fitted model per economy/outcome and computes
+    # the mean +/- SD benchmark separately within each outcome.
+    model_dir = Path(report.get("model_artifact_directory", destination.parent / "pisa2018-paper-reproduction-models"))
     for number, economy in zip(range(6, 11), ECONOMIES):
-        fig, axis = plt.subplots(figsize=(9, 4.8))
-        for outcome in OUTCOMES:
-            rows = groups[(economy, outcome)]
-            names = list(rows[0]["effective_interactions"]["values"])
-            effective_matrix = np.asarray(
-                [[r["effective_interactions"]["values"][name] for name in names] for r in rows]
+        fig, axes = plt.subplots(1, 3, figsize=(12, 4.2), sharey=False)
+        for axis, outcome in zip(axes, OUTCOMES):
+            model_path = model_dir / f"{economy}-{outcome}.pt"
+            model = LearningModel.load(model_path)
+            selection = cast(dict[str, Any], model.artifact_metadata["reproduction_selection"])
+            selected_repeat = int(selection["repeat"])
+            row = next(
+                item for item in groups[(economy, outcome)] if item["repeat"] == selected_repeat
             )
-            axis.plot(np.arange(len(names)), effective_matrix.mean(axis=0), marker="o", markersize=2.5,
-                      linewidth=1.3, label=OUTCOME_LABELS[outcome])
-        all_effective_values = np.asarray([
-            value
-            for outcome in OUTCOMES
-            for row in groups[(economy, outcome)]
-            for value in row["effective_interactions"]["values"].values()
-        ])
-        mean = float(all_effective_values.mean())
-        std = float(all_effective_values.std(ddof=0))
-        axis.axhline(mean, color="#394b59", linewidth=1.0)
-        axis.axhline(mean - std, color="#e47945", linestyle="--", linewidth=1.0)
-        axis.axhline(mean + std, color="#e47945", linestyle="--", linewidth=1.0)
-        axis.set_xticks(np.arange(len(names)), [str(i) for i in range(len(names))])
-        axis.set(xlabel="Frozen node i", ylabel="epsilon_outcome", title=f"Figure {number}: {economy}")
-        axis.legend(frameon=False)
+            interaction_report = cast(dict[str, Any], row["effective_interactions"])
+            effective_values_array = np.asarray(
+                list(cast(dict[str, float], interaction_report["values"]).values()), dtype=float
+            )
+            effective_mean = float(effective_values_array.mean())
+            effective_std = float(effective_values_array.std(ddof=0))
+            node_indices = np.arange(effective_values_array.size)
+            axis.plot(node_indices, effective_values_array, color="#3d8dcc", linewidth=1.2)
+            axis.axhline(effective_mean + effective_std, color="#ff7f0e", linewidth=1.0, label="mean+std of ε")
+            axis.axhline(effective_mean - effective_std, color="#2ca02c", linewidth=1.0, label="mean-std of ε")
+            axis.set_xticks(node_indices, [str(i) for i in node_indices])
+            axis.set(xlabel="Frozen node i", ylabel="ε", title=f"{ECONOMY_LABELS[economy]} {OUTCOME_LABELS[outcome]}")
+            axis.legend(frameon=False, fontsize=7, loc="best")
+        fig.suptitle(f"Figure {number}: ε̄_outcome versus frozen node i in {economy}")
         outputs.append(_save(fig, destination, number, f"effective-interactions-{economy}"))
 
     # Figure 11: response from the selected model artifact for each group.
     # Recompute over the full temperature range; the aggregate report only
     # stores the original narrow scan used by the first reproduction run.
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), sharex=True)
-    model_dir = Path(report.get("model_artifact_directory", destination.parent / "pisa2018-paper-reproduction-models"))
     temperatures = np.linspace(0.05, 4.0, 161)
     for economy in ECONOMIES:
         label = ECONOMY_LABELS[economy]
