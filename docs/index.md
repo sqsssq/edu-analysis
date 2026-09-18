@@ -3,8 +3,8 @@
 **See the structure behind learning data.**
 
 Interpretable Learning Energy Framework is a Python package for fitting binary
-pairwise maximum-entropy energy models, inspecting interactions, and building
-auditable reproduction workflows.
+and experimental continuous pairwise maximum-entropy energy models, inspecting
+interactions, and building auditable reproduction workflows.
 
 !!! tip "The short version"
     Declare your data contract, fit a model, inspect `h` and `J`, and export
@@ -55,6 +55,7 @@ For a paper-aligned, end-to-end reproduction workflow, see
 - [Methods](guide/methods.md) — objective, normalization, exact enumeration, and Gibbs sampling.
 - [Parameters](guide/parameters.md) — data, training, and Monte Carlo settings.
 - [Fit and inspect](guide/fit-and-inspect.md) — the main package workflow and result objects.
+- [Continuous models](guide/continuous-models.md) — fit numeric variables without binarization.
 - [Python API](api-reference.md) — generated reference pages for public classes and functions.
 
 ## Model convention

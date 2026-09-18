@@ -7,6 +7,10 @@ These pages are generated from the package's public docstrings by
 
 ::: learning_energy_model.model.LearningModel
 
+## Continuous model
+
+::: learning_energy_model.continuous.ContinuousEnergyModel
+
 ## Configuration
 
 ::: learning_energy_model.config.DataConfig
@@ -18,6 +22,10 @@ These pages are generated from the package's public docstrings by
 ::: learning_energy_model.results.PredictionResult
 
 ::: learning_energy_model.results.AnalysisResult
+
+::: learning_energy_model.continuous.ContinuousFitResult
+
+::: learning_energy_model.continuous.ContinuousAnalysisResult
 
 ## Visualization
 

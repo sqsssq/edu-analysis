@@ -22,3 +22,11 @@ paper-aligned reference path, and adds a separate `method="adam"` with
 implementation. The compatibility path remains binary and uses the package's
 documented `{0, 1}` energy convention; exact numerical equivalence with the
 original C++ spin/Metropolis executable is not claimed.
+
+### 2026-09-18: Add continuous Gaussian model as a separate experimental family
+
+Continuous input support must not silently remove binary preprocessing from
+`LearningModel`. The project adds a separate `ContinuousEnergyModel` with a
+quadratic Gaussian energy, closed-form weighted fit, precision-based
+conditional interactions, sampling, and artifact persistence. Mixed-node,
+nonlinear, and non-Gaussian extensions remain separate future tasks.

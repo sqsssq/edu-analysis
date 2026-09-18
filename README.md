@@ -33,6 +33,21 @@ analysis = model.analyze()
 model.save("learning-model.pt")
 ```
 
+For continuous data that should not be thresholded, use the separate
+experimental Gaussian energy model:
+
+```python
+from learnenergy import ContinuousEnergyModel
+
+continuous = ContinuousEnergyModel(feature_names=("feature_a", "feature_b"), seed=7)
+continuous.fit(X_continuous)
+report = continuous.analyze()
+```
+
+This continuous family uses a quadratic Gaussian energy and precision-based
+conditional interactions. Mixed binary-continuous and nonlinear models remain
+future extensions; the binary paper-reproduction API is unchanged.
+
 For estimator-style callers, the dependency-free `LearningEnergyClassifier` exposes `fit`, `predict_proba`, `predict`, and `analyze` while retaining the same interpretable model underneath:
 
 ```python

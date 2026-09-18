@@ -63,6 +63,7 @@ nav:
       - Methods: guide/methods.md
       - Parameters: guide/parameters.md
       - Fit and inspect: guide/fit-and-inspect.md
+      - Continuous models: guide/continuous-models.md
       - Visualizations: guide/visualizations.md
       - Save and reload: guide/save-and-reload.md
   - Reproduction:
@@ -73,6 +74,7 @@ nav:
       - Overview: API.md
       - Python API: api-reference.md
       - Core model: api/core.md
+      - Continuous model: api/continuous.md
       - Data and results: api/data-and-results.md
       - Adapters and managers: api/adapters.md
       - PISA and visualization: api/integrations.md

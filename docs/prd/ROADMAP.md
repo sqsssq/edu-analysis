@@ -42,6 +42,7 @@
 - sklearn adapter. **Implemented: dependency-free `LearningEnergyClassifier` provides the common estimator methods while preserving the structured analysis API.**
 - Multi-domain manager for independent target models. **Implemented: `MultiDomainManager` provides independent fit/predict/analyze/save/load operations per domain.**
 - Better CLI and reporting exports. **Implemented: `python -m learning_energy_model fit/predict/analyze` and the `learning-energy-model` console entry point support numeric CSV workflows and aggregate interpretability export.**
+- Experimental continuous Gaussian/quadratic energy model. **In progress: separate `ContinuousEnergyModel` API; mixed and nonlinear continuous models remain future work.**
 
 ## v1.0 - stable release
 

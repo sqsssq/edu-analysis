@@ -8,6 +8,7 @@ from .components import (
     TrainerProtocol,
 )
 from .config import DataConfig
+from .continuous import ContinuousAnalysisResult, ContinuousEnergyModel, ContinuousFitResult
 from .data import PreparedData, TabularQualityReport, prepare_tabular_data, validate_tabular_data
 from .evaluation import MomentComparison, compare_moment_orders
 from .manager import MultiDomainManager
@@ -21,6 +22,9 @@ from .visualization import plot_effective_interactions, plot_temperature_respons
 __all__ = [
     "AnalysisResult",
     "AnalyzerProtocol",
+    "ContinuousAnalysisResult",
+    "ContinuousEnergyModel",
+    "ContinuousFitResult",
     "DataConfig",
     "FitResult",
     "LearningEnergyClassifier",
