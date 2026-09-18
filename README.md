@@ -127,6 +127,9 @@ By default it also writes 15 selected PyTorch `.pt` model artifacts under
 
 The visual landing page is [`docs/landing.html`](docs/landing.html). The full searchable documentation is built from [`docs/`](docs/) with MkDocs Material and is available under `/docs/` on GitHub Pages.
 
+For a complete Chinese guide to calling the package for paper reproduction,
+see [`docs/reproduction/PAPER_REPRODUCTION_GUIDE.md`](docs/reproduction/PAPER_REPRODUCTION_GUIDE.md).
+
 Before fitting a local table, callers can inspect input quality without changing the data:
 
 ```python

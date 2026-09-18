@@ -47,6 +47,9 @@ analysis = model.analyze()
 
 Read [Getting Started](getting-started.md) for a complete example.
 
+For a paper-aligned, end-to-end reproduction workflow, see
+[用 `learnenergy` 复现论文](reproduction/PAPER_REPRODUCTION_GUIDE.md).
+
 ## Start with the documentation
 
 - [Methods](guide/methods.md) — objective, normalization, exact enumeration, and Gibbs sampling.
