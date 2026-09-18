@@ -43,6 +43,14 @@ the normal package defaults (`median` or `quantile`) remain unchanged.
 | `mc_min_effective_sample_size` | Minimum accepted ESS | `100` |
 | `mc_max_mcse` | Maximum accepted MCSE | `0.05` |
 
+## Adam compatibility configuration
+
+| Parameter | Meaning | Default |
+| --- | --- | --- |
+| `adam_beta1` | First-moment decay used by `method="adam"` | `0.9` |
+| `adam_beta2` | Second-moment decay used by `method="adam"` | `0.999` |
+| `adam_epsilon` | Numerical stabilizer used by `method="adam"` | `1e-8` |
+
 ## Interpretation of `h` and `J`
 
 `h[i]` is the fitted field for node `i`. `J[i, j]` is the fitted pairwise

@@ -294,6 +294,43 @@ def test_model_switches_to_monte_carlo_above_exact_threshold():
     assert model.sample(10).shape == (10, 4)
 
 
+def test_monte_carlo_adam_compatibility_path_records_optimizer_and_diagnostics(tmp_path):
+    rng = np.random.default_rng(22)
+    X = rng.integers(0, 2, size=(80, 2)).astype(float)
+    y = rng.integers(0, 2, size=80).astype(float)
+    model = LearningModel(
+        DataConfig(feature_names=("a", "b")),
+        calculation="monte_carlo",
+        learning_rate=0.01,
+        max_epochs=3,
+        min_epochs=1,
+        mc_samples=20,
+        mc_burn_in=5,
+        mc_chains=2,
+        seed=22,
+    )
+    result = model.fit(X, y, method="adam")
+    assert result.diagnostics["calculation"] == "monte_carlo"
+    assert result.diagnostics["training_method"] == "adam"
+    assert result.diagnostics["optimizer"] == "adam"
+    assert "max_rhat" in result.diagnostics
+    assert len(result.objective_history) == 3
+    path = tmp_path / "adam.pt"
+    model.save(path)
+    loaded = LearningModel.load(path)
+    assert loaded.adam_beta1 == 0.9
+    assert loaded.adam_beta2 == 0.999
+    assert loaded.adam_epsilon == 1e-8
+
+
+def test_adam_compatibility_path_requires_monte_carlo():
+    X = np.array([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]])
+    y = np.array([0.0, 1.0, 1.0, 1.0])
+    model = LearningModel(DataConfig(feature_names=("a", "b")), calculation="exact")
+    with pytest.raises(ValueError, match="method='adam'"):
+        model.fit(X, y, method="adam")
+
+
 def test_model_accepts_a_replaceable_sampler_component():
     rng = np.random.default_rng(17)
     X = rng.integers(0, 2, size=(20, 2)).astype(float)

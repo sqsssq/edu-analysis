@@ -128,7 +128,7 @@ def build_parser() -> argparse.ArgumentParser:
     fit.add_argument("--target", required=True, help="target column")
     fit.add_argument("--weight", help="optional ordinary row-weight column")
     fit.add_argument("--output", required=True, help="model artifact path")
-    fit.add_argument("--method", choices=("moment_matching", "kl"), default="moment_matching")
+    fit.add_argument("--method", choices=("moment_matching", "kl", "adam"), default="moment_matching")
     fit.add_argument("--missing-strategy", choices=("error", "median", "mean", "zero"), default="error")
     fit.add_argument("--learning-rate", type=float, default=0.05)
     fit.add_argument("--max-epochs", type=int, default=2_000)

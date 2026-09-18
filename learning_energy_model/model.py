@@ -42,6 +42,9 @@ class LearningModel:
         mc_max_rhat: float = 1.1,
         mc_min_effective_sample_size: float = 100.0,
         mc_max_mcse: float = 0.05,
+        adam_beta1: float = 0.9,
+        adam_beta2: float = 0.999,
+        adam_epsilon: float = 1e-8,
         preprocessor: PreprocessorProtocol | None = None,
         sampler: SamplerProtocol | None = None,
         trainer: TrainerProtocol | None = None,
@@ -57,6 +60,12 @@ class LearningModel:
             raise ValueError("mc_min_effective_sample_size must be finite and positive")
         if mc_max_mcse <= 0 or not np.isfinite(mc_max_mcse):
             raise ValueError("mc_max_mcse must be finite and positive")
+        if not 0 < adam_beta1 < 1 or not np.isfinite(adam_beta1):
+            raise ValueError("adam_beta1 must be finite and between 0 and 1")
+        if not 0 < adam_beta2 < 1 or not np.isfinite(adam_beta2):
+            raise ValueError("adam_beta2 must be finite and between 0 and 1")
+        if adam_epsilon <= 0 or not np.isfinite(adam_epsilon):
+            raise ValueError("adam_epsilon must be finite and positive")
         self.config = config or DataConfig()
         self.learning_rate = learning_rate
         self.max_epochs = max_epochs
@@ -71,6 +80,9 @@ class LearningModel:
         self.mc_max_rhat = mc_max_rhat
         self.mc_min_effective_sample_size = mc_min_effective_sample_size
         self.mc_max_mcse = mc_max_mcse
+        self.adam_beta1 = adam_beta1
+        self.adam_beta2 = adam_beta2
+        self.adam_epsilon = adam_epsilon
         self.device = torch.device(device or "cpu")
         self.seed = seed
         self.preprocessor = preprocessor or BinaryPreprocessor(self.config)
@@ -298,6 +310,114 @@ class LearningModel:
         )
         return self.fit_result
 
+    def _fit_adam(self, data: torch.Tensor, weights: torch.Tensor) -> FitResult:
+        """Fit with Monte Carlo moments and the original Adam update style.
+
+        The historical implementation associated with the paper estimates
+        model moments with single-site Monte Carlo and updates the packed
+        fields/couplings with Adam.  This package-native compatibility path
+        keeps the public ``{0, 1}`` energy convention and uses the configured
+        Gibbs sampler, while recording the approximation diagnostics.
+        """
+        if self._states is not None:
+            raise ValueError(
+                "method='adam' is the Monte Carlo compatibility path; "
+                "set calculation='monte_carlo' explicitly"
+            )
+        assert self.h is not None and self.J is not None
+        data_means = self._weighted_mean(data, weights)
+        data_pairs = self._weighted_pairwise(data, weights)
+        first_h = torch.zeros_like(self.h)
+        second_h = torch.zeros_like(self.h)
+        first_J = torch.zeros_like(self.J)
+        second_J = torch.zeros_like(self.J)
+        history: list[float] = []
+        converged = False
+        mean_error = float("inf")
+        correlation_error = float("inf")
+        gradient_norm = float("inf")
+        sampling_diagnostics: dict[str, Any] = {}
+
+        for epoch in range(1, self.max_epochs + 1):
+            model_means, model_pairs, _, sampling_diagnostics = self._model_moments(
+                seed_offset=epoch
+            )
+            mean_gradient = model_means - data_means
+            pair_gradient = model_pairs - data_pairs
+            pair_gradient.fill_diagonal_(0.0)
+            gradient_norm = float(
+                torch.maximum(
+                    torch.max(torch.abs(mean_gradient)),
+                    torch.max(torch.abs(pair_gradient)),
+                )
+            )
+            mean_error = float(torch.max(torch.abs(mean_gradient)))
+            correlation_error = float(torch.max(torch.abs(pair_gradient)))
+            objective = float(
+                torch.cat((mean_gradient.reshape(-1), pair_gradient.reshape(-1))).square().mean()
+            )
+            history.append(objective)
+
+            first_h.mul_(self.adam_beta1).add_(mean_gradient, alpha=1.0 - self.adam_beta1)
+            second_h.mul_(self.adam_beta2).addcmul_(
+                mean_gradient, mean_gradient, value=1.0 - self.adam_beta2
+            )
+            first_J.mul_(self.adam_beta1).add_(pair_gradient, alpha=1.0 - self.adam_beta1)
+            second_J.mul_(self.adam_beta2).addcmul_(
+                pair_gradient, pair_gradient, value=1.0 - self.adam_beta2
+            )
+            bias_one = 1.0 - self.adam_beta1**epoch
+            bias_two = 1.0 - self.adam_beta2**epoch
+            step_h = (first_h / bias_one) / (torch.sqrt(second_h / bias_two) + self.adam_epsilon)
+            step_J = (first_J / bias_one) / (torch.sqrt(second_J / bias_two) + self.adam_epsilon)
+            self.h -= self.learning_rate * step_h
+            self.J -= self.learning_rate * step_J
+            self.J.fill_diagonal_(0.0)
+            self.J.copy_((self.J + self.J.T) / 2)
+
+            if epoch >= self.min_epochs and max(mean_error, correlation_error) <= self.tolerance:
+                converged = True
+                break
+
+        warnings = []
+        sampling_quality_passed, sampling_quality = self._sampling_quality(sampling_diagnostics)
+        if not converged:
+            warnings.append("Monte Carlo Adam training did not reach the requested tolerance")
+        if not sampling_quality_passed:
+            warnings.append("Monte Carlo diagnostics did not meet configured quality thresholds")
+        final_model_means, final_model_pairs, _, final_sampling_diagnostics = self._model_moments(
+            seed_offset=self.max_epochs + 1
+        )
+        self._fitted = True
+        self.fit_result = FitResult(
+            converged=converged,
+            epochs=epoch,
+            objective_history=history,
+            mean_error=mean_error,
+            correlation_error=correlation_error,
+            warnings=warnings,
+            diagnostics={
+                "n_samples": int(data.shape[0]),
+                "n_nodes": int(data.shape[1]),
+                "calculation": "monte_carlo",
+                "training_method": "adam",
+                "optimizer": "adam",
+                "gradient_norm": gradient_norm,
+                "adam_beta1": self.adam_beta1,
+                "adam_beta2": self.adam_beta2,
+                "adam_epsilon": self.adam_epsilon,
+                **final_sampling_diagnostics,
+                **sampling_quality,
+            },
+            observed_means=data_means.detach().cpu().numpy(),
+            model_means=final_model_means.detach().cpu().numpy(),
+            observed_pairwise_moments=data_pairs.detach().cpu().numpy(),
+            model_pairwise_moments=final_model_pairs.detach().cpu().numpy(),
+            observed_higher_order_moments=self._empirical_higher_order_moments(data, weights),
+            model_higher_order_moments=self._higher_order_moments(),
+        )
+        return self.fit_result
+
     def fit(
         self,
         X: Any,
@@ -312,8 +432,8 @@ class LearningModel:
             if not isinstance(result, FitResult):
                 raise TypeError("custom trainer must return a FitResult")
             return result
-        if method not in {"moment_matching", "kl"}:
-            raise ValueError("method must be 'moment_matching' or 'kl'")
+        if method not in {"moment_matching", "kl", "adam"}:
+            raise ValueError("method must be 'moment_matching', 'kl', or 'adam'")
         torch.manual_seed(self.seed)
         binary_X, binary_y = self.preprocessor.fit(X, y).transform(X, y)
         data_np = np.column_stack([binary_X, binary_y])
@@ -358,6 +478,8 @@ class LearningModel:
             )
         if method == "kl":
             return self._fit_kl(data, weights)
+        if method == "adam":
+            return self._fit_adam(data, weights)
         data_means = self._weighted_mean(data, weights)
         data_pairs = self._weighted_pairwise(data, weights)
         history = []
@@ -789,6 +911,9 @@ class LearningModel:
                 "mc_max_rhat": self.mc_max_rhat,
                 "mc_min_effective_sample_size": self.mc_min_effective_sample_size,
                 "mc_max_mcse": self.mc_max_mcse,
+                "adam_beta1": self.adam_beta1,
+                "adam_beta2": self.adam_beta2,
+                "adam_epsilon": self.adam_epsilon,
                 "seed": self.seed,
             },
         }
@@ -803,6 +928,9 @@ class LearningModel:
         settings.setdefault("mc_max_rhat", 1.1)
         settings.setdefault("mc_min_effective_sample_size", 100.0)
         settings.setdefault("mc_max_mcse", 0.05)
+        settings.setdefault("adam_beta1", 0.9)
+        settings.setdefault("adam_beta2", 0.999)
+        settings.setdefault("adam_epsilon", 1e-8)
         model = cls(config, **settings, device=map_location)
         model.artifact_metadata = payload.get(
             "artifact",

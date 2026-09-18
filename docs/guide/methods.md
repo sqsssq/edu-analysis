@@ -41,11 +41,30 @@ every state. The result includes R-hat, effective sample size, and MCSE. A
 sampled result should not be interpreted until those diagnostics pass the
 configured quality thresholds.
 
+The optional compatibility path uses those sampled moments with Adam:
+
+```python
+model = LearningModel(
+    config,
+    calculation="monte_carlo",
+    learning_rate=0.001,
+    mc_samples=2**20,
+    mc_burn_in=1024,
+)
+fit = model.fit(X, y, method="adam")
+```
+
+This follows the original implementation's broad algorithmic pattern
+(``sample moments -> Adam update``), but it keeps the package's `{0, 1}` state
+encoding and uses the package Gibbs sampler. It is therefore a compatibility
+path, not a bit-for-bit replacement for the original C++ spin/Metropolis code.
+
 ## Methods exposed by the API
 
 | Method | Use |
 | --- | --- |
 | `moment_matching` | Iteratively match first- and second-order moments |
 | `kl` | Exact explicit KL-gradient descent |
+| `adam` | Monte Carlo moment estimates with Adam updates; use with `calculation="monte_carlo"` |
 | `exact` calculation | Enumerate all states |
 | `monte_carlo` calculation | Estimate moments with Gibbs sampling |

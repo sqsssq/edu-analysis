@@ -58,7 +58,10 @@ never stored.
 
 `calculation="auto"` uses exact enumeration through `max_exact_nodes` and
 Gibbs sampling above it. Use `"exact"` or `"monte_carlo"` to force a path.
-`method="kl"` is an exact-only explicit KL-gradient path.
+`method="kl"` is an exact-only explicit KL-gradient path. The optional
+`method="adam"` path requires `calculation="monte_carlo"` and follows the
+sampled-moments-plus-Adam pattern of the original implementation while keeping
+the package's binary state and Gibbs sampler.
 
 `FitResult` contains convergence information, sampler quality checks, observed
 and modeled moments through fourth order, and warnings. For sampled fits,

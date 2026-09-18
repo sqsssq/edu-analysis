@@ -142,9 +142,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--training-method",
-        choices=("moment_matching", "kl"),
+        choices=("moment_matching", "kl", "adam"),
         default="moment_matching",
-        help="training objective; kl reproduces the paper's explicit KL-gradient path",
+        help="training objective; kl is exact KL-gradient, adam is Monte Carlo compatibility mode",
     )
     parser.add_argument("--max-epochs", type=int, default=2_000)
     parser.add_argument("--min-epochs", type=int, default=25)

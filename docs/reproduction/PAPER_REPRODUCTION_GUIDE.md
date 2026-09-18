@@ -149,6 +149,22 @@ model.save("data/prepared/TAP-PV1MATH.pt")
 
 说明：`normalization="zscore"` 和 `threshold_method="paper_std"` 是论文复现设置。对经过 z-score 的变量，严格规则 `f > population standard deviation` 等价于 `z > 1`。如果训练自己的数据而不是复现论文，可以根据研究问题改用默认的 median threshold，但必须把配置写进报告。
 
+如果要运行原始仓库风格的近似训练路径，可以改用：
+
+```python
+model = LearningModel(
+    config,
+    calculation="monte_carlo",
+    learning_rate=0.001,
+    mc_samples=2**20,
+    mc_burn_in=1024,
+    seed=7,
+)
+fit = model.fit(X, y, method="adam")
+```
+
+这与原始仓库的“Monte Carlo 估计 moments，再用 Adam 更新”流程相近，但当前包仍使用 `{0, 1}` 状态和 Gibbs sampler；原仓库使用 `{-1, +1}` spin、C++ Metropolis 和 HDF5，因此两条路径的参数不能直接逐项比较。
+
 ## 4. 直接运行论文协议
 
 如果目标是复现论文的批量结果，推荐直接使用项目内 runner。它会：
@@ -250,6 +266,12 @@ model.save("my-learning-energy-model.pt")
 ```
 
 `calculation="auto"` 会在节点数不超过 `max_exact_nodes` 时使用 exact enumeration，节点更多时切换到 Gibbs/Monte Carlo。需要论文级可追溯性时，应显式设置 `calculation`、随机种子、预处理、采样诊断和报告版本。
+
+## 关于不二值化的数据
+
+当前 `LearningModel` 的数学对象是二值 pairwise model，不能只删除二值化步骤后继续使用相同的条件概率、节点冻结和参数解释。连续变量需要新的状态空间、能量函数、采样器和归一化约定。
+
+后续可以增加独立的 continuous 或 mixed-node 模型 API，并保留当前 binary API 的兼容性。例如连续节点可以使用 Gaussian/quadratic energy，混合数据则需要定义离散-连续交互项和相应的 sampler。这个方向应作为独立任务设计和验证，而不是悄悄改变当前包的默认语义。
 
 ## 8. 复现边界
 
