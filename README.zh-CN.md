@@ -81,7 +81,8 @@ python examples/pisa_paper_figures_4_12.py \
 
 脚本生成 9 张 PNG：Figure 3、4、5、6–10 和 11。
 Figure 3 和 Figure 4 的散点使用一致的经济体颜色编码。
-Figure 5 恢复使用全部观测到的 `Jij` 范围，并由 Matplotlib 自动确定横轴。
+Figure 5 会先将 package 的 `{0,1}` 能量系数转换到论文代码的对称自旋坐标
+(`j = -J / 4`)，再使用全部转换后的 `Jij` 范围并由 Matplotlib 自动确定横轴。
 Figure 11 的温度横轴显示范围已调整为 0–4，并使用选出的 `.pt` 模型文件在
 `T=0.05–4.0` 上重新计算 exact covariance 响应。
 

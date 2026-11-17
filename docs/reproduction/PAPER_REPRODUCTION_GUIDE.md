@@ -245,6 +245,8 @@ python examples/pisa_paper_figures_4_12.py \
 
 脚本不会再次读取原始 PISA 行，而是使用报告中的聚合字段和模型 artifact。Figure 11 的温度轴使用 `0–4` 的显示范围，并从选定模型重新计算 `T=0.05–4.0` 的 exact-covariance response。Figure A.12 不属于当前输出集合。
 
+Figure 5 在绘图前会将 package 保存的 `{0,1}` 能量系数转换为论文作者代码的 `{-1,+1}` 对称自旋系数：`j_paper = -J_package / 4`。因此图中的均值、标准差、偏度、峰度和横轴范围都在论文参数坐标下计算，不应与 package 原始 `J` 直接比较。
+
 ## 7. 使用自己的数据
 
 只要数据可以转换为数值特征矩阵和二值目标，就不需要 PISA adapter：

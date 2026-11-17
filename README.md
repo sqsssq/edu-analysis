@@ -128,7 +128,9 @@ python examples/pisa_paper_figures_4_12.py \
 
 This produces nine PNGs: Figures 3–5, 6–10, and 11.
 Figures 3 and 4 use the same economy color mapping for their scatter points.
-Figure 5 uses the full observed `Jij` range with Matplotlib's automatic x-axis.
+Figure 5 converts the package's 0/1 energy couplings to the paper code's
+symmetric-spin convention (`j = -J / 4`) and uses the full converted `Jij`
+range with Matplotlib's automatic x-axis.
 Figure 11 displays the requested temperature axis from 0 to 4 and recomputes
 the exact-covariance curves over `T=0.05–4.0` from the selected `.pt` artifacts.
 

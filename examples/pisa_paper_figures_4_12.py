@@ -37,6 +37,20 @@ def _pearson(x: list[float], y: list[float]) -> float:
     return float(np.corrcoef(left, right)[0, 1])
 
 
+def _paper_spin_couplings(matrix: np.ndarray) -> np.ndarray:
+    """Return upper-triangle couplings in the paper's +/-1 spin convention.
+
+    ``LearningModel`` stores the 0/1 energy coefficients in
+    ``p(s) proportional to exp(-E(s))``.  The historical paper code plots the
+    equivalent coefficients of its symmetric-spin exponent.  With
+    ``sigma = 2*s - 1``, the pair coefficients satisfy ``j = -J / 4``.
+    """
+    values = np.asarray(matrix, dtype=float)
+    if values.ndim != 2 or values.shape[0] != values.shape[1]:
+        raise ValueError("J must be a square matrix")
+    return -values[np.triu_indices_from(values, k=1)] / 4.0
+
+
 def _group_rows(report: dict[str, Any]) -> dict[tuple[str, str], list[dict[str, Any]]]:
     groups: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
     for row in report["results"]:
@@ -170,16 +184,15 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
     fig.suptitle("Figure 4: Comparison of triple and quadruplet correlations")
     outputs.append(_save(fig, destination, 4, "higher-order-correlations"))
 
-    # Figure 5: the paper's order is Math, Reading, Science, with distribution
-    # statistics included in each economy legend entry.
+    # Figure 5: the paper's order is Math, Reading, Science. Convert the
+    # package's 0/1 energy coefficients to the historical paper code's +/-1
+    # symmetric-spin coefficients before computing or plotting statistics.
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.5), sharey=True)
     for axis, outcome in zip(axes, ("PV1MATH", "PV1READ", "PV1SCIE")):
         for economy in ECONOMIES:
-            values: list[float] = []
             row = _selected_row(groups, model_dir, economy, outcome)
             matrix = np.asarray(row["J"], dtype=float)
-            values.extend(matrix[np.triu_indices_from(matrix, k=1)].tolist())
-            values_array = np.asarray(values, dtype=float)
+            values_array = _paper_spin_couplings(matrix)
             centered = values_array - values_array.mean()
             scale = float(values_array.std())
             skew = float((centered**3).mean() / scale**3) if scale else 0.0
@@ -189,13 +202,13 @@ def export_paper_figures(report: dict[str, Any], output_dir: str | Path) -> list
                 f"μ={values_array.mean():.3f} ({scale:.2f})\n"
                 f"skw={skew:.2f}, kur={kurtosis:.2f}"
             )
-            axis.hist(values, bins=35, density=True, histtype="step", linewidth=1.4,
+            axis.hist(values_array, bins=35, density=True, histtype="step", linewidth=1.4,
                       color=ECONOMY_COLORS[economy], label=legend_label)
         axis.set_title(OUTCOME_LABELS[outcome])
-        axis.set_xlabel("Jij")
+        axis.set_xlabel("Jij (paper +/-1-spin convention)")
         axis.legend(frameon=False, fontsize=8)
     axes[0].set_ylabel("Density")
-    fig.suptitle("Figure 5: Jij distributions across five economies")
+    fig.suptitle("Figure 5: Jij distributions across five economies (paper convention)")
     outputs.append(_save(fig, destination, 5, "Jij-distributions"))
 
     # Figures 6--10: one economy per figure, one paper-style panel per outcome.
